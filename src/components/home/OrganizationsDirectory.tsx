@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { School, Baby, Search, Phone, MapPin, Users, Award, ExternalLink, X, Building2 } from 'lucide-react';
+import { School, Baby, Search, Phone, MapPin, Users, Award, ExternalLink, X, Building2, RefreshCw, Database } from 'lucide-react';
 import { usePortal } from '../../context/PortalContext';
 import { Organization } from '../../types';
 
 export const OrganizationsDirectory: React.FC = () => {
-  const { organizations } = usePortal();
+  const { organizations, googleSyncStatus, refreshDataFromSheets } = usePortal();
   const [filterType, setFilterType] = useState<'all' | 'maktab' | 'mtt' | 'ixtisos'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const filteredOrgs = organizations.filter(org => {
     const matchesType = filterType === 'all' || org.type === filterType;
@@ -73,9 +74,9 @@ export const OrganizationsDirectory: React.FC = () => {
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="mb-6 max-w-md">
-          <div className="relative">
+        {/* Search Bar & Live Sheets Sync Button */}
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="relative w-full max-w-md">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
@@ -92,6 +93,31 @@ export const OrganizationsDirectory: React.FC = () => {
                 Tozalash
               </button>
             )}
+          </div>
+
+          {/* Live Sync with Google Sheets indicator & button */}
+          <div className="flex items-center gap-2 shrink-0">
+            {googleSyncStatus.lastSyncedAt && (
+              <span className="hidden lg:inline text-[11px] text-slate-500 font-medium">
+                Sinxronlangan: {googleSyncStatus.lastSyncedAt}
+              </span>
+            )}
+            <button
+              onClick={async () => {
+                setIsRefreshing(true);
+                try {
+                  await refreshDataFromSheets();
+                } finally {
+                  setTimeout(() => setIsRefreshing(false), 600);
+                }
+              }}
+              disabled={isRefreshing || googleSyncStatus.syncing}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold border border-emerald-200 transition-colors shadow-2xs cursor-pointer"
+              title="Google Sheets bazasidagi o'zgarishlarni yuklab olish"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-emerald-600 ${isRefreshing || googleSyncStatus.syncing ? 'animate-spin' : ''}`} />
+              <span>{isRefreshing || googleSyncStatus.syncing ? "Yuklanmoqda..." : "Baza bilan yangilash"}</span>
+            </button>
           </div>
         </div>
 

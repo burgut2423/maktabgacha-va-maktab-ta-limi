@@ -1,6 +1,7 @@
 import { getAccessToken } from './googleAuth';
 import { NewsItem, Organization, Leader, DocumentItem, CitizenAppeal, PortalSettings } from '../types';
 import { INITIAL_NEWS, INITIAL_ORGANIZATIONS, INITIAL_LEADERS, INITIAL_DOCUMENTS, INITIAL_APPEALS, INITIAL_SETTINGS } from '../data/initialData';
+import { PORTAL_CONFIG } from '../config/portalConfig';
 
 const SHEETS_API_URL = 'https://sheets.googleapis.com/v4/spreadsheets';
 const DRIVE_API_URL = 'https://www.googleapis.com/drive/v3';
@@ -17,15 +18,34 @@ export interface PortalAllData {
 }
 
 /**
- * Gets cached spreadsheet ID from storage or null
+ * Extracts raw alphanumeric spreadsheet ID from either a full Google Sheets URL
+ * (e.g. https://docs.google.com/spreadsheets/d/1BxiMVs.../edit) or bare ID
+ */
+export const extractSpreadsheetId = (input: string): string => {
+  if (!input) return '';
+  const trimmed = input.trim();
+  const match = trimmed.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  if (match && match[1]) {
+    return match[1];
+  }
+  return trimmed;
+};
+
+/**
+ * Gets cached spreadsheet ID from storage or configuration
  */
 export const getStoredSpreadsheetId = (): string | null => {
-  return localStorage.getItem(SPREADSHEET_STORAGE_KEY);
+  const stored = localStorage.getItem(SPREADSHEET_STORAGE_KEY);
+  if (stored && stored.trim()) return extractSpreadsheetId(stored);
+  if (PORTAL_CONFIG.DEFAULT_SPREADSHEET_ID && PORTAL_CONFIG.DEFAULT_SPREADSHEET_ID.trim()) {
+    return extractSpreadsheetId(PORTAL_CONFIG.DEFAULT_SPREADSHEET_ID);
+  }
+  return null;
 };
 
 export const setStoredSpreadsheetId = (id: string | null) => {
-  if (id) {
-    localStorage.setItem(SPREADSHEET_STORAGE_KEY, id);
+  if (id && id.trim()) {
+    localStorage.setItem(SPREADSHEET_STORAGE_KEY, extractSpreadsheetId(id));
   } else {
     localStorage.removeItem(SPREADSHEET_STORAGE_KEY);
   }
@@ -226,11 +246,58 @@ export const seedInitialDataToSpreadsheet = async (spreadsheetId: string, token:
 };
 
 /**
- * Reads all portal records from Google Sheets
+ * Reads Google Sheets rows via the Google Visualization (GViz) API.
+ * This works on ANY public Google Sheet ("Anyone with the link can view"),
+ * completely free, without requiring OAuth tokens, backend servers, or API keys!
+ */
+export const fetchSheetRowsViaGviz = async (
+  spreadsheetId: string,
+  sheetName: string
+): Promise<string[][]> => {
+  try {
+    const cleanId = extractSpreadsheetId(spreadsheetId);
+    if (!cleanId) return [];
+
+    const url = `https://docs.google.com/spreadsheets/d/${cleanId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&headers=0`;
+    const res = await fetch(url);
+    if (!res.ok) return [];
+
+    const text = await res.text();
+    const start = text.indexOf('{');
+    const end = text.lastIndexOf('}');
+    if (start === -1 || end === -1) return [];
+
+    const json = JSON.parse(text.substring(start, end + 1));
+    if (!json.table || !json.table.rows) return [];
+
+    return json.table.rows.map((row: any) => {
+      if (!row || !row.c) return [];
+      return row.c.map((cell: any) => {
+        if (!cell) return '';
+        if (cell.v !== undefined && cell.v !== null) return String(cell.v);
+        if (cell.f !== undefined && cell.f !== null) return String(cell.f);
+        return '';
+      });
+    });
+  } catch (e) {
+    console.warn(`GViz fetch warning for sheet "${sheetName}":`, e);
+    return [];
+  }
+};
+
+/**
+ * Reads all portal records from Google Sheets.
+ * Works seamlessly in 3 modes:
+ * 1. Admin OAuth Bearer token (full private access)
+ * 2. Google Sheets API with API Key (public access)
+ * 3. Google Visualization GViz endpoint (universal fallback, zero-auth, zero-cors)
  */
 export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promise<PortalAllData> => {
+  const cleanId = extractSpreadsheetId(spreadsheetId);
+  if (!cleanId) throw new Error("Google Sheets ID topilmadi");
+
   const token = await getAccessToken();
-  if (!token) throw new Error("Google hisobiga ulanmagan");
+  let valueRanges: Array<{ values?: any[][] }> = [];
 
   const ranges = [
     'Yangiliklar!A2:J',
@@ -241,21 +308,77 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
     'Sozlamalar!A2:B'
   ];
 
-  const queryUrl = `${SHEETS_API_URL}/${spreadsheetId}/values:batchGet?${ranges.map(r => `ranges=${encodeURIComponent(r)}`).join('&')}`;
-
-  const res = await fetch(queryUrl, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-
-  if (!res.ok) {
-    throw new Error("Google Sheets'dan ma'lumotlarni o'qib bo'lmadi");
+  // Mode 1: Authenticated Bearer request
+  if (token) {
+    try {
+      const queryUrl = `${SHEETS_API_URL}/${cleanId}/values:batchGet?${ranges.map(r => `ranges=${encodeURIComponent(r)}`).join('&')}`;
+      const res = await fetch(queryUrl, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        valueRanges = data.valueRanges || [];
+      }
+    } catch (e) {
+      console.warn("Bearer fetch failed, falling back to public methods:", e);
+    }
   }
 
-  const data = await res.json();
-  const valueRanges = data.valueRanges || [];
+  // Mode 2: Google Sheets API with public API Key
+  if (!valueRanges || valueRanges.length === 0 || !valueRanges[1]?.values?.length) {
+    try {
+      const apiKey = PORTAL_CONFIG.GOOGLE_API_KEY;
+      if (apiKey) {
+        const queryUrl = `${SHEETS_API_URL}/${cleanId}/values:batchGet?${ranges.map(r => `ranges=${encodeURIComponent(r)}`).join('&')}&key=${apiKey}`;
+        const res = await fetch(queryUrl);
+        if (res.ok) {
+          const data = await res.json();
+          valueRanges = data.valueRanges || [];
+        }
+      }
+    } catch (e) {
+      console.warn("API Key fetch failed, trying GViz fallback:", e);
+    }
+  }
 
-  // Parse News
-  const newsRows = valueRanges[0]?.values || [];
+  // Mode 3: Universal GViz table query fallback
+  if (!valueRanges || valueRanges.length === 0 || !valueRanges[1]?.values?.length) {
+    try {
+      const [newsRows, orgRows, leaderRows, docRows, appealRows, settingsRows] = await Promise.all([
+        fetchSheetRowsViaGviz(cleanId, 'Yangiliklar'),
+        fetchSheetRowsViaGviz(cleanId, 'Tashkilotlar').then(async r => {
+          if (r.length === 0) return await fetchSheetRowsViaGviz(cleanId, 'Tashkilot');
+          if (r.length === 0) return await fetchSheetRowsViaGviz(cleanId, 'Maktablar');
+          return r;
+        }),
+        fetchSheetRowsViaGviz(cleanId, 'Rahbariyat'),
+        fetchSheetRowsViaGviz(cleanId, 'Hujjatlar'),
+        fetchSheetRowsViaGviz(cleanId, 'Murojaatlar'),
+        fetchSheetRowsViaGviz(cleanId, 'Sozlamalar')
+      ]);
+
+      valueRanges = [
+        { values: newsRows },
+        { values: orgRows },
+        { values: leaderRows },
+        { values: docRows },
+        { values: appealRows },
+        { values: settingsRows }
+      ];
+    } catch (e) {
+      console.warn("GViz query fallback encountered an issue:", e);
+    }
+  }
+
+  // Parse News (skip header if present)
+  const rawNewsRows = valueRanges[0]?.values || [];
+  const newsRows = rawNewsRows.filter((r: any[]) => {
+    if (!r || r.length === 0) return false;
+    const txt = r.join(' ').toLowerCase();
+    if (txt.includes('sarlavha') && txt.includes('kategoriya')) return false;
+    return r.some(c => c && String(c).trim().length > 0);
+  });
+
   const news: NewsItem[] = newsRows.map((r: any[], idx: number) => ({
     id: r[0] || `news-${idx + 1}`,
     title: r[1] || 'Yangilik sarlavhasi',
@@ -269,28 +392,86 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
     isPinned: r[9] === 'ha' || r[9] === 'true'
   }));
 
-  // Parse Organizations
-  const orgRows = valueRanges[1]?.values || [];
-  const organizations: Organization[] = orgRows.map((r: any[], idx: number) => ({
-    id: r[0] || `org-${idx + 1}`,
-    type: (r[1] as any) || 'maktab',
-    number: parseInt(r[2] || '1', 10) || 1,
-    name: r[3] || 'Ta\'lim muassasasi',
-    address: r[4] || '',
-    mahalla: r[5] || '',
-    director: r[6] || '',
-    phone: r[7] || '',
-    email: r[8] || '',
-    studentsCount: parseInt(r[9] || '0', 10) || 0,
-    teachersCount: parseInt(r[10] || '0', 10) || 0,
-    shifts: parseInt(r[11] || '1', 10) || 1,
-    establishedYear: parseInt(r[12] || '2000', 10) || 2000,
-    rating: parseFloat(r[13] || '4.5') || 4.5,
-    photoUrl: r[14] || undefined
-  }));
+  // Parse Organizations (robust & resilient against custom headers/columns)
+  const rawOrgRows = valueRanges[1]?.values || [];
+  const orgRows = rawOrgRows.filter((r: any[]) => {
+    if (!r || r.length === 0) return false;
+    const txt = r.join(' ').toLowerCase();
+    if (txt.includes('turi') && (txt.includes('nomi') || txt.includes('raqam'))) return false;
+    if (txt.includes('o\'quvchilar') && txt.includes('direktor')) return false;
+    return r.some(c => c && String(c).trim().length > 0);
+  });
+
+  const organizations: Organization[] = orgRows.map((r: any[], idx: number) => {
+    const col0 = String(r[0] || '').trim();
+    const col1 = String(r[1] || '').trim();
+    const col2 = String(r[2] || '').trim();
+    const col3 = String(r[3] || '').trim();
+    const col4 = String(r[4] || '').trim();
+    const col5 = String(r[5] || '').trim();
+    const col6 = String(r[6] || '').trim();
+    const col7 = String(r[7] || '').trim();
+
+    // Determine type: maktab, mtt, or ixtisos
+    let type: Organization['type'] = 'maktab';
+    if (col1 === 'maktab' || col1 === 'mtt' || col1 === 'ixtisos') {
+      type = col1 as Organization['type'];
+    } else {
+      const fullText = (col0 + ' ' + col1 + ' ' + col2 + ' ' + col3).toLowerCase();
+      if (fullText.includes('mtt') || fullText.includes('bog\'cha') || fullText.includes('bogcha') || fullText.includes('maktabgacha')) {
+        type = 'mtt';
+      } else if (fullText.includes('ixtisos') || fullText.includes('internat')) {
+        type = 'ixtisos';
+      }
+    }
+
+    // Determine number
+    let number = idx + 1;
+    const numInCol2 = parseInt(col2, 10);
+    const numInCol1 = parseInt(col1, 10);
+    const numInCol0 = parseInt(col0, 10);
+    if (!isNaN(numInCol2) && numInCol2 > 0) {
+      number = numInCol2;
+    } else if (!isNaN(numInCol1) && numInCol1 > 0) {
+      number = numInCol1;
+    } else if (!isNaN(numInCol0) && numInCol0 > 0) {
+      number = numInCol0;
+    }
+
+    // Determine name
+    let name = col3 || col2 || col1 || `${number}-sonli ${type === 'mtt' ? 'MTT' : 'maktab'}`;
+    if (/^\d+$/.test(name)) {
+      name = `${name}-sonli ${type === 'mtt' ? 'maktabgacha ta\'lim tashkiloti' : 'umumiy o\'rta ta\'lim maktabi'}`;
+    }
+
+    return {
+      id: col0.startsWith('org-') || col0.startsWith('sch-') || col0.startsWith('mtt-') ? col0 : `org-${type}-${number}-${idx + 1}`,
+      type,
+      number,
+      name,
+      address: col4 || "Qo'shko'pir tumani",
+      mahalla: col5 || "Qo'shko'pir",
+      director: col6 || "Rahbar tayinlanmagan",
+      phone: col7 || "+998 (62) 352-00-00",
+      email: String(r[8] || ""),
+      studentsCount: parseInt(r[9] || '0', 10) || 500,
+      teachersCount: parseInt(r[10] || '0', 10) || 40,
+      shifts: parseInt(r[11] || '1', 10) || 1,
+      establishedYear: parseInt(r[12] || '1990', 10) || 1990,
+      rating: parseFloat(r[13] || '4.8') || 4.8,
+      photoUrl: r[14] || undefined
+    };
+  });
 
   // Parse Leaders
-  const leaderRows = valueRanges[2]?.values || [];
+  const rawLeaderRows = valueRanges[2]?.values || [];
+  const leaderRows = rawLeaderRows.filter((r: any[]) => {
+    if (!r || r.length === 0) return false;
+    const txt = r.join(' ').toLowerCase();
+    if (txt.includes('fio') && txt.includes('lavozim')) return false;
+    return r.some(c => c && String(c).trim().length > 0);
+  });
+
   const leaders: Leader[] = leaderRows.map((r: any[], idx: number) => ({
     id: r[0] || `lead-${idx + 1}`,
     name: r[1] || 'Rahbar FIO',
@@ -306,7 +487,14 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
   }));
 
   // Parse Documents
-  const docRows = valueRanges[3]?.values || [];
+  const rawDocRows = valueRanges[3]?.values || [];
+  const docRows = rawDocRows.filter((r: any[]) => {
+    if (!r || r.length === 0) return false;
+    const txt = r.join(' ').toLowerCase();
+    if (txt.includes('sarlavha') && txt.includes('hujjat')) return false;
+    return r.some(c => c && String(c).trim().length > 0);
+  });
+
   const documents: DocumentItem[] = docRows.map((r: any[], idx: number) => ({
     id: r[0] || `doc-${idx + 1}`,
     title: r[1] || 'Hujjat nomi',
@@ -320,7 +508,14 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
   }));
 
   // Parse Appeals
-  const appealRows = valueRanges[4]?.values || [];
+  const rawAppealRows = valueRanges[4]?.values || [];
+  const appealRows = rawAppealRows.filter((r: any[]) => {
+    if (!r || r.length === 0) return false;
+    const txt = r.join(' ').toLowerCase();
+    if (txt.includes('kuzatuv') && txt.includes('fio')) return false;
+    return r.some(c => c && String(c).trim().length > 0);
+  });
+
   const appeals: CitizenAppeal[] = appealRows.map((r: any[], idx: number) => ({
     id: r[0] || `app-${idx + 1}`,
     trackingCode: r[1] || `QSP-2026-${1000 + idx}`,

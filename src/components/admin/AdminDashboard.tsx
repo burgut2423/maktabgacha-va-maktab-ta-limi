@@ -261,6 +261,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
   const [manualSheetConnecting, setManualSheetConnecting] = useState(false);
   const [manualSheetMsg, setManualSheetMsg] = useState<{ isError: boolean; text: string } | null>(null);
   const [domainCopied, setDomainCopied] = useState(false);
+  const [scriptCopied, setScriptCopied] = useState(false);
 
   // Active input ref for letter helper
   const activeInputRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
@@ -2463,29 +2464,30 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   </div>
                 </div>
 
-                {/* Direct Google Sheets ID Connection (Fallback/Alternative) */}
-                <div className="p-4 rounded bg-slate-50 border border-slate-200 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Database className="w-4 h-4 text-emerald-600" />
-                    <span className="font-bold text-slate-800 text-sm">
-                      Mavjud Google Sheets Jadvalining ID raqami orqali to‘g‘ridan-to‘g‘ri ulash:
+                {/* Google Sheets Installation & Auto-Sync Wizard */}
+                <div className="p-5 rounded-lg bg-emerald-50/70 border border-emerald-300 space-y-4">
+                  <div className="flex items-center gap-2 text-emerald-950">
+                    <Database className="w-5 h-5 text-emerald-700" />
+                    <span className="font-bold text-sm">
+                      Google Sheets Bazasini Saytga O‘rnatish va Bog‘lash (Instalizatsiya)
                     </span>
                   </div>
-                  <p className="text-slate-600 text-xs leading-relaxed">
-                    Agar Firebase orqali Google hisobiga ulanish kutilayotgan bo‘lsa yoki jadval boshqa hisobda bo‘lsa, ushbu maydonga Google Sheets jadvalining ID sini kiritib, darhol ma’lumotlarni yuklab olishingiz mumkin.
+                  <p className="text-slate-700 text-xs leading-relaxed">
+                    Ushbu maydonga Google Sheets jadvalingizning to‘liq havolasini (masalan: <code className="bg-white px-1.5 py-0.5 rounded border text-slate-800">https://docs.google.com/spreadsheets/d/.../edit</code>) yoki faqat ID sini kiriting va <strong>«O‘rnatish va Bog‘lash»</strong> tugmasini bosing.
                   </p>
+
                   <div className="flex flex-col sm:flex-row gap-2">
                     <input
                       type="text"
-                      placeholder="Masalan: 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
+                      placeholder="Google Sheets havolasi yoki ID raqami..."
                       value={manualSheetInput}
                       onChange={e => setManualSheetInput(e.target.value)}
-                      className="flex-1 px-3 py-2 rounded border border-slate-300 font-mono text-xs focus:border-sky-500"
+                      className="flex-1 px-3 py-2 rounded border border-slate-300 font-mono text-xs focus:border-emerald-600 bg-white"
                     />
                     <button
                       onClick={async () => {
                         if (!manualSheetInput.trim()) {
-                          alert("Iltimos, Google Sheets ID sini kiriting.");
+                          alert("Iltimos, Google Sheets havolasi yoki ID sini kiriting.");
                           return;
                         }
                         setManualSheetConnecting(true);
@@ -2493,9 +2495,15 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                         try {
                           const success = await connectSpreadsheetById(manualSheetInput.trim());
                           if (success) {
-                            setManualSheetMsg({ isError: false, text: "Google Sheets muvaffaqiyatli ulandi va ma’lumotlar yangilandi!" });
+                            setManualSheetMsg({
+                              isError: false,
+                              text: `Muvaffaqiyatli o‘rnatildi! Google Sheets bazasi bog‘landi (${organizations.length} ta tashkilot yuklandi). Sayt har 30 soniyada va har safar jadvaldan qaytganingizda avtomatik yangilanadi!`
+                            });
                           } else {
-                            setManualSheetMsg({ isError: true, text: "Google Sheets jadvaliga ulanib bo‘lmadi. Jadval barchaga 'O‘qish va tahrirlash' huquqi bilan ulashilganligini tekshiring." });
+                            setManualSheetMsg({
+                              isError: true,
+                              text: "Google Sheets jadvaliga ulanib bo‘lmadi. Jadvalda «Поделиться» (Share) tugmasini bosib, «Все, у кого есть ссылка» (Havolasi bo‘lgan har kim - Читатель) qilib qo‘yilganligini tekshiring."
+                            });
                           }
                         } catch (e: any) {
                           setManualSheetMsg({ isError: true, text: e.message || "Ulanishda xatolik yuz berdi." });
@@ -2504,20 +2512,68 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                         }
                       }}
                       disabled={manualSheetConnecting}
-                      className="px-4 py-2 rounded bg-sky-700 hover:bg-sky-800 text-white font-bold flex items-center justify-center gap-1.5 shadow-2xs transition-colors"
+                      className="px-5 py-2 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-bold flex items-center justify-center gap-1.5 shadow-xs transition-colors cursor-pointer"
                     >
                       {manualSheetConnecting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                      <span>{manualSheetConnecting ? "Ulanmoqda..." : "Jadvalni Ulash"}</span>
+                      <span>{manualSheetConnecting ? "O‘rnatilmoqda..." : "O‘rnatish va Bog‘lash"}</span>
                     </button>
                   </div>
 
                   {manualSheetMsg && (
-                    <div className={`p-2.5 rounded text-xs font-semibold ${
-                      manualSheetMsg.isError ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                    <div className={`p-3 rounded text-xs font-semibold ${
+                      manualSheetMsg.isError ? 'bg-red-50 text-red-700 border border-red-300' : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
                     }`}>
                       {manualSheetMsg.text}
                     </div>
                   )}
+
+                  {/* Real-time synchronization explanation */}
+                  <div className="bg-white p-3.5 rounded border border-slate-200 text-xs text-slate-700 space-y-2">
+                    <span className="font-bold text-slate-900 block text-xs">Jadvalda o‘zgarish bo‘lganda sayt qanday avtomatik yangilanadi?</span>
+                    <ul className="list-disc list-inside space-y-1 text-slate-600">
+                      <li><strong>Tab Focus (Tezkor)</strong>: Google Sheets’da katakni o‘zgartirib, sayt oynasiga qaytishingiz bilanoq, sayt o‘z-o‘zidan darhol yangilanadi.</li>
+                      <li><strong>Fonda avto-tekshirish</strong>: Sayt ochiq turganda ham har 30 soniyada Google Sheets’dan yangi o‘zgarishlarni tortib oladi.</li>
+                      <li><strong>Tashkilotlar sahifasida tugma</strong>: Sayt bosh sahifasidagi «Baza bilan yangilash» tugmasi orqali ham istalgan paytda bir bosishda yangilash mumkin.</li>
+                    </ul>
+                  </div>
+
+                  {/* Google Apps Script automation code snippet */}
+                  <div className="bg-slate-900 text-slate-100 p-4 rounded-lg space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-xs text-emerald-400">
+                        Google Apps Script (onEdit) avtomatlashtirish kodi:
+                      </span>
+                      <button
+                        onClick={() => {
+                          const script = `/**
+ * Qo'shko'pir MMTB Rasmiy Baza Avto-Sinxronizatsiya Skripti
+ * Ushbu skript Google Sheets'da biror katak o'zgarganda avtomatik ishlaydi.
+ */
+function onEdit(e) {
+  var sheet = e.source.getActiveSheet();
+  Logger.log("Katak yangilandi: " + sheet.getName() + " -> " + e.range.getA1Notation());
+}`;
+                          navigator.clipboard.writeText(script);
+                          setScriptCopied(true);
+                          setTimeout(() => setScriptCopied(false), 3000);
+                        }}
+                        className="px-2.5 py-1 rounded bg-slate-700 hover:bg-slate-600 text-white text-[11px] font-semibold flex items-center gap-1 transition-colors"
+                      >
+                        {scriptCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        <span>{scriptCopied ? "Nusxalandi!" : "Kodni nusxalash"}</span>
+                      </button>
+                    </div>
+                    <pre className="text-[11px] font-mono text-emerald-300 overflow-x-auto p-2 bg-black/40 rounded">
+{`function onEdit(e) {
+  // Google Sheets'da katak o'zgarganda avtomatik yoziladi
+  var sheet = e.source.getActiveSheet();
+  Logger.log("Katak yangilandi: " + sheet.getName() + " -> " + e.range.getA1Notation());
+}`}
+                    </pre>
+                    <p className="text-[11px] text-slate-400 leading-normal">
+                      O‘rnatish: Google Sheets jadvalingizda <strong>Расширения (Extensions) &rarr; Apps Script</strong> ni bosing, ushbu kodni qo‘yib <strong>Сохранить (Save)</strong> tugmasini bosing.
+                    </p>
+                  </div>
                 </div>
 
                 {/* Storage Schema Details */}

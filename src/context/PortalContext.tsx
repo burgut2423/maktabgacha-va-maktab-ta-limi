@@ -14,9 +14,12 @@ import {
   getOrCreateSpreadsheet,
   fetchAllPortalDataFromSheets,
   syncAllDataToGoogleSheets,
-  getStoredSpreadsheetId
+  getStoredSpreadsheetId,
+  setStoredSpreadsheetId,
+  extractSpreadsheetId
 } from '../services/googleSheets';
 import { getOrCreatePortalFolder } from '../services/googleDrive';
+import { PORTAL_CONFIG } from '../config/portalConfig';
 
 interface PortalContextType {
   // State
@@ -33,6 +36,7 @@ interface PortalContextType {
   loginWithGoogle: () => Promise<void>;
   loginWithGoogleRedirect: () => Promise<void>;
   connectSpreadsheetById: (sheetId: string) => Promise<boolean>;
+  refreshDataFromSheets: (targetId?: string) => Promise<void>;
   logoutGoogle: () => Promise<void>;
   syncNow: () => Promise<void>;
 
@@ -256,6 +260,129 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return () => unsubscribe();
   }, []);
 
+  // Universal Public/Auth Sheets Synchronization
+  const refreshDataFromSheets = useCallback(async (targetId?: string) => {
+    const rawId = targetId || googleSyncStatus.spreadsheetId || getStoredSpreadsheetId() || settings.googleSpreadsheetId;
+    if (!rawId) return;
+    const cleanId = extractSpreadsheetId(rawId);
+    if (!cleanId) return;
+
+    try {
+      setGoogleSyncStatus(prev => ({ ...prev, syncing: true, error: null }));
+      const loaded = await fetchAllPortalDataFromSheets(cleanId);
+      if (loaded) {
+        if (loaded.organizations && loaded.organizations.length > 0) {
+          setOrganizations(loaded.organizations);
+          try {
+            localStorage.setItem(`${LOCAL_STORAGE_KEY}_orgs`, JSON.stringify(loaded.organizations));
+          } catch {}
+        }
+        if (loaded.news && loaded.news.length > 0) {
+          setNews(loaded.news);
+          try {
+            localStorage.setItem(`${LOCAL_STORAGE_KEY}_news`, JSON.stringify(loaded.news));
+          } catch {}
+        }
+        if (loaded.leaders && loaded.leaders.length > 0) {
+          setLeaders(loaded.leaders);
+          try {
+            localStorage.setItem(`${LOCAL_STORAGE_KEY}_leaders`, JSON.stringify(loaded.leaders));
+          } catch {}
+        }
+        if (loaded.documents && loaded.documents.length > 0) {
+          setDocuments(loaded.documents);
+          try {
+            localStorage.setItem(`${LOCAL_STORAGE_KEY}_docs`, JSON.stringify(loaded.documents));
+          } catch {}
+        }
+        if (loaded.appeals && loaded.appeals.length > 0) {
+          setAppeals(loaded.appeals);
+          try {
+            localStorage.setItem(`${LOCAL_STORAGE_KEY}_appeals`, JSON.stringify(loaded.appeals));
+          } catch {}
+        }
+        if (loaded.settings) {
+          setSettings(prev => ({ ...prev, ...loaded.settings, googleSpreadsheetId: cleanId }));
+        }
+      }
+      setGoogleSyncStatus(prev => ({
+        ...prev,
+        spreadsheetId: cleanId,
+        spreadsheetUrl: `https://docs.google.com/spreadsheets/d/${cleanId}/edit`,
+        syncing: false,
+        lastSyncedAt: new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' }),
+        error: null
+      }));
+    } catch (err: any) {
+      console.warn("Google Sheets yangilanishida ogohlantirish:", err);
+      setGoogleSyncStatus(prev => ({
+        ...prev,
+        syncing: false
+      }));
+    }
+  }, [googleSyncStatus.spreadsheetId, settings.googleSpreadsheetId]);
+
+  // Initial auto-sync and periodic background poll from Google Sheets
+  useEffect(() => {
+    // 1. Detect spreadsheet ID from URL query ?sheet=... or ?spreadsheetId=...
+    try {
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const urlSheet = params.get('sheet') || params.get('spreadsheetId');
+        if (urlSheet) {
+          const clean = extractSpreadsheetId(urlSheet);
+          setStoredSpreadsheetId(clean);
+          setGoogleSyncStatus(prev => ({
+            ...prev,
+            spreadsheetId: clean,
+            spreadsheetUrl: `https://docs.google.com/spreadsheets/d/${clean}/edit`
+          }));
+          refreshDataFromSheets(clean);
+          // Clean param from address bar without reloading
+          const cleanUrl = window.location.pathname + window.location.hash;
+          window.history.replaceState({}, '', cleanUrl);
+          return;
+        }
+      }
+    } catch {}
+
+    // 2. Initial fetch if ID already configured
+    const initialId = getStoredSpreadsheetId() || settings.googleSpreadsheetId;
+    if (initialId) {
+      refreshDataFromSheets(initialId);
+    }
+
+    // 3. Periodic background poll (every 30 seconds)
+    const interval = setInterval(() => {
+      const activeId = getStoredSpreadsheetId() || settings.googleSpreadsheetId;
+      if (activeId) {
+        refreshDataFromSheets(activeId);
+      }
+    }, PORTAL_CONFIG.AUTO_REFRESH_INTERVAL_MS || 30000);
+
+    // 4. Instant synchronization when user switches back to website tab
+    const handleTabFocus = () => {
+      const activeId = getStoredSpreadsheetId() || settings.googleSpreadsheetId;
+      if (activeId) {
+        refreshDataFromSheets(activeId);
+      }
+    };
+
+    window.addEventListener('focus', handleTabFocus);
+    const handleVisibility = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        handleTabFocus();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleTabFocus);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [refreshDataFromSheets, settings.googleSpreadsheetId]);
+
   const loginWithGoogle = async () => {
     try {
       setGoogleSyncStatus(prev => ({ ...prev, syncing: true, error: null }));
@@ -322,20 +449,58 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const connectSpreadsheetById = async (sheetId: string): Promise<boolean> => {
     try {
+      const clean = extractSpreadsheetId(sheetId);
+      if (!clean) return false;
+
       setGoogleSyncStatus(prev => ({ ...prev, syncing: true, error: null }));
-      const loaded = await fetchAllPortalDataFromSheets(sheetId.trim());
-      setNews(loaded.news);
-      setOrganizations(loaded.organizations);
-      setLeaders(loaded.leaders);
-      setDocuments(loaded.documents);
-      setAppeals(loaded.appeals);
-      setSettings(loaded.settings);
+      setStoredSpreadsheetId(clean);
+
+      const loaded = await fetchAllPortalDataFromSheets(clean);
+      if (loaded) {
+        if (loaded.organizations && loaded.organizations.length > 0) {
+          setOrganizations(loaded.organizations);
+          try {
+            localStorage.setItem(`${LOCAL_STORAGE_KEY}_orgs`, JSON.stringify(loaded.organizations));
+          } catch {}
+        }
+        if (loaded.news && loaded.news.length > 0) {
+          setNews(loaded.news);
+          try {
+            localStorage.setItem(`${LOCAL_STORAGE_KEY}_news`, JSON.stringify(loaded.news));
+          } catch {}
+        }
+        if (loaded.leaders && loaded.leaders.length > 0) {
+          setLeaders(loaded.leaders);
+          try {
+            localStorage.setItem(`${LOCAL_STORAGE_KEY}_leaders`, JSON.stringify(loaded.leaders));
+          } catch {}
+        }
+        if (loaded.documents && loaded.documents.length > 0) {
+          setDocuments(loaded.documents);
+          try {
+            localStorage.setItem(`${LOCAL_STORAGE_KEY}_docs`, JSON.stringify(loaded.documents));
+          } catch {}
+        }
+        if (loaded.appeals && loaded.appeals.length > 0) {
+          setAppeals(loaded.appeals);
+          try {
+            localStorage.setItem(`${LOCAL_STORAGE_KEY}_appeals`, JSON.stringify(loaded.appeals));
+          } catch {}
+        }
+        if (loaded.settings) {
+          setSettings(prev => ({ ...prev, ...loaded.settings, googleSpreadsheetId: clean }));
+        } else {
+          setSettings(prev => ({ ...prev, googleSpreadsheetId: clean }));
+        }
+      }
+
       setGoogleSyncStatus(prev => ({
         ...prev,
         isConnected: true,
-        spreadsheetId: sheetId.trim(),
-        spreadsheetUrl: `https://docs.google.com/spreadsheets/d/${sheetId.trim()}/edit`,
+        spreadsheetId: clean,
+        spreadsheetUrl: `https://docs.google.com/spreadsheets/d/${clean}/edit`,
         syncing: false,
+        lastSyncedAt: new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' }),
         error: null
       }));
       return true;
@@ -587,6 +752,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         loginWithGoogle,
         loginWithGoogleRedirect,
         connectSpreadsheetById,
+        refreshDataFromSheets,
         logoutGoogle,
         syncNow,
         addNews,

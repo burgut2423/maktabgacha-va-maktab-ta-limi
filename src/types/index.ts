@@ -141,6 +141,7 @@ export interface PortalSettings {
   instagramAccountId: string;
   instagramAccessToken: string;
   instagramAutoPublish: boolean;
+  googleSpreadsheetId?: string;
 }
 
 export interface GoogleSyncStatus {
