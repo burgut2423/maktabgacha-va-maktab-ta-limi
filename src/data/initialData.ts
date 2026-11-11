@@ -238,6 +238,40 @@ export const INITIAL_NEWS: NewsItem[] = [
 
 export const INITIAL_ORGANIZATIONS: Organization[] = [
   {
+    id: "mtt-12",
+    type: "mtt",
+    number: 12,
+    name: "12-sonli 'Kamalak' davlat maktabgacha ta'lim tashkiloti",
+    address: "Qo'shko'pir tumani, G'azovot qishlog'i",
+    mahalla: "G'azovot mahallasi",
+    director: "Ibragimova Nodira Qodirovna",
+    phone: "+998 (62) 352-18-12",
+    email: "mtt12.qoshkopir@edu.uz",
+    studentsCount: 190,
+    teachersCount: 22,
+    shifts: 1,
+    establishedYear: 2020,
+    rating: 4.7,
+    photoUrl: preschoolBuilding
+  },
+  {
+    id: "org-1",
+    type: "maktab",
+    number: 1,
+    name: "1-son maktab",
+    address: "Shaxarda",
+    mahalla: "Markaz",
+    director: "Avezov Furqatbek",
+    phone: "+998 (62) 352-19-02",
+    email: "maktab1.qoshkopir@edu.uz",
+    studentsCount: 350,
+    teachersCount: 45,
+    shifts: 1,
+    establishedYear: 1990,
+    rating: 4.5,
+    photoUrl: heroImage
+  },
+  {
     id: "sch-1",
     type: "ixtisos",
     number: 1,

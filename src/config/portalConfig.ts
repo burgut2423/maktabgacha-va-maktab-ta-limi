@@ -5,8 +5,8 @@
  */
 
 export const PORTAL_CONFIG = {
-  // Asosiy Google Sheets ID si (admin kiritganda saqlanadi yoki bo'sh qoldiriladi)
-  DEFAULT_SPREADSHEET_ID: "",
+  // Asosiy Google Sheets ID si (barcha brauzerlar va fuqarolar uchun yagona rasmiy baza)
+  DEFAULT_SPREADSHEET_ID: "14xTiUicc9FL23qpE2pBljDazsYDlaw57mbR8Ua_QABk",
 
   // Google Sheets API ommaviy kaliti
   GOOGLE_API_KEY: "AIzaSyBszmlCmVIcCdE4zsGwA4JMbk7Xg_HcTCc",
