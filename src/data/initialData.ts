@@ -1,4 +1,5 @@
 import { NewsItem, Organization, Leader, DocumentItem, CitizenAppeal, PortalSettings } from '../types';
+import { heroImage, headPortrait, preschoolBuilding, conferenceImage } from '../assets/images';
 
 export const INITIAL_SETTINGS: PortalSettings = {
   districtName: "Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi",
@@ -22,7 +23,7 @@ export const INITIAL_SETTINGS: PortalSettings = {
   heroTitle: "Ta'lim va tarbiya — kelajak poydevori, ma'rifatli avlod kafolati",
   heroSubtitle: "Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi tizimidagi 54 ta umumta'lim maktabi hamda 42 ta davlat va xususiy MTTlar faoliyatini yagona raqamli platforma orqali kuzatib boring.",
   heroBadgeText: "Xorazm viloyati · Qo'shko'pir tumani",
-  heroImageUrl: "/src/assets/images/hero_education_district_1794303548345.jpg",
+  heroImageUrl: heroImage,
   quickServices: [
     {
       id: "srv-1",
@@ -153,7 +154,7 @@ export const INITIAL_LEADERS: Leader[] = [
     receptionDays: "Har haftaning chorshanba va juma kunlari",
     receptionHours: "10:00 - 12:00",
     bio: "Pedagogika fanlari bo'yicha falsafa doktori (PhD). Ta'lim sohasida 22 yildan ortiq tajribaga ega. Tuman umumta'lim tizimini raqamlashtirish va maktabgacha ta'lim qamrovini 85% ga oshirish tashabbuskori.",
-    photoUrl: "/src/assets/images/department_head_portrait_1794303519848.jpg",
+    photoUrl: headPortrait,
     order: 1
   },
   {
@@ -166,7 +167,7 @@ export const INITIAL_LEADERS: Leader[] = [
     receptionDays: "Har haftaning seshanba va payshanba kunlari",
     receptionHours: "14:00 - 17:00",
     bio: "Oliy toifali matematika fani o'qituvchisi. Tuman maktablarida aniq fanlar chuqurlashtirilgan sinflari va olimpiada markazlarini tashkil etish bo'yicha mas'ul rahbar.",
-    photoUrl: "/src/assets/images/department_head_portrait_1794303519848.jpg",
+    photoUrl: headPortrait,
     order: 2
   },
   {
@@ -179,7 +180,7 @@ export const INITIAL_LEADERS: Leader[] = [
     receptionDays: "Har haftaning dushanba va chorshanba kunlari",
     receptionHours: "09:00 - 12:00",
     bio: "Maktabgacha ta'lim a'lochisi. Davlat va nodavlat MTTlar tarmog'ini rivojlantirish hamda 'Aqlvoy' dasturi joriy etilishi bo'yicha yetakchi mutaxassis.",
-    photoUrl: "/src/assets/images/department_head_portrait_1794303519848.jpg",
+    photoUrl: headPortrait,
     order: 3
   }
 ];
@@ -192,7 +193,7 @@ export const INITIAL_NEWS: NewsItem[] = [
     date: "2026-11-08",
     summary: "Tumanning Shixmashhad mahallasida 660 o'ringa mo'ljallangan zamonaviy 14-sonli umumiy o'rta ta'lim maktabining yangi binosi tantanali ravishda ochildi.",
     content: "O'zbekiston Respublikasi Prezidentining ta'lim sifatini oshirish va maktab infratuzilmasini yaxshilashga doir qarorlari ijrosi doirasida Qo'shko'pir tumanida navbatdagi zamonaviy ta'lim muassasasi qad rostladi. Yangi maktab binosida eng so'nggi rusumdagi STEM laboratoriyalari, interaktiv multimedia sinfxonalari, keng sport zali va zamonaviy kutubxona mavjud. Ochilish marosimida tuman hokimligi, viloyat va tuman maktabgacha va maktab ta'limi bo'limi rahbariyati, nuroniylar hamda ota-onalar ishtirok etishdi.",
-    imageUrl: "/src/assets/images/hero_education_district_1794303548345.jpg",
+    imageUrl: heroImage,
     author: "Matbuot xizmati",
     views: 1240,
     isPinned: true
@@ -204,7 +205,7 @@ export const INITIAL_NEWS: NewsItem[] = [
     date: "2026-11-05",
     summary: "Maktabgacha yoshdagi bolalarni sifatli ta'lim bilan qamrab olish ko'rsatkichi Qo'shko'pirda 85 foizga yetkazildi.",
     content: "Bo'limning maktabgacha ta'lim sho'basi tashabbusi bilan tuman markazidagi 5-sonli 'Mitti Qadamlar' davlat maktabgacha ta'lim tashkilotida seminar-trening tashkil etildi. Treningda tarbiyachilar yangi interaktiv didaktik o'yinlar, bolalarni maktabga tayyorlashning zamonaviy metodikalari hamda sensor rivojlanish vositalarini amaliyotda qo'llash ko'nikmalarini mustahkamladilar.",
-    imageUrl: "/src/assets/images/preschool_mtt_building_1794303520561.jpg",
+    imageUrl: preschoolBuilding,
     author: "Maktabgacha ta'lim sho'basi",
     views: 890,
     isPinned: true
@@ -216,7 +217,7 @@ export const INITIAL_NEWS: NewsItem[] = [
     date: "2026-10-29",
     summary: "Qo'shko'pir tumanidagi 500 dan ortiq yetakchi fan o'qituvchilari ishtirokida ilmiy-amaliy anjuman bo'lib o'tdi.",
     content: "O'quvchilarning mantiqiy, tanqidiy fikrlashini o'stirish, fanlararo integratsiyani ta'minlash va yangi darsliklar bilan ishlash bo'yicha mahorat darslari o'tkazildi. Forum yakunida yuqori natijalarga erishgan 25 nafar fidoiy o'qituvchi bo'limning faxriy yorliqlari va esdalik sovg'alari bilan taqdirlandi.",
-    imageUrl: "/src/assets/images/teachers_conference_1794303520010.jpg",
+    imageUrl: conferenceImage,
     author: "Metodika sho'basi",
     views: 645,
     isPinned: false
@@ -228,7 +229,7 @@ export const INITIAL_NEWS: NewsItem[] = [
     date: "2026-10-21",
     summary: "Matematika, fizika, kimyo va xorijiy tillar yo'nalishlarida Qo'shko'pir yoshlari yuqori bilim saviyasini namoyon qildilar.",
     content: "G'olib o'quvchilar endi viloyat bosqichida tuman sharafini himoya qiladilar. Eng yuqori natijani 1-sonli ixtisoslashtirilgan maktab-internati hamda 14-sonli umumiy o'rta ta'lim maktabi o'quvchilari qayd etishdi.",
-    imageUrl: "/src/assets/images/hero_education_district_1794303548345.jpg",
+    imageUrl: heroImage,
     author: "Iqtidorli yoshlar sho'basi",
     views: 780,
     isPinned: false
@@ -251,7 +252,7 @@ export const INITIAL_ORGANIZATIONS: Organization[] = [
     shifts: 1,
     establishedYear: 1998,
     rating: 4.9,
-    photoUrl: "/src/assets/images/hero_education_district_1794303548345.jpg"
+    photoUrl: heroImage
   },
   {
     id: "sch-14",
@@ -268,7 +269,7 @@ export const INITIAL_ORGANIZATIONS: Organization[] = [
     shifts: 2,
     establishedYear: 1982,
     rating: 4.8,
-    photoUrl: "/src/assets/images/hero_education_district_1794303548345.jpg"
+    photoUrl: heroImage
   },
   {
     id: "sch-2",
@@ -285,7 +286,7 @@ export const INITIAL_ORGANIZATIONS: Organization[] = [
     shifts: 2,
     establishedYear: 1975,
     rating: 4.7,
-    photoUrl: "/src/assets/images/hero_education_district_1794303548345.jpg"
+    photoUrl: heroImage
   },
   {
     id: "sch-23",
@@ -302,7 +303,7 @@ export const INITIAL_ORGANIZATIONS: Organization[] = [
     shifts: 2,
     establishedYear: 1990,
     rating: 4.6,
-    photoUrl: "/src/assets/images/hero_education_district_1794303548345.jpg"
+    photoUrl: heroImage
   },
   {
     id: "mtt-5",
@@ -319,7 +320,7 @@ export const INITIAL_ORGANIZATIONS: Organization[] = [
     shifts: 1,
     establishedYear: 2018,
     rating: 4.9,
-    photoUrl: "/src/assets/images/preschool_mtt_building_1794303520561.jpg"
+    photoUrl: preschoolBuilding
   },
   {
     id: "mtt-12",
@@ -336,7 +337,7 @@ export const INITIAL_ORGANIZATIONS: Organization[] = [
     shifts: 1,
     establishedYear: 2020,
     rating: 4.7,
-    photoUrl: "/src/assets/images/preschool_mtt_building_1794303520561.jpg"
+    photoUrl: preschoolBuilding
   }
 ];
 

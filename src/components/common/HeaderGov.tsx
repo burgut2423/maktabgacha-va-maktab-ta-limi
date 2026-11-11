@@ -13,6 +13,7 @@ import {
   Database
 } from 'lucide-react';
 import { usePortal } from '../../context/PortalContext';
+import { stateEmblem } from '../../assets/images';
 
 interface HeaderGovProps {
   onOpenAdmin: () => void;
@@ -201,7 +202,7 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
           className="flex items-center gap-3.5 cursor-pointer group shrink-0"
         >
           <img
-            src="/src/assets/images/state_emblem_uzb_1794303518799.jpg"
+            src={stateEmblem}
             alt="O'zbekiston Davlat Gerbi"
             className="w-12 h-12 object-contain drop-shadow-xs group-hover:scale-105 transition-transform"
             referrerPolicy="no-referrer"

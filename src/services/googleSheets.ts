@@ -263,7 +263,7 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
     date: r[3] || new Date().toISOString().split('T')[0],
     summary: r[4] || '',
     content: r[5] || '',
-    imageUrl: r[6] || '/src/assets/images/hero_education_district_1794303548345.jpg',
+    imageUrl: r[6] || './assets/images/hero_education_district_1794303548345.jpg',
     author: r[7] || 'Matbuot xizmati',
     views: parseInt(r[8] || '0', 10) || 0,
     isPinned: r[9] === 'ha' || r[9] === 'true'
@@ -301,7 +301,7 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
     receptionDays: r[6] || '',
     receptionHours: r[7] || '',
     bio: r[8] || '',
-    photoUrl: r[9] || '/src/assets/images/department_head_portrait_1794303519848.jpg',
+    photoUrl: r[9] || './assets/images/department_head_portrait_1794303519848.jpg',
     order: parseInt(r[10] || `${idx + 1}`, 10) || idx + 1
   }));
 

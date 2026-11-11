@@ -1,6 +1,7 @@
 import React from 'react';
 import { ShieldCheck, ExternalLink, Phone, Mail, MapPin } from 'lucide-react';
 import { usePortal } from '../../context/PortalContext';
+import { stateEmblem } from '../../assets/images';
 
 export const FooterGov: React.FC<{ onOpenAdmin: () => void; onNavigate: (s: string) => void }> = ({
   onOpenAdmin,
@@ -26,7 +27,7 @@ export const FooterGov: React.FC<{ onOpenAdmin: () => void; onNavigate: (s: stri
           <div className="lg:col-span-5 space-y-4">
             <div className="flex items-center gap-3">
               <img
-                src="/src/assets/images/state_emblem_uzb_1794303518799.jpg"
+                src={stateEmblem}
                 alt="Davlat Gerbi"
                 className="w-10 h-10 object-contain"
                 referrerPolicy="no-referrer"

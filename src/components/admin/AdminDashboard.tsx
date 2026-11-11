@@ -1409,7 +1409,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   {leaders.map(ldr => (
                     <div key={ldr.id} className="p-4 rounded border border-slate-200 bg-slate-50 flex gap-3 text-xs">
                       <img
-                        src={ldr.photoUrl || '/assets/aistudio/image_0a3ac00b.png'}
+                        src={ldr.photoUrl || './assets/aistudio/image_0a3ac00b.png'}
                         alt={ldr.name}
                         className="w-16 h-20 object-cover rounded border border-slate-300 shrink-0"
                       />
@@ -1600,7 +1600,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                     >
                       <div className="flex items-start gap-3 flex-1">
                         <img
-                          src={item.imageUrl || '/assets/aistudio/image_0a3ac00b.png'}
+                          src={item.imageUrl || './assets/aistudio/image_0a3ac00b.png'}
                           alt=""
                           className="w-16 h-16 rounded object-cover border border-slate-300 shrink-0"
                         />
@@ -2609,7 +2609,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                     date: newsModal.item.date || new Date().toISOString().split('T')[0],
                     summary: fixUzbekText(newsModal.item.summary || ''),
                     content: fixUzbekText(newsModal.item.content || ''),
-                    imageUrl: newsModal.item.imageUrl || '/assets/aistudio/image_0a3ac00b.png',
+                    imageUrl: newsModal.item.imageUrl || './assets/aistudio/image_0a3ac00b.png',
                     driveFileId: newsModal.item.driveFileId,
                     author: fixUzbekText(newsModal.item.author || "Qo‘shko‘pir MMTB Matbuot xizmati"),
                     views: newsModal.item.views || 100,
@@ -3242,7 +3242,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                     receptionDays: fixUzbekText(leaderModal.item.receptionDays || 'Har kuni'),
                     receptionHours: leaderModal.item.receptionHours || '09:00 - 12:00',
                     bio: fixUzbekText(leaderModal.item.bio || ''),
-                    photoUrl: leaderModal.item.photoUrl || '/assets/aistudio/image_0a3ac00b.png',
+                    photoUrl: leaderModal.item.photoUrl || './assets/aistudio/image_0a3ac00b.png',
                     order: leaderModal.item.order || leaders.length + 1
                   };
                   if (leaderModal.isEdit) {
