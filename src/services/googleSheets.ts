@@ -1,0 +1,486 @@
+import { getAccessToken } from './googleAuth';
+import { NewsItem, Organization, Leader, DocumentItem, CitizenAppeal, PortalSettings } from '../types';
+import { INITIAL_NEWS, INITIAL_ORGANIZATIONS, INITIAL_LEADERS, INITIAL_DOCUMENTS, INITIAL_APPEALS, INITIAL_SETTINGS } from '../data/initialData';
+
+const SHEETS_API_URL = 'https://sheets.googleapis.com/v4/spreadsheets';
+const DRIVE_API_URL = 'https://www.googleapis.com/drive/v3';
+const SPREADSHEET_TITLE = "Qo'shko'pir_MMTB_Rasmiy_Baza";
+const SPREADSHEET_STORAGE_KEY = 'qoshkopir_mmtb_spreadsheet_id';
+
+export interface PortalAllData {
+  news: NewsItem[];
+  organizations: Organization[];
+  leaders: Leader[];
+  documents: DocumentItem[];
+  appeals: CitizenAppeal[];
+  settings: PortalSettings;
+}
+
+/**
+ * Gets cached spreadsheet ID from storage or null
+ */
+export const getStoredSpreadsheetId = (): string | null => {
+  return localStorage.getItem(SPREADSHEET_STORAGE_KEY);
+};
+
+export const setStoredSpreadsheetId = (id: string | null) => {
+  if (id) {
+    localStorage.setItem(SPREADSHEET_STORAGE_KEY, id);
+  } else {
+    localStorage.removeItem(SPREADSHEET_STORAGE_KEY);
+  }
+};
+
+/**
+ * Finds or creates the official Google Spreadsheet in user's Drive
+ */
+export const getOrCreateSpreadsheet = async (): Promise<{ id: string; url: string; isNew: boolean }> => {
+  const token = await getAccessToken();
+  if (!token) throw new Error("Google hisobiga ulanmagan");
+
+  // 1. Check if stored ID still exists and is accessible
+  const existingId = getStoredSpreadsheetId();
+  if (existingId) {
+    try {
+      const checkRes = await fetch(`${SHEETS_API_URL}/${existingId}?fields=spreadsheetId,spreadsheetUrl,properties.title`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (checkRes.ok) {
+        const data = await checkRes.json();
+        return {
+          id: data.spreadsheetId,
+          url: data.spreadsheetUrl || `https://docs.google.com/spreadsheets/d/${data.spreadsheetId}/edit`,
+          isNew: false
+        };
+      }
+    } catch {
+      // Ignore and continue search
+    }
+  }
+
+  // 2. Search Drive for existing spreadsheet
+  const query = encodeURIComponent(`name = '${SPREADSHEET_TITLE}' and mimeType = 'application/vnd.google-apps.spreadsheet' and trashed = false`);
+  const searchRes = await fetch(`${DRIVE_API_URL}/files?q=${query}&fields=files(id,name,webViewLink)`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  if (searchRes.ok) {
+    const searchData = await searchRes.json();
+    if (searchData.files && searchData.files.length > 0) {
+      const file = searchData.files[0];
+      setStoredSpreadsheetId(file.id);
+      return {
+        id: file.id,
+        url: file.webViewLink || `https://docs.google.com/spreadsheets/d/${file.id}/edit`,
+        isNew: false
+      };
+    }
+  }
+
+  // 3. Create a brand new spreadsheet with structured sheets
+  const createPayload = {
+    properties: {
+      title: SPREADSHEET_TITLE
+    },
+    sheets: [
+      { properties: { title: 'Yangiliklar' } },
+      { properties: { title: 'Tashkilotlar' } },
+      { properties: { title: 'Rahbariyat' } },
+      { properties: { title: 'Hujjatlar' } },
+      { properties: { title: 'Murojaatlar' } },
+      { properties: { title: 'Sozlamalar' } }
+    ]
+  };
+
+  const createRes = await fetch(SHEETS_API_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(createPayload)
+  });
+
+  if (!createRes.ok) {
+    const errText = await createRes.text();
+    throw new Error(`Google Sheets yaratishda xatolik: ${errText}`);
+  }
+
+  const newSheet = await createRes.json();
+  const spreadsheetId = newSheet.spreadsheetId;
+  const spreadsheetUrl = newSheet.spreadsheetUrl || `https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit`;
+
+  setStoredSpreadsheetId(spreadsheetId);
+
+  // Seed default data into newly created spreadsheet
+  await seedInitialDataToSpreadsheet(spreadsheetId, token);
+
+  return {
+    id: spreadsheetId,
+    url: spreadsheetUrl,
+    isNew: true
+  };
+};
+
+/**
+ * Seeds initial demo data to Google Sheets
+ */
+export const seedInitialDataToSpreadsheet = async (spreadsheetId: string, token: string) => {
+  const newsRows = [
+    ['ID', 'Sarlavha', 'Kategoriya', 'Sana', 'Qisqacha', 'Matn', 'RasmURL', 'Muallif', 'Ko\'rishlar', 'Muhim'],
+    ...INITIAL_NEWS.map(n => [
+      n.id, n.title, n.category, n.date, n.summary, n.content, n.imageUrl, n.author, n.views.toString(), n.isPinned ? 'ha' : 'yoq'
+    ])
+  ];
+
+  const orgRows = [
+    ['ID', 'Turi', 'Raqam', 'Nomi', 'Manzil', 'Mahalla', 'Direktor', 'Telefon', 'Email', 'O\'quvchilar', 'O\'qituvchilar', 'Smena', 'TashkilQilinganYil', 'Reyting', 'RasmURL'],
+    ...INITIAL_ORGANIZATIONS.map(o => [
+      o.id, o.type, o.number.toString(), o.name, o.address, o.mahalla, o.director, o.phone, o.email,
+      o.studentsCount.toString(), o.teachersCount.toString(), o.shifts.toString(), o.establishedYear.toString(), o.rating.toString(), o.photoUrl || ''
+    ])
+  ];
+
+  const leaderRows = [
+    ['ID', 'FIO', 'Lavozim', 'Bo\'lim', 'Telefon', 'Email', 'QabulKunlari', 'QabulVaqti', 'Biografiya', 'RasmURL', 'Tartib'],
+    ...INITIAL_LEADERS.map(l => [
+      l.id, l.name, l.position, l.department, l.phone, l.email, l.receptionDays, l.receptionHours, l.bio, l.photoUrl, l.order.toString()
+    ])
+  ];
+
+  const docRows = [
+    ['ID', 'Sarlavha', 'HujjatRaqami', 'Sana', 'Kategoriya', 'FaylURL', 'DriveFileId', 'Hajm', 'FaylTuri'],
+    ...INITIAL_DOCUMENTS.map(d => [
+      d.id, d.title, d.docNumber, d.date, d.category, d.fileUrl, d.driveFileId || '', d.fileSize, d.fileType
+    ])
+  ];
+
+  const appealRows = [
+    ['ID', 'KuzatuvKodi', 'FIO', 'Telefon', 'Email', 'Manzil', 'Tashkilot', 'Mavzu', 'MurojaatMatni', 'Sana', 'Holat', 'JavobMatni', 'JavobSanasi', 'Mas\'ul'],
+    ...INITIAL_APPEALS.map(a => [
+      a.id, a.trackingCode, a.fullName, a.phone, a.email || '', a.address, a.organizationType, a.subject, a.message, a.date, a.status,
+      a.replyMessage || '', a.replyDate || '', a.officer || ''
+    ])
+  ];
+
+  const settingsRows = [
+    ['Kalit', 'Qiymat'],
+    ['districtName', INITIAL_SETTINGS.districtName],
+    ['departmentPhone', INITIAL_SETTINGS.departmentPhone],
+    ['trustPhone', INITIAL_SETTINGS.trustPhone],
+    ['email', INITIAL_SETTINGS.email],
+    ['address', INITIAL_SETTINGS.address],
+    ['workingHours', INITIAL_SETTINGS.workingHours],
+    ['telegramChannel', INITIAL_SETTINGS.telegramChannel],
+    ['facebookPage', INITIAL_SETTINGS.facebookPage],
+    ['youtubeChannel', INITIAL_SETTINGS.youtubeChannel],
+    ['schoolsCount', INITIAL_SETTINGS.schoolsCount.toString()],
+    ['mttsCount', INITIAL_SETTINGS.mttsCount.toString()],
+    ['studentsTotal', INITIAL_SETTINGS.studentsTotal.toString()],
+    ['teachersTotal', INITIAL_SETTINGS.teachersTotal.toString()],
+    ['specializedSchoolsCount', INITIAL_SETTINGS.specializedSchoolsCount.toString()],
+    ['higherCategoryTeachersCount', INITIAL_SETTINGS.higherCategoryTeachersCount.toString()],
+    ['marqueeText', INITIAL_SETTINGS.marqueeText],
+    ['heroTitle', INITIAL_SETTINGS.heroTitle],
+    ['heroSubtitle', INITIAL_SETTINGS.heroSubtitle],
+    ['heroBadgeText', INITIAL_SETTINGS.heroBadgeText],
+    ['heroImageUrl', INITIAL_SETTINGS.heroImageUrl],
+    ['quickServices', JSON.stringify(INITIAL_SETTINGS.quickServices)],
+    ['departmentHistory', INITIAL_SETTINGS.departmentHistory],
+    ['departmentMission', INITIAL_SETTINGS.departmentMission],
+    ['departmentCharter', INITIAL_SETTINGS.departmentCharter],
+    ['tasksList', JSON.stringify(INITIAL_SETTINGS.tasksList)],
+    ['branches', JSON.stringify(INITIAL_SETTINGS.branches)],
+    ['telegramBotToken', INITIAL_SETTINGS.telegramBotToken],
+    ['telegramChannelUsername', INITIAL_SETTINGS.telegramChannelUsername],
+    ['telegramAutoPublish', INITIAL_SETTINGS.telegramAutoPublish ? 'ha' : 'yoq'],
+    ['facebookPageId', INITIAL_SETTINGS.facebookPageId],
+    ['facebookPageToken', INITIAL_SETTINGS.facebookPageToken],
+    ['facebookAutoPublish', INITIAL_SETTINGS.facebookAutoPublish ? 'ha' : 'yoq'],
+    ['instagramPage', INITIAL_SETTINGS.instagramPage],
+    ['instagramAccountId', INITIAL_SETTINGS.instagramAccountId],
+    ['instagramAccessToken', INITIAL_SETTINGS.instagramAccessToken],
+    ['instagramAutoPublish', INITIAL_SETTINGS.instagramAutoPublish ? 'ha' : 'yoq']
+  ];
+
+  const valueRanges = [
+    { range: 'Yangiliklar!A1:J', values: newsRows },
+    { range: 'Tashkilotlar!A1:O', values: orgRows },
+    { range: 'Rahbariyat!A1:K', values: leaderRows },
+    { range: 'Hujjatlar!A1:I', values: docRows },
+    { range: 'Murojaatlar!A1:N', values: appealRows },
+    { range: 'Sozlamalar!A1:B', values: settingsRows }
+  ];
+
+  await fetch(`${SHEETS_API_URL}/${spreadsheetId}/values:batchUpdate`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      valueInputOption: 'USER_ENTERED',
+      data: valueRanges
+    })
+  });
+};
+
+/**
+ * Reads all portal records from Google Sheets
+ */
+export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promise<PortalAllData> => {
+  const token = await getAccessToken();
+  if (!token) throw new Error("Google hisobiga ulanmagan");
+
+  const ranges = [
+    'Yangiliklar!A2:J',
+    'Tashkilotlar!A2:O',
+    'Rahbariyat!A2:K',
+    'Hujjatlar!A2:I',
+    'Murojaatlar!A2:N',
+    'Sozlamalar!A2:B'
+  ];
+
+  const queryUrl = `${SHEETS_API_URL}/${spreadsheetId}/values:batchGet?${ranges.map(r => `ranges=${encodeURIComponent(r)}`).join('&')}`;
+
+  const res = await fetch(queryUrl, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  if (!res.ok) {
+    throw new Error("Google Sheets'dan ma'lumotlarni o'qib bo'lmadi");
+  }
+
+  const data = await res.json();
+  const valueRanges = data.valueRanges || [];
+
+  // Parse News
+  const newsRows = valueRanges[0]?.values || [];
+  const news: NewsItem[] = newsRows.map((r: any[], idx: number) => ({
+    id: r[0] || `news-${idx + 1}`,
+    title: r[1] || 'Yangilik sarlavhasi',
+    category: (r[2] as any) || 'Boshqaruv',
+    date: r[3] || new Date().toISOString().split('T')[0],
+    summary: r[4] || '',
+    content: r[5] || '',
+    imageUrl: r[6] || '/src/assets/images/hero_education_district_1794303548345.jpg',
+    author: r[7] || 'Matbuot xizmati',
+    views: parseInt(r[8] || '0', 10) || 0,
+    isPinned: r[9] === 'ha' || r[9] === 'true'
+  }));
+
+  // Parse Organizations
+  const orgRows = valueRanges[1]?.values || [];
+  const organizations: Organization[] = orgRows.map((r: any[], idx: number) => ({
+    id: r[0] || `org-${idx + 1}`,
+    type: (r[1] as any) || 'maktab',
+    number: parseInt(r[2] || '1', 10) || 1,
+    name: r[3] || 'Ta\'lim muassasasi',
+    address: r[4] || '',
+    mahalla: r[5] || '',
+    director: r[6] || '',
+    phone: r[7] || '',
+    email: r[8] || '',
+    studentsCount: parseInt(r[9] || '0', 10) || 0,
+    teachersCount: parseInt(r[10] || '0', 10) || 0,
+    shifts: parseInt(r[11] || '1', 10) || 1,
+    establishedYear: parseInt(r[12] || '2000', 10) || 2000,
+    rating: parseFloat(r[13] || '4.5') || 4.5,
+    photoUrl: r[14] || undefined
+  }));
+
+  // Parse Leaders
+  const leaderRows = valueRanges[2]?.values || [];
+  const leaders: Leader[] = leaderRows.map((r: any[], idx: number) => ({
+    id: r[0] || `lead-${idx + 1}`,
+    name: r[1] || 'Rahbar FIO',
+    position: r[2] || 'Lavozim',
+    department: r[3] || 'Bo\'lim',
+    phone: r[4] || '',
+    email: r[5] || '',
+    receptionDays: r[6] || '',
+    receptionHours: r[7] || '',
+    bio: r[8] || '',
+    photoUrl: r[9] || '/src/assets/images/department_head_portrait_1794303519848.jpg',
+    order: parseInt(r[10] || `${idx + 1}`, 10) || idx + 1
+  }));
+
+  // Parse Documents
+  const docRows = valueRanges[3]?.values || [];
+  const documents: DocumentItem[] = docRows.map((r: any[], idx: number) => ({
+    id: r[0] || `doc-${idx + 1}`,
+    title: r[1] || 'Hujjat nomi',
+    docNumber: r[2] || '',
+    date: r[3] || '',
+    category: (r[4] as any) || 'Bo\'lim buyruqlari',
+    fileUrl: r[5] || 'https://drive.google.com',
+    driveFileId: r[6] || undefined,
+    fileSize: r[7] || '1.0 MB',
+    fileType: r[8] || 'PDF'
+  }));
+
+  // Parse Appeals
+  const appealRows = valueRanges[4]?.values || [];
+  const appeals: CitizenAppeal[] = appealRows.map((r: any[], idx: number) => ({
+    id: r[0] || `app-${idx + 1}`,
+    trackingCode: r[1] || `QSP-2026-${1000 + idx}`,
+    fullName: r[2] || 'Fuqaro',
+    phone: r[3] || '',
+    email: r[4] || undefined,
+    address: r[5] || '',
+    organizationType: r[6] || '',
+    subject: r[7] || '',
+    message: r[8] || '',
+    date: r[9] || '',
+    status: (r[10] as any) || 'yangi',
+    replyMessage: r[11] || undefined,
+    replyDate: r[12] || undefined,
+    officer: r[13] || undefined
+  }));
+
+  // Parse Settings
+  const settingsRows = valueRanges[5]?.values || [];
+  const settingsObj: Record<string, any> = { ...INITIAL_SETTINGS };
+  settingsRows.forEach((r: any[]) => {
+    if (r[0] && r[1] !== undefined) {
+      if (['schoolsCount', 'mttsCount', 'studentsTotal', 'teachersTotal', 'specializedSchoolsCount', 'higherCategoryTeachersCount'].includes(r[0])) {
+        settingsObj[r[0]] = parseInt(r[1], 10) || 0;
+      } else if (r[0] === 'quickServices' || r[0] === 'tasksList' || r[0] === 'branches') {
+        try {
+          settingsObj[r[0]] = JSON.parse(r[1]);
+        } catch {
+          // Keep default
+        }
+      } else if (r[0] === 'telegramAutoPublish' || r[0] === 'facebookAutoPublish' || r[0] === 'instagramAutoPublish') {
+        settingsObj[r[0]] = r[1] === 'ha' || r[1] === 'true';
+      } else {
+        settingsObj[r[0]] = r[1];
+      }
+    }
+  });
+
+  return {
+    news: news.length > 0 ? news : INITIAL_NEWS,
+    organizations: organizations.length > 0 ? organizations : INITIAL_ORGANIZATIONS,
+    leaders: leaders.length > 0 ? leaders : INITIAL_LEADERS,
+    documents: documents.length > 0 ? documents : INITIAL_DOCUMENTS,
+    appeals: appeals.length > 0 ? appeals : INITIAL_APPEALS,
+    settings: settingsObj as PortalSettings
+  };
+};
+
+/**
+ * Saves all current state to Google Sheets
+ */
+export const syncAllDataToGoogleSheets = async (
+  spreadsheetId: string,
+  data: PortalAllData
+): Promise<void> => {
+  const token = await getAccessToken();
+  if (!token) throw new Error("Google hisobiga ulanmagan");
+
+  // First clear old contents
+  const clearPromises = [
+    'Yangiliklar!A2:J',
+    'Tashkilotlar!A2:O',
+    'Rahbariyat!A2:K',
+    'Hujjatlar!A2:I',
+    'Murojaatlar!A2:N',
+    'Sozlamalar!A2:B'
+  ].map(range =>
+    fetch(`${SHEETS_API_URL}/${spreadsheetId}/values/${encodeURIComponent(range)}:clear`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` }
+    })
+  );
+  await Promise.all(clearPromises);
+
+  // Prepare updated values
+  const newsRows = data.news.map(n => [
+    n.id, n.title, n.category, n.date, n.summary, n.content, n.imageUrl, n.author, n.views.toString(), n.isPinned ? 'ha' : 'yoq'
+  ]);
+
+  const orgRows = data.organizations.map(o => [
+    o.id, o.type, o.number.toString(), o.name, o.address, o.mahalla, o.director, o.phone, o.email,
+    o.studentsCount.toString(), o.teachersCount.toString(), o.shifts.toString(), o.establishedYear.toString(), o.rating.toString(), o.photoUrl || ''
+  ]);
+
+  const leaderRows = data.leaders.map(l => [
+    l.id, l.name, l.position, l.department, l.phone, l.email, l.receptionDays, l.receptionHours, l.bio, l.photoUrl, l.order.toString()
+  ]);
+
+  const docRows = data.documents.map(d => [
+    d.id, d.title, d.docNumber, d.date, d.category, d.fileUrl, d.driveFileId || '', d.fileSize, d.fileType
+  ]);
+
+  const appealRows = data.appeals.map(a => [
+    a.id, a.trackingCode, a.fullName, a.phone, a.email || '', a.address, a.organizationType, a.subject, a.message, a.date, a.status,
+    a.replyMessage || '', a.replyDate || '', a.officer || ''
+  ]);
+
+  const s = data.settings;
+  const settingsRows = [
+    ['districtName', s.districtName],
+    ['departmentPhone', s.departmentPhone],
+    ['trustPhone', s.trustPhone],
+    ['email', s.email],
+    ['address', s.address],
+    ['workingHours', s.workingHours],
+    ['telegramChannel', s.telegramChannel],
+    ['facebookPage', s.facebookPage],
+    ['youtubeChannel', s.youtubeChannel],
+    ['schoolsCount', s.schoolsCount.toString()],
+    ['mttsCount', s.mttsCount.toString()],
+    ['studentsTotal', s.studentsTotal.toString()],
+    ['teachersTotal', s.teachersTotal.toString()],
+    ['specializedSchoolsCount', s.specializedSchoolsCount.toString()],
+    ['higherCategoryTeachersCount', s.higherCategoryTeachersCount.toString()],
+    ['marqueeText', s.marqueeText],
+    ['heroTitle', s.heroTitle || ''],
+    ['heroSubtitle', s.heroSubtitle || ''],
+    ['heroBadgeText', s.heroBadgeText || ''],
+    ['heroImageUrl', s.heroImageUrl || ''],
+    ['quickServices', JSON.stringify(s.quickServices || [])],
+    ['departmentHistory', s.departmentHistory || ''],
+    ['departmentMission', s.departmentMission || ''],
+    ['departmentCharter', s.departmentCharter || ''],
+    ['tasksList', JSON.stringify(s.tasksList || [])],
+    ['branches', JSON.stringify(s.branches || [])],
+    ['telegramBotToken', s.telegramBotToken || ''],
+    ['telegramChannelUsername', s.telegramChannelUsername || ''],
+    ['telegramAutoPublish', s.telegramAutoPublish ? 'ha' : 'yoq'],
+    ['facebookPageId', s.facebookPageId || ''],
+    ['facebookPageToken', s.facebookPageToken || ''],
+    ['facebookAutoPublish', s.facebookAutoPublish ? 'ha' : 'yoq'],
+    ['instagramPage', s.instagramPage || ''],
+    ['instagramAccountId', s.instagramAccountId || ''],
+    ['instagramAccessToken', s.instagramAccessToken || ''],
+    ['instagramAutoPublish', s.instagramAutoPublish ? 'ha' : 'yoq']
+  ];
+
+  const updateData = [
+    { range: 'Yangiliklar!A2:J', values: newsRows },
+    { range: 'Tashkilotlar!A2:O', values: orgRows },
+    { range: 'Rahbariyat!A2:K', values: leaderRows },
+    { range: 'Hujjatlar!A2:I', values: docRows },
+    { range: 'Murojaatlar!A2:N', values: appealRows },
+    { range: 'Sozlamalar!A2:B', values: settingsRows }
+  ];
+
+  const res = await fetch(`${SHEETS_API_URL}/${spreadsheetId}/values:batchUpdate`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      valueInputOption: 'USER_ENTERED',
+      data: updateData
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Google Sheets yangilashda xatolik: ${err}`);
+  }
+};

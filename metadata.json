@@ -1,0 +1,6 @@
+{
+  "name": "Qo'shko'pir Tumani Maktabgacha va Maktab Ta'limi Bo'limi",
+  "description": "Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limining rasmiy portali. Yangiliklar, maktablar va MTTlar ro'yxati, interaktiv xizmatlar va to'liq boshqaruv tizimi.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

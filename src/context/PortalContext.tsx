@@ -1,0 +1,572 @@
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { User } from 'firebase/auth';
+import { NewsItem, Organization, Leader, DocumentItem, CitizenAppeal, PortalSettings, GoogleSyncStatus } from '../types';
+import {
+  INITIAL_NEWS,
+  INITIAL_ORGANIZATIONS,
+  INITIAL_LEADERS,
+  INITIAL_DOCUMENTS,
+  INITIAL_APPEALS,
+  INITIAL_SETTINGS
+} from '../data/initialData';
+import { initAuth, googleSignIn, logout, getCurrentUser } from '../services/googleAuth';
+import {
+  getOrCreateSpreadsheet,
+  fetchAllPortalDataFromSheets,
+  syncAllDataToGoogleSheets,
+  getStoredSpreadsheetId
+} from '../services/googleSheets';
+import { getOrCreatePortalFolder } from '../services/googleDrive';
+
+interface PortalContextType {
+  // State
+  news: NewsItem[];
+  organizations: Organization[];
+  leaders: Leader[];
+  documents: DocumentItem[];
+  appeals: CitizenAppeal[];
+  settings: PortalSettings;
+
+  // Google Integration
+  user: User | null;
+  googleSyncStatus: GoogleSyncStatus;
+  loginWithGoogle: () => Promise<void>;
+  logoutGoogle: () => Promise<void>;
+  syncNow: () => Promise<void>;
+
+  // CRUD actions
+  addNews: (item: Omit<NewsItem, 'id' | 'views'>) => Promise<void>;
+  updateNews: (item: NewsItem) => Promise<void>;
+  deleteNews: (id: string) => Promise<void>;
+
+  addOrganization: (item: Omit<Organization, 'id'>) => Promise<void>;
+  updateOrganization: (item: Organization) => Promise<void>;
+  deleteOrganization: (id: string) => Promise<void>;
+
+  addLeader: (item: Omit<Leader, 'id'>) => Promise<void>;
+  updateLeader: (item: Leader) => Promise<void>;
+  deleteLeader: (id: string) => Promise<void>;
+
+  addDocument: (item: Omit<DocumentItem, 'id'>) => Promise<void>;
+  updateDocument: (item: DocumentItem) => Promise<void>;
+  deleteDocument: (id: string) => Promise<void>;
+
+  submitCitizenAppeal: (data: Omit<CitizenAppeal, 'id' | 'trackingCode' | 'date' | 'status'>) => Promise<string>;
+  updateAppeal: (item: CitizenAppeal) => Promise<void>;
+  deleteAppeal: (id: string) => Promise<void>;
+
+  updateSettings: (newSettings: Partial<PortalSettings>) => Promise<void>;
+
+  // Accessibility
+  fontSize: 'normal' | 'large' | 'xlarge';
+  setFontSize: (size: 'normal' | 'large' | 'xlarge') => void;
+  contrastMode: 'normal' | 'high' | 'grayscale';
+  setContrastMode: (mode: 'normal' | 'high' | 'grayscale') => void;
+  speakText: (text: string) => void;
+  stopSpeaking: () => void;
+  isSpeaking: boolean;
+}
+
+const PortalContext = createContext<PortalContextType | undefined>(undefined);
+
+const LOCAL_STORAGE_KEY = 'qoshkopir_portal_data_v1';
+
+export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Load initial local data if cached
+  const [news, setNews] = useState<NewsItem[]>(() => {
+    try {
+      const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_news`);
+      return saved ? JSON.parse(saved) : INITIAL_NEWS;
+    } catch {
+      return INITIAL_NEWS;
+    }
+  });
+
+  const [organizations, setOrganizations] = useState<Organization[]>(() => {
+    try {
+      const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_orgs`);
+      return saved ? JSON.parse(saved) : INITIAL_ORGANIZATIONS;
+    } catch {
+      return INITIAL_ORGANIZATIONS;
+    }
+  });
+
+  const [leaders, setLeaders] = useState<Leader[]>(() => {
+    try {
+      const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_leaders`);
+      return saved ? JSON.parse(saved) : INITIAL_LEADERS;
+    } catch {
+      return INITIAL_LEADERS;
+    }
+  });
+
+  const [documents, setDocuments] = useState<DocumentItem[]>(() => {
+    try {
+      const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_docs`);
+      return saved ? JSON.parse(saved) : INITIAL_DOCUMENTS;
+    } catch {
+      return INITIAL_DOCUMENTS;
+    }
+  });
+
+  const [appeals, setAppeals] = useState<CitizenAppeal[]>(() => {
+    try {
+      const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_appeals`);
+      return saved ? JSON.parse(saved) : INITIAL_APPEALS;
+    } catch {
+      return INITIAL_APPEALS;
+    }
+  });
+
+  const [settings, setSettings] = useState<PortalSettings>(() => {
+    try {
+      const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_settings`);
+      return saved ? JSON.parse(saved) : INITIAL_SETTINGS;
+    } catch {
+      return INITIAL_SETTINGS;
+    }
+  });
+
+  // Google State
+  const [user, setUser] = useState<User | null>(null);
+  const [googleSyncStatus, setGoogleSyncStatus] = useState<GoogleSyncStatus>({
+    isConnected: false,
+    spreadsheetId: getStoredSpreadsheetId(),
+    spreadsheetUrl: null,
+    folderId: null,
+    folderUrl: null,
+    lastSyncedAt: null,
+    syncing: false,
+    error: null
+  });
+
+  // Accessibility State
+  const [fontSize, setFontSizeState] = useState<'normal' | 'large' | 'xlarge'>('normal');
+  const [contrastMode, setContrastModeState] = useState<'normal' | 'high' | 'grayscale'>('normal');
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  // Sync to local storage
+  useEffect(() => {
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_news`, JSON.stringify(news));
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_orgs`, JSON.stringify(organizations));
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_leaders`, JSON.stringify(leaders));
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_docs`, JSON.stringify(documents));
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_appeals`, JSON.stringify(appeals));
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_settings`, JSON.stringify(settings));
+    } catch (e) {
+      console.warn("Mahalliy xotiraga yozishda cheklov:", e);
+    }
+  }, [news, organizations, leaders, documents, appeals, settings]);
+
+  // Synchronize with Google Sheets
+  const triggerGoogleSheetsSync = useCallback(async (
+    targetSpreadsheetId?: string,
+    stateOverride?: {
+      news?: NewsItem[];
+      organizations?: Organization[];
+      leaders?: Leader[];
+      documents?: DocumentItem[];
+      appeals?: CitizenAppeal[];
+      settings?: PortalSettings;
+    }
+  ) => {
+    const sheetId = targetSpreadsheetId || googleSyncStatus.spreadsheetId || getStoredSpreadsheetId();
+    if (!sheetId) return;
+
+    try {
+      setGoogleSyncStatus(prev => ({ ...prev, syncing: true, error: null }));
+      await syncAllDataToGoogleSheets(sheetId, {
+        news: stateOverride?.news || news,
+        organizations: stateOverride?.organizations || organizations,
+        leaders: stateOverride?.leaders || leaders,
+        documents: stateOverride?.documents || documents,
+        appeals: stateOverride?.appeals || appeals,
+        settings: stateOverride?.settings || settings
+      });
+
+      setGoogleSyncStatus(prev => ({
+        ...prev,
+        syncing: false,
+        lastSyncedAt: new Date().toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' }),
+        error: null
+      }));
+    } catch (err: any) {
+      console.error("Google Sheets sinxronlashda xatolik:", err);
+      setGoogleSyncStatus(prev => ({
+        ...prev,
+        syncing: false,
+        error: err.message || "Google Sheets bilan bog'lanishda xatolik"
+      }));
+    }
+  }, [news, organizations, leaders, documents, appeals, settings, googleSyncStatus.spreadsheetId]);
+
+  // Initialize Auth
+  useEffect(() => {
+    const unsubscribe = initAuth(
+      async (authUser, token) => {
+        setUser(authUser);
+        if (token) {
+          // Connected with valid token - check or create spreadsheet
+          try {
+            setGoogleSyncStatus(prev => ({ ...prev, syncing: true, isConnected: true }));
+            const sheetInfo = await getOrCreateSpreadsheet();
+            const folderId = await getOrCreatePortalFolder();
+
+            setGoogleSyncStatus(prev => ({
+              ...prev,
+              isConnected: true,
+              spreadsheetId: sheetInfo.id,
+              spreadsheetUrl: sheetInfo.url,
+              folderId: folderId,
+              folderUrl: `https://drive.google.com/drive/folders/${folderId}`,
+              syncing: false,
+              error: null
+            }));
+
+            // If existing spreadsheet, load data from it
+            if (!sheetInfo.isNew) {
+              const loaded = await fetchAllPortalDataFromSheets(sheetInfo.id);
+              setNews(loaded.news);
+              setOrganizations(loaded.organizations);
+              setLeaders(loaded.leaders);
+              setDocuments(loaded.documents);
+              setAppeals(loaded.appeals);
+              setSettings(loaded.settings);
+            }
+          } catch (err: any) {
+            console.warn("Google Sheets dastlabki tekshiruvida xatolik:", err);
+            setGoogleSyncStatus(prev => ({
+              ...prev,
+              isConnected: true,
+              syncing: false,
+              error: err.message
+            }));
+          }
+        }
+      },
+      () => {
+        setUser(null);
+        setGoogleSyncStatus(prev => ({ ...prev, isConnected: false, syncing: false }));
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
+  const loginWithGoogle = async () => {
+    try {
+      setGoogleSyncStatus(prev => ({ ...prev, syncing: true, error: null }));
+      const result = await googleSignIn();
+      if (result) {
+        setUser(result.user);
+        const sheetInfo = await getOrCreateSpreadsheet();
+        let folderId: string | null = null;
+        try {
+          folderId = await getOrCreatePortalFolder();
+        } catch (e) {
+          console.warn("Drive jild yaratishda ogohlantirish:", e);
+        }
+
+        setGoogleSyncStatus(prev => ({
+          ...prev,
+          isConnected: true,
+          spreadsheetId: sheetInfo.id,
+          spreadsheetUrl: sheetInfo.url,
+          folderId,
+          folderUrl: folderId ? `https://drive.google.com/drive/folders/${folderId}` : null,
+          syncing: false,
+          error: null
+        }));
+
+        if (!sheetInfo.isNew) {
+          const loaded = await fetchAllPortalDataFromSheets(sheetInfo.id);
+          setNews(loaded.news);
+          setOrganizations(loaded.organizations);
+          setLeaders(loaded.leaders);
+          setDocuments(loaded.documents);
+          setAppeals(loaded.appeals);
+          setSettings(loaded.settings);
+        }
+      }
+    } catch (err: any) {
+      console.error("Login xatoligi:", err);
+      setGoogleSyncStatus(prev => ({ ...prev, syncing: false, error: err.message }));
+      throw err;
+    }
+  };
+
+  const logoutGoogle = async () => {
+    await logout();
+    setUser(null);
+    setGoogleSyncStatus(prev => ({
+      ...prev,
+      isConnected: false,
+      syncing: false,
+      error: null
+    }));
+  };
+
+  const syncNow = async () => {
+    if (!googleSyncStatus.spreadsheetId) {
+      if (user) {
+        const sheetInfo = await getOrCreateSpreadsheet();
+        await triggerGoogleSheetsSync(sheetInfo.id);
+      } else {
+        await loginWithGoogle();
+      }
+    } else {
+      await triggerGoogleSheetsSync();
+    }
+  };
+
+  // CRUD Implementations
+  const addNews = async (item: Omit<NewsItem, 'id' | 'views'>) => {
+    const newItem: NewsItem = {
+      ...item,
+      id: `news-${Date.now()}`,
+      views: 0
+    };
+    const updated = [newItem, ...news];
+    setNews(updated);
+    if (googleSyncStatus.spreadsheetId) {
+      await triggerGoogleSheetsSync(undefined, { news: updated });
+    }
+  };
+
+  const updateNews = async (item: NewsItem) => {
+    const updated = news.map(n => n.id === item.id ? item : n);
+    setNews(updated);
+    if (googleSyncStatus.spreadsheetId) {
+      await triggerGoogleSheetsSync(undefined, { news: updated });
+    }
+  };
+
+  const deleteNews = async (id: string) => {
+    const updated = news.filter(n => n.id !== id);
+    setNews(updated);
+    if (googleSyncStatus.spreadsheetId) {
+      await triggerGoogleSheetsSync(undefined, { news: updated });
+    }
+  };
+
+  const addOrganization = async (item: Omit<Organization, 'id'>) => {
+    const newOrg: Organization = {
+      ...item,
+      id: `org-${Date.now()}`
+    };
+    const updated = [...organizations, newOrg];
+    setOrganizations(updated);
+    if (googleSyncStatus.spreadsheetId) {
+      await triggerGoogleSheetsSync(undefined, { organizations: updated });
+    }
+  };
+
+  const updateOrganization = async (item: Organization) => {
+    const updated = organizations.map(o => o.id === item.id ? item : o);
+    setOrganizations(updated);
+    if (googleSyncStatus.spreadsheetId) {
+      await triggerGoogleSheetsSync(undefined, { organizations: updated });
+    }
+  };
+
+  const deleteOrganization = async (id: string) => {
+    const updated = organizations.filter(o => o.id !== id);
+    setOrganizations(updated);
+    if (googleSyncStatus.spreadsheetId) {
+      await triggerGoogleSheetsSync(undefined, { organizations: updated });
+    }
+  };
+
+  const addLeader = async (item: Omit<Leader, 'id'>) => {
+    const newLeader: Leader = {
+      ...item,
+      id: `lead-${Date.now()}`
+    };
+    const updated = [...leaders, newLeader].sort((a, b) => a.order - b.order);
+    setLeaders(updated);
+    if (googleSyncStatus.spreadsheetId) {
+      await triggerGoogleSheetsSync(undefined, { leaders: updated });
+    }
+  };
+
+  const updateLeader = async (item: Leader) => {
+    const updated = leaders.map(l => l.id === item.id ? item : l).sort((a, b) => a.order - b.order);
+    setLeaders(updated);
+    if (googleSyncStatus.spreadsheetId) {
+      await triggerGoogleSheetsSync(undefined, { leaders: updated });
+    }
+  };
+
+  const deleteLeader = async (id: string) => {
+    const updated = leaders.filter(l => l.id !== id);
+    setLeaders(updated);
+    if (googleSyncStatus.spreadsheetId) {
+      await triggerGoogleSheetsSync(undefined, { leaders: updated });
+    }
+  };
+
+  const addDocument = async (item: Omit<DocumentItem, 'id'>) => {
+    const newDoc: DocumentItem = {
+      ...item,
+      id: `doc-${Date.now()}`
+    };
+    const updated = [newDoc, ...documents];
+    setDocuments(updated);
+    if (googleSyncStatus.spreadsheetId) {
+      await triggerGoogleSheetsSync(undefined, { documents: updated });
+    }
+  };
+
+  const updateDocument = async (item: DocumentItem) => {
+    const updated = documents.map(d => d.id === item.id ? item : d);
+    setDocuments(updated);
+    if (googleSyncStatus.spreadsheetId) {
+      await triggerGoogleSheetsSync(undefined, { documents: updated });
+    }
+  };
+
+  const deleteDocument = async (id: string) => {
+    const updated = documents.filter(d => d.id !== id);
+    setDocuments(updated);
+    if (googleSyncStatus.spreadsheetId) {
+      await triggerGoogleSheetsSync(undefined, { documents: updated });
+    }
+  };
+
+  const submitCitizenAppeal = async (data: Omit<CitizenAppeal, 'id' | 'trackingCode' | 'date' | 'status'>): Promise<string> => {
+    const randomCode = `QSP-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+    const newAppeal: CitizenAppeal = {
+      ...data,
+      id: `app-${Date.now()}`,
+      trackingCode: randomCode,
+      date: new Date().toISOString().split('T')[0],
+      status: 'yangi'
+    };
+    const updated = [newAppeal, ...appeals];
+    setAppeals(updated);
+    if (googleSyncStatus.spreadsheetId) {
+      await triggerGoogleSheetsSync(undefined, { appeals: updated });
+    }
+    return randomCode;
+  };
+
+  const updateAppeal = async (item: CitizenAppeal) => {
+    const updated = appeals.map(a => a.id === item.id ? item : a);
+    setAppeals(updated);
+    if (googleSyncStatus.spreadsheetId) {
+      await triggerGoogleSheetsSync(undefined, { appeals: updated });
+    }
+  };
+
+  const deleteAppeal = async (id: string) => {
+    const updated = appeals.filter(a => a.id !== id);
+    setAppeals(updated);
+    if (googleSyncStatus.spreadsheetId) {
+      await triggerGoogleSheetsSync(undefined, { appeals: updated });
+    }
+  };
+
+  const updateSettings = async (newSettings: Partial<PortalSettings>) => {
+    const updated: PortalSettings = { ...settings, ...newSettings };
+    setSettings(updated);
+    if (googleSyncStatus.spreadsheetId) {
+      await triggerGoogleSheetsSync(undefined, { settings: updated });
+    }
+  };
+
+  // Accessibility Handlers
+  const setFontSize = (size: 'normal' | 'large' | 'xlarge') => {
+    setFontSizeState(size);
+    const root = document.documentElement;
+    root.classList.remove('text-sm', 'text-base', 'text-lg', 'text-xl');
+    if (size === 'large') {
+      root.style.fontSize = '18px';
+    } else if (size === 'xlarge') {
+      root.style.fontSize = '20px';
+    } else {
+      root.style.fontSize = '16px';
+    }
+  };
+
+  const setContrastMode = (mode: 'normal' | 'high' | 'grayscale') => {
+    setContrastModeState(mode);
+    const root = document.documentElement;
+    root.classList.remove('high-contrast', 'grayscale-mode');
+    if (mode === 'high') {
+      root.classList.add('high-contrast');
+    } else if (mode === 'grayscale') {
+      root.classList.add('grayscale-mode');
+    }
+  };
+
+  const speakText = (text: string) => {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'uz-UZ';
+    utterance.rate = 0.95;
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const stopSpeaking = () => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    }
+  };
+
+  return (
+    <PortalContext.Provider
+      value={{
+        news,
+        organizations,
+        leaders,
+        documents,
+        appeals,
+        settings,
+        user,
+        googleSyncStatus,
+        loginWithGoogle,
+        logoutGoogle,
+        syncNow,
+        addNews,
+        updateNews,
+        deleteNews,
+        addOrganization,
+        updateOrganization,
+        deleteOrganization,
+        addLeader,
+        updateLeader,
+        deleteLeader,
+        addDocument,
+        updateDocument,
+        deleteDocument,
+        submitCitizenAppeal,
+        updateAppeal,
+        deleteAppeal,
+        updateSettings,
+        fontSize,
+        setFontSize,
+        contrastMode,
+        setContrastMode,
+        speakText,
+        stopSpeaking,
+        isSpeaking
+      }}
+    >
+      {children}
+    </PortalContext.Provider>
+  );
+};
+
+export const usePortal = () => {
+  const context = useContext(PortalContext);
+  if (!context) {
+    throw new Error('usePortal must be used within a PortalProvider');
+  }
+  return context;
+};
