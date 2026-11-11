@@ -9,7 +9,7 @@ import {
   INITIAL_APPEALS,
   INITIAL_SETTINGS
 } from '../data/initialData';
-import { initAuth, googleSignIn, logout, getCurrentUser } from '../services/googleAuth';
+import { initAuth, googleSignIn, googleSignInRedirect, logout, getCurrentUser } from '../services/googleAuth';
 import {
   getOrCreateSpreadsheet,
   fetchAllPortalDataFromSheets,
@@ -31,6 +31,8 @@ interface PortalContextType {
   user: User | null;
   googleSyncStatus: GoogleSyncStatus;
   loginWithGoogle: () => Promise<void>;
+  loginWithGoogleRedirect: () => Promise<void>;
+  connectSpreadsheetById: (sheetId: string) => Promise<boolean>;
   logoutGoogle: () => Promise<void>;
   syncNow: () => Promise<void>;
 
@@ -291,8 +293,59 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
     } catch (err: any) {
       console.error("Login xatoligi:", err);
-      setGoogleSyncStatus(prev => ({ ...prev, syncing: false, error: err.message }));
+      const isDomainError = err.code === 'auth/unauthorized-domain';
+      setGoogleSyncStatus(prev => ({
+        ...prev,
+        syncing: false,
+        error: err.customExplanation || err.message,
+        unauthorizedDomain: isDomainError ? (err.domainToAdd || window.location.hostname) : null
+      }));
       throw err;
+    }
+  };
+
+  const loginWithGoogleRedirect = async () => {
+    try {
+      setGoogleSyncStatus(prev => ({ ...prev, syncing: true, error: null }));
+      await googleSignInRedirect();
+    } catch (err: any) {
+      console.error("Redirect login xatoligi:", err);
+      const isDomainError = err.code === 'auth/unauthorized-domain';
+      setGoogleSyncStatus(prev => ({
+        ...prev,
+        syncing: false,
+        error: err.customExplanation || err.message,
+        unauthorizedDomain: isDomainError ? (err.domainToAdd || window.location.hostname) : null
+      }));
+    }
+  };
+
+  const connectSpreadsheetById = async (sheetId: string): Promise<boolean> => {
+    try {
+      setGoogleSyncStatus(prev => ({ ...prev, syncing: true, error: null }));
+      const loaded = await fetchAllPortalDataFromSheets(sheetId.trim());
+      setNews(loaded.news);
+      setOrganizations(loaded.organizations);
+      setLeaders(loaded.leaders);
+      setDocuments(loaded.documents);
+      setAppeals(loaded.appeals);
+      setSettings(loaded.settings);
+      setGoogleSyncStatus(prev => ({
+        ...prev,
+        isConnected: true,
+        spreadsheetId: sheetId.trim(),
+        spreadsheetUrl: `https://docs.google.com/spreadsheets/d/${sheetId.trim()}/edit`,
+        syncing: false,
+        error: null
+      }));
+      return true;
+    } catch (err: any) {
+      setGoogleSyncStatus(prev => ({
+        ...prev,
+        syncing: false,
+        error: "Google Sheets jadvaliga ulanishda xatolik: " + err.message
+      }));
+      return false;
     }
   };
 
@@ -303,7 +356,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       ...prev,
       isConnected: false,
       syncing: false,
-      error: null
+      error: null,
+      unauthorizedDomain: null
     }));
   };
 
@@ -531,6 +585,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         user,
         googleSyncStatus,
         loginWithGoogle,
+        loginWithGoogleRedirect,
+        connectSpreadsheetById,
         logoutGoogle,
         syncNow,
         addNews,

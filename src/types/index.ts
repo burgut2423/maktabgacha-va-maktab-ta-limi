@@ -152,4 +152,5 @@ export interface GoogleSyncStatus {
   lastSyncedAt: string | null;
   syncing: boolean;
   error: string | null;
+  unauthorizedDomain?: string | null;
 }
