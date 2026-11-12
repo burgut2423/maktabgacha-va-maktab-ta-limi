@@ -45,7 +45,11 @@ import {
   BarChart3,
   HelpCircle,
   Sliders,
-  ChevronDown
+  ChevronDown,
+  Images,
+  Star,
+  FolderOpen,
+  Loader2
 } from 'lucide-react';
 import { usePortal } from '../../context/PortalContext';
 import {
@@ -58,7 +62,14 @@ import {
   QuickServiceItem,
   PortalSettings
 } from '../../types';
-import { uploadFileToDrive, deleteFileFromDrive } from '../../services/googleDrive';
+import {
+  uploadFileToDrive,
+  uploadMultipleFilesToDrive,
+  deleteFileFromDrive,
+  fileToDataUrl,
+  getDirectDriveImageUrl
+} from '../../services/googleDrive';
+import { PORTAL_CONFIG } from '../../config/portalConfig';
 import {
   postToTelegram,
   postToFacebook,
@@ -156,6 +167,15 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
     broadcastToFacebook: localSettings.facebookAutoPublish ?? false,
     broadcastToInstagram: localSettings.instagramAutoPublish ?? false
   });
+
+  // News multi-image gallery inputs state
+  const [newsImageInputUrl, setNewsImageInputUrl] = useState<string>('');
+  const [multiUploadProgress, setMultiUploadProgress] = useState<{
+    uploading: boolean;
+    current: number;
+    total: number;
+    currentFileName?: string;
+  }>({ uploading: false, current: 0, total: 0 });
 
   // Org Modal State
   const [orgModal, setOrgModal] = useState<{
@@ -288,7 +308,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
     });
   };
 
-  // File upload to Drive handler
+  // File upload to Drive handler (single file)
   const handleDriveFileUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
     onSuccess: (url: string, driveId?: string, size?: string) => void
@@ -297,7 +317,13 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
     if (!file) return;
 
     if (!googleSyncStatus.isConnected) {
-      alert("Faylni Google Drive'ga yuklash uchun avval yuqoridagi 'Google bilan kirish' tugmasi orqali hisobingizga kiring.");
+      try {
+        const dataUrl = await fileToDataUrl(file);
+        onSuccess(dataUrl, undefined, `${(file.size / (1024 * 1024)).toFixed(1)} MB`);
+        alert("Eslatma: Google hisobiga ulanmagansiz. Rasm vaqtinchalik brauzerga yuklandi. Google Drive'ga (1xBvm3Oz0j4_n8YZB4sYPmA3EqcnqUp8d) saqlash uchun avval 'Google bilan kirish' tugmasini bosing.");
+      } catch (err: any) {
+        alert("Faylni o'qishda xatolik: " + err.message);
+      }
       return;
     }
 
@@ -305,14 +331,113 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
     setUploadSuccess(null);
     try {
       const uploaded = await uploadFileToDrive(file);
-      const fileUrl = uploaded.webViewLink || uploaded.webContentLink || URL.createObjectURL(file);
+      const fileUrl = uploaded.directUrl || uploaded.webViewLink || uploaded.webContentLink || URL.createObjectURL(file);
       onSuccess(fileUrl, uploaded.id, uploaded.size);
       setUploadSuccess(`"${file.name}" Google Drive'ga muvaffaqiyatli yuklandi!`);
       setTimeout(() => setUploadSuccess(null), 4000);
     } catch (err: any) {
-      alert("Google Drive'ga yuklashda xatolik: " + err.message);
+      console.warn("Drive upload error, falling back to local:", err);
+      try {
+        const dataUrl = await fileToDataUrl(file);
+        onSuccess(dataUrl, undefined, `${(file.size / (1024 * 1024)).toFixed(1)} MB`);
+        alert(`Google Drive'ga yuklashda ogohlantirish (${err.message}). Rasm lokal xotiraga olindi.`);
+      } catch {
+        alert("Google Drive'ga yuklashda xatolik: " + err.message);
+      }
     } finally {
       setIsUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  // Multi-image upload for news gallery: creates a subfolder in official Google Drive folder 1xBvm3Oz0j4_n8YZB4sYPmA3EqcnqUp8d
+  const handleMultipleNewsImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fileList = e.target.files;
+    if (!fileList || fileList.length === 0) return;
+    const files = Array.from(fileList);
+
+    const newsTitle = newsModal.item.title || "Yangi_Yangilik";
+
+    // If Google is NOT connected, convert to local Data URLs for instant preview
+    if (!googleSyncStatus.isConnected) {
+      setIsUploading(true);
+      try {
+        const dataUrls = await Promise.all(files.map(fileToDataUrl));
+        const currentImages = (newsModal.item.images && newsModal.item.images.length > 0)
+          ? newsModal.item.images
+          : (newsModal.item.imageUrl ? [newsModal.item.imageUrl] : []);
+        const combined = [...currentImages, ...dataUrls];
+        setNewsModal(prev => ({
+          ...prev,
+          item: {
+            ...prev.item,
+            imageUrl: combined[0] || prev.item.imageUrl,
+            images: combined
+          }
+        }));
+        alert("Eslatma: Google hisobingizga kirmagansiz, shuning uchun rasmlar vaqtinchalik brauzerga yuklandi. Rasmlarni rasmiy Google Drive jildiga (1xBvm3Oz0j4_n8YZB4sYPmA3EqcnqUp8d) saqlash uchun avval yuqoridagi 'Google bilan kirish' tugmasini bosing.");
+      } catch (err: any) {
+        alert("Rasmlarni yuklashda xatolik: " + err.message);
+      } finally {
+        setIsUploading(false);
+        e.target.value = '';
+      }
+      return;
+    }
+
+    // Google IS connected: upload to Google Drive subfolder!
+    setIsUploading(true);
+    setMultiUploadProgress({ uploading: true, current: 0, total: files.length, currentFileName: files[0]?.name });
+    try {
+      const result = await uploadMultipleFilesToDrive(
+        files,
+        `Yangilik_${newsTitle.slice(0, 30)}_${Date.now()}`,
+        newsModal.item.driveFolderId,
+        (current, total, fileName) => {
+          setMultiUploadProgress({ uploading: true, current, total, currentFileName: fileName });
+        }
+      );
+
+      const currentImages = (newsModal.item.images && newsModal.item.images.length > 0)
+        ? newsModal.item.images
+        : (newsModal.item.imageUrl ? [newsModal.item.imageUrl] : []);
+      const newImages = [...currentImages, ...result.imageUrls];
+
+      setNewsModal(prev => ({
+        ...prev,
+        item: {
+          ...prev.item,
+          imageUrl: newImages[0] || prev.item.imageUrl,
+          images: newImages,
+          driveFolderId: result.folderId,
+          driveFolderUrl: result.folderUrl
+        }
+      }));
+
+      setUploadSuccess(`${files.length} ta rasm Google Drive'dagi maxsus jildga muvaffaqiyatli yuklandi!`);
+      setTimeout(() => setUploadSuccess(null), 5000);
+    } catch (err: any) {
+      console.error("Multi upload error:", err);
+      try {
+        const dataUrls = await Promise.all(files.map(fileToDataUrl));
+        const currentImages = (newsModal.item.images && newsModal.item.images.length > 0)
+          ? newsModal.item.images
+          : (newsModal.item.imageUrl ? [newsModal.item.imageUrl] : []);
+        const combined = [...currentImages, ...dataUrls];
+        setNewsModal(prev => ({
+          ...prev,
+          item: {
+            ...prev.item,
+            imageUrl: combined[0] || prev.item.imageUrl,
+            images: combined
+          }
+        }));
+        alert(`Google Drive'ga yuklashda ogohlantirish (${err.message}). Rasmlar vaqtinchalik lokal xotiraga olindi.`);
+      } catch {}
+    } finally {
+      setIsUploading(false);
+      setMultiUploadProgress({ uploading: false, current: 0, total: 0 });
+      e.target.value = '';
     }
   };
 
@@ -1744,16 +1869,23 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                         </a>
 
                         <button
-                          onClick={() =>
+                          onClick={() => {
+                            const currentImages = (item.images && item.images.length > 0)
+                              ? [...item.images]
+                              : (item.imageUrl ? [item.imageUrl] : []);
                             setNewsModal({
                               isOpen: true,
-                              item,
+                              item: {
+                                ...item,
+                                images: currentImages,
+                                imageUrl: currentImages[0] || item.imageUrl
+                              },
                               isEdit: true,
                               broadcastToTelegram: false,
                               broadcastToFacebook: false,
                               broadcastToInstagram: false
-                            })
-                          }
+                            });
+                          }}
                           className="p-1.5 rounded hover:bg-slate-200 text-slate-600"
                           title="Tahrirlash"
                         >
@@ -2752,39 +2884,229 @@ function onEdit(e) {
                 />
               </div>
 
-              <div>
-                <label className="font-bold text-slate-700 block mb-1">Yangilik Rasmi (URL yoki Drive)</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="https://... yoki fayl tanlang"
-                    value={newsModal.item.imageUrl || ''}
-                    onChange={e =>
-                      setNewsModal({
-                        ...newsModal,
-                        item: { ...newsModal.item, imageUrl: e.target.value }
-                      })
-                    }
-                    className="flex-1 px-3 py-2 rounded border border-slate-300"
-                  />
-                  <label className="cursor-pointer px-3 py-2 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 font-semibold text-slate-700 flex items-center gap-1 shrink-0">
-                    <Upload className="w-3.5 h-3.5 text-sky-600" />
-                    <span>Yuklash</span>
+              {/* Yangilik Rasmlari va Fotogalereya (Multi-image upload & Google Drive folder integration) */}
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <label className="font-bold text-slate-900 block text-sm flex items-center gap-1.5">
+                      <Images className="w-4 h-4 text-sky-700" />
+                      <span>Yangilik Rasmlari va Fotogalereya</span>
+                      <span className="text-xs font-normal text-slate-500">(1 yoki bir nechta rasm)</span>
+                    </label>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Rasmlar Google Drive’dagi rasmiy jild (<code>1xBvm3Oz0j4...</code>) ichida yangilik uchun ochilgan alohida papkaga saqlanadi.
+                    </p>
+                  </div>
+
+                  {newsModal.item.driveFolderUrl && (
+                    <a
+                      href={newsModal.item.driveFolderUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-sky-700 hover:text-sky-900 font-semibold bg-sky-50 px-2.5 py-1 rounded border border-sky-200 shrink-0"
+                    >
+                      <FolderOpen className="w-3.5 h-3.5 text-amber-500" />
+                      <span>Drive papkasini ochish</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
+                </div>
+
+                {/* Upload action buttons */}
+                <div className="flex flex-wrap items-center gap-2">
+                  {/* Multiple file picker button */}
+                  <label className="cursor-pointer px-4 py-2 rounded-lg bg-sky-800 hover:bg-sky-900 text-white font-semibold text-xs flex items-center gap-1.5 shadow-xs transition-colors">
+                    {multiUploadProgress.uploading ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-white" />
+                    ) : (
+                      <Upload className="w-4 h-4 text-white" />
+                    )}
+                    <span>
+                      {multiUploadProgress.uploading
+                        ? `Yuklanmoqda: ${multiUploadProgress.current}/${multiUploadProgress.total}...`
+                        : "Kompyuter/telefondan rasm yuklash (1 yoki ko'p)"}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      disabled={multiUploadProgress.uploading}
+                      className="hidden"
+                      onChange={handleMultipleNewsImagesUpload}
+                    />
+                  </label>
+
+                  {/* Single file upload button (Drive) */}
+                  <label className="cursor-pointer px-3 py-2 rounded-lg bg-white hover:bg-slate-100 border border-slate-300 font-semibold text-slate-700 text-xs flex items-center gap-1.5 shadow-2xs transition-colors">
+                    <Plus className="w-3.5 h-3.5 text-sky-600" />
+                    <span>Yana rasm qo‘shish</span>
                     <input
                       type="file"
                       accept="image/*"
                       className="hidden"
                       onChange={e =>
                         handleDriveFileUpload(e, (url, driveId) => {
+                          const current = (newsModal.item.images && newsModal.item.images.length > 0)
+                            ? newsModal.item.images
+                            : (newsModal.item.imageUrl ? [newsModal.item.imageUrl] : []);
+                          const updated = [...current, url];
                           setNewsModal(prev => ({
                             ...prev,
-                            item: { ...prev.item, imageUrl: url, driveFileId: driveId }
+                            item: {
+                              ...prev.item,
+                              imageUrl: updated[0] || url,
+                              images: updated,
+                              driveFileId: driveId || prev.item.driveFileId
+                            }
                           }));
                         })
                       }
                     />
                   </label>
                 </div>
+
+                {/* Upload Progress Bar */}
+                {multiUploadProgress.uploading && (
+                  <div className="p-3 bg-sky-50 border border-sky-200 rounded-lg">
+                    <div className="flex items-center justify-between text-xs text-sky-900 font-semibold mb-1">
+                      <span className="flex items-center gap-1.5">
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-sky-600" />
+                        <span>Google Drive'ga yuklanmoqda: {multiUploadProgress.currentFileName || ''}</span>
+                      </span>
+                      <span>{multiUploadProgress.current} / {multiUploadProgress.total}</span>
+                    </div>
+                    <div className="w-full bg-sky-200 rounded-full h-2 overflow-hidden">
+                      <div
+                        className="bg-sky-600 h-2 transition-all duration-300 rounded-full"
+                        style={{
+                          width: `${Math.round((multiUploadProgress.current / Math.max(multiUploadProgress.total, 1)) * 100)}%`
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Manual Image URL Adder */}
+                <div className="flex gap-2 pt-1">
+                  <input
+                    type="text"
+                    placeholder="Yoki to'g'ridan-to'g'ri rasm havolasini (URL) kiriting: https://..."
+                    value={newsImageInputUrl}
+                    onChange={e => setNewsImageInputUrl(e.target.value)}
+                    className="flex-1 px-3 py-1.5 text-xs rounded border border-slate-300 focus:border-sky-500 bg-white"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!newsImageInputUrl.trim()) return;
+                      const current = (newsModal.item.images && newsModal.item.images.length > 0)
+                        ? newsModal.item.images
+                        : (newsModal.item.imageUrl ? [newsModal.item.imageUrl] : []);
+                      const updated = [...current, newsImageInputUrl.trim()];
+                      setNewsModal(prev => ({
+                        ...prev,
+                        item: {
+                          ...prev.item,
+                          imageUrl: updated[0] || newsImageInputUrl.trim(),
+                          images: updated
+                        }
+                      }));
+                      setNewsImageInputUrl('');
+                    }}
+                    className="px-3 py-1.5 rounded bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-semibold"
+                  >
+                    + Havolani qo‘shish
+                  </button>
+                </div>
+
+                {/* Gallery Images Thumbnails Grid */}
+                {((newsModal.item.images && newsModal.item.images.length > 0) || newsModal.item.imageUrl) && (
+                  <div className="pt-2">
+                    <span className="text-xs font-bold text-slate-700 block mb-2">
+                      Galereyadagi rasmlar ({((newsModal.item.images && newsModal.item.images.length > 0) ? newsModal.item.images : [newsModal.item.imageUrl]).filter(Boolean).length} ta):
+                    </span>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2.5">
+                      {((newsModal.item.images && newsModal.item.images.length > 0)
+                        ? newsModal.item.images
+                        : [newsModal.item.imageUrl]
+                      ).filter(Boolean).map((imgUrl, idx) => {
+                        const isMain = idx === 0 || imgUrl === newsModal.item.imageUrl;
+                        return (
+                          <div
+                            key={idx}
+                            className={`relative group rounded-lg overflow-hidden border bg-white shadow-2xs ${
+                              isMain ? 'ring-2 ring-emerald-500 border-emerald-500' : 'border-slate-200'
+                            }`}
+                          >
+                            <div className="h-24 w-full bg-slate-100 overflow-hidden">
+                              <img
+                                src={imgUrl}
+                                alt={`Galereya ${idx + 1}`}
+                                className="w-full h-full object-cover"
+                                referrerPolicy="no-referrer"
+                              />
+                            </div>
+
+                            {/* Main photo badge */}
+                            {isMain ? (
+                              <div className="absolute top-1 left-1 bg-emerald-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5 shadow-xs">
+                                <Star className="w-2.5 h-2.5 fill-white" />
+                                <span>Asosiy</span>
+                              </div>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const current = newsModal.item.images || [];
+                                  const reordered = [imgUrl, ...current.filter((_, i) => i !== idx)];
+                                  setNewsModal(prev => ({
+                                    ...prev,
+                                    item: {
+                                      ...prev.item,
+                                      imageUrl: imgUrl,
+                                      images: reordered
+                                    }
+                                  }));
+                                }}
+                                className="absolute top-1 left-1 opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 hover:bg-black text-white text-[10px] font-semibold px-1.5 py-0.5 rounded shadow-xs"
+                                title="Ushbu rasmni asosiy muqova qilish"
+                              >
+                                Asosiy qilish
+                              </button>
+                            )}
+
+                            {/* Remove photo button */}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const current = (newsModal.item.images && newsModal.item.images.length > 0)
+                                  ? newsModal.item.images
+                                  : (newsModal.item.imageUrl ? [newsModal.item.imageUrl] : []);
+                                const updated = current.filter((_, i) => i !== idx);
+                                setNewsModal(prev => ({
+                                  ...prev,
+                                  item: {
+                                    ...prev.item,
+                                    imageUrl: updated[0] || '',
+                                    images: updated
+                                  }
+                                }));
+                              }}
+                              className="absolute top-1 right-1 p-1 rounded-full bg-red-600/90 hover:bg-red-700 text-white opacity-0 group-hover:opacity-100 transition-opacity shadow-xs"
+                              title="O‘chirish"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+
+                            <div className="p-1 bg-white text-center">
+                              <span className="text-[10px] text-slate-500 font-medium">#{idx + 1}-rasm</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Social Media Broadcast Options (Telegram, Instagram, Facebook) */}
@@ -2883,6 +3205,11 @@ function onEdit(e) {
                     return;
                   }
 
+                  const rawImages = (newsModal.item.images && newsModal.item.images.length > 0)
+                    ? newsModal.item.images
+                    : (newsModal.item.imageUrl ? [newsModal.item.imageUrl] : []);
+                  const primaryImg = rawImages[0] || newsModal.item.imageUrl || './assets/images/hero_education_district_1794303548345.jpg';
+
                   const finalItem: NewsItem = {
                     id: newsModal.item.id || `news-${Date.now()}`,
                     title: fixUzbekText(newsModal.item.title),
@@ -2890,8 +3217,11 @@ function onEdit(e) {
                     date: newsModal.item.date || new Date().toISOString().split('T')[0],
                     summary: fixUzbekText(newsModal.item.summary || ''),
                     content: fixUzbekText(newsModal.item.content || ''),
-                    imageUrl: newsModal.item.imageUrl || './assets/aistudio/image_0a3ac00b.png',
+                    imageUrl: primaryImg,
+                    images: rawImages.length > 0 ? rawImages : [primaryImg],
                     driveFileId: newsModal.item.driveFileId,
+                    driveFolderId: newsModal.item.driveFolderId,
+                    driveFolderUrl: newsModal.item.driveFolderUrl,
                     author: fixUzbekText(newsModal.item.author || "Qo‘shko‘pir MMTB Matbuot xizmati"),
                     views: newsModal.item.views || 100,
                     isPinned: newsModal.item.isPinned,

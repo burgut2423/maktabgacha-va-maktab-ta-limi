@@ -8,6 +8,10 @@ export const PORTAL_CONFIG = {
   // Asosiy Google Sheets ID si (barcha brauzerlar va fuqarolar uchun yagona rasmiy baza)
   DEFAULT_SPREADSHEET_ID: "14xTiUicc9FL23qpE2pBljDazsYDlaw57mbR8Ua_QABk",
 
+  // Rasmiy Google Drive rasmlar va fayllar asosiy papkasi
+  DEFAULT_DRIVE_FOLDER_ID: "1xBvm3Oz0j4_n8YZB4sYPmA3EqcnqUp8d",
+  DEFAULT_DRIVE_FOLDER_URL: "https://drive.google.com/drive/folders/1xBvm3Oz0j4_n8YZB4sYPmA3EqcnqUp8d?usp=sharing",
+
   // Google Sheets API ommaviy kaliti
   GOOGLE_API_KEY: "AIzaSyBszmlCmVIcCdE4zsGwA4JMbk7Xg_HcTCc",
 

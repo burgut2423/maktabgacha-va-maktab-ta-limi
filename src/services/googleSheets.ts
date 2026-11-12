@@ -147,9 +147,11 @@ export const getOrCreateSpreadsheet = async (): Promise<{ id: string; url: strin
  */
 export const seedInitialDataToSpreadsheet = async (spreadsheetId: string, token: string) => {
   const newsRows = [
-    ['ID', 'Sarlavha', 'Kategoriya', 'Sana', 'Qisqacha', 'Matn', 'RasmURL', 'Muallif', 'Ko\'rishlar', 'Muhim'],
+    ['ID', 'Sarlavha', 'Kategoriya', 'Sana', 'Qisqacha', 'Matn', 'RasmURL', 'Muallif', 'Ko\'rishlar', 'Muhim', 'RasmlarGalereyasi', 'DriveFolderUrl'],
     ...INITIAL_NEWS.map(n => [
-      n.id, n.title, n.category, n.date, n.summary, n.content, n.imageUrl, n.author, n.views.toString(), n.isPinned ? 'ha' : 'yoq'
+      n.id, n.title, n.category, n.date, n.summary, n.content, n.imageUrl, n.author, n.views.toString(), n.isPinned ? 'ha' : 'yoq',
+      (n.images && n.images.length > 0) ? n.images.join(' , ') : (n.imageUrl || ''),
+      n.driveFolderUrl || ''
     ])
   ];
 
@@ -224,7 +226,7 @@ export const seedInitialDataToSpreadsheet = async (spreadsheetId: string, token:
   ];
 
   const valueRanges = [
-    { range: 'Yangiliklar!A1:J', values: newsRows },
+    { range: 'Yangiliklar!A1:L', values: newsRows },
     { range: 'Tashkilotlar!A1:O', values: orgRows },
     { range: 'Rahbariyat!A1:K', values: leaderRows },
     { range: 'Hujjatlar!A1:I', values: docRows },
@@ -300,7 +302,7 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
   let valueRanges: Array<{ values?: any[][] }> = [];
 
   const ranges = [
-    'Yangiliklar!A2:J',
+    'Yangiliklar!A2:L',
     'Tashkilotlar!A2:O',
     'Rahbariyat!A2:K',
     'Hujjatlar!A2:I',
@@ -379,18 +381,35 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
     return r.some(c => c && String(c).trim().length > 0);
   });
 
-  const news: NewsItem[] = newsRows.map((r: any[], idx: number) => ({
-    id: r[0] || `news-${idx + 1}`,
-    title: r[1] || 'Yangilik sarlavhasi',
-    category: (r[2] as any) || 'Boshqaruv',
-    date: r[3] || new Date().toISOString().split('T')[0],
-    summary: r[4] || '',
-    content: r[5] || '',
-    imageUrl: r[6] || './assets/images/hero_education_district_1794303548345.jpg',
-    author: r[7] || 'Matbuot xizmati',
-    views: parseInt(r[8] || '0', 10) || 0,
-    isPinned: r[9] === 'ha' || r[9] === 'true'
-  }));
+  const news: NewsItem[] = newsRows.map((r: any[], idx: number) => {
+    const rawImg = r[6] || '';
+    const rawGallery = r[10] || '';
+    let images: string[] = [];
+    if (rawGallery) {
+      images = rawGallery.split(/[\n,;]+/).map((s: string) => s.trim()).filter(Boolean);
+    } else if (rawImg && rawImg.includes(',')) {
+      images = rawImg.split(',').map((s: string) => s.trim()).filter(Boolean);
+    }
+    if (images.length === 0 && rawImg) {
+      images = [rawImg];
+    }
+    const primaryImg = images[0] || rawImg || './assets/images/hero_education_district_1794303548345.jpg';
+
+    return {
+      id: r[0] || `news-${idx + 1}`,
+      title: r[1] || 'Yangilik sarlavhasi',
+      category: (r[2] as any) || 'Boshqaruv',
+      date: r[3] || new Date().toISOString().split('T')[0],
+      summary: r[4] || '',
+      content: r[5] || '',
+      imageUrl: primaryImg,
+      images: images.length > 0 ? images : [primaryImg],
+      author: r[7] || 'Matbuot xizmati',
+      views: parseInt(r[8] || '0', 10) || 0,
+      isPinned: r[9] === 'ha' || r[9] === 'true',
+      driveFolderUrl: r[11] || undefined
+    };
+  });
 
   // Parse Organizations (robust & resilient against custom headers/columns)
   const rawOrgRows = valueRanges[1]?.values || [];
@@ -576,7 +595,7 @@ export const syncAllDataToGoogleSheets = async (
 
   // First clear old contents
   const clearPromises = [
-    'Yangiliklar!A2:J',
+    'Yangiliklar!A2:L',
     'Tashkilotlar!A2:O',
     'Rahbariyat!A2:K',
     'Hujjatlar!A2:I',
@@ -592,7 +611,18 @@ export const syncAllDataToGoogleSheets = async (
 
   // Prepare updated values
   const newsRows = data.news.map(n => [
-    n.id, n.title, n.category, n.date, n.summary, n.content, n.imageUrl, n.author, n.views.toString(), n.isPinned ? 'ha' : 'yoq'
+    n.id,
+    n.title,
+    n.category,
+    n.date,
+    n.summary,
+    n.content,
+    n.imageUrl,
+    n.author,
+    n.views.toString(),
+    n.isPinned ? 'ha' : 'yoq',
+    (n.images && n.images.length > 0) ? n.images.join(' , ') : (n.imageUrl || ''),
+    n.driveFolderUrl || ''
   ]);
 
   const orgRows = data.organizations.map(o => [
@@ -654,7 +684,7 @@ export const syncAllDataToGoogleSheets = async (
   ];
 
   const updateData = [
-    { range: 'Yangiliklar!A2:J', values: newsRows },
+    { range: 'Yangiliklar!A2:L', values: newsRows },
     { range: 'Tashkilotlar!A2:O', values: orgRows },
     { range: 'Rahbariyat!A2:K', values: leaderRows },
     { range: 'Hujjatlar!A2:I', values: docRows },

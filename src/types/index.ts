@@ -24,6 +24,9 @@ export interface NewsItem {
   summary: string;
   content: string;
   imageUrl: string;
+  images?: string[]; // Multiple images for gallery
+  driveFolderId?: string; // Sub-folder created in Google Drive for this news item
+  driveFolderUrl?: string; // Link to the Google Drive folder
   driveFileId?: string;
   author: string;
   views: number;
