@@ -84,6 +84,7 @@ import {
 import { fixUzbekText } from '../../utils/uzbekTypography';
 import { UzbekLetterHelper } from './UzbekLetterHelper';
 import { destroyAdminSession } from '../../services/adminAuth';
+import { heroImage } from '../../assets/images';
 
 type AdminTab =
   | 'overview'
@@ -3208,7 +3209,7 @@ function onEdit(e) {
                   const rawImages = (newsModal.item.images && newsModal.item.images.length > 0)
                     ? newsModal.item.images
                     : (newsModal.item.imageUrl ? [newsModal.item.imageUrl] : []);
-                  const primaryImg = rawImages[0] || newsModal.item.imageUrl || './assets/images/hero_education_district_1794303548345.jpg';
+                  const primaryImg = rawImages[0] || newsModal.item.imageUrl || heroImage;
 
                   const finalItem: NewsItem = {
                     id: newsModal.item.id || `news-${Date.now()}`,
