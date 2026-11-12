@@ -1,6 +1,6 @@
 {
-  "name": "Qöşköpir Tumani Maktabgaça va Maktab Ta'limi Bölimi",
-  "description": "Qöşköpir tumani maktabgaça va maktab ta'limi bölimining rasmiy portali. Yangiliklar, maktablar va MTTlar röyxati, interaktiv xizmatlar va töliq boşqaruv tizimi.",
+  "name": "Qöşköpir tuman ta'lim bölimi",
+  "description": "Qöşköpir tuman ta'lim bölimining rasmiy portali. Yangiliklar, maktablar va MTTlar röyxati, interaktiv xizmatlar va töliq boşqaruv tizimi.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
