@@ -17,6 +17,7 @@ import {
 import { usePortal } from '../../context/PortalContext';
 import { NewsItem } from '../../types';
 import { PORTAL_CONFIG } from '../../config/portalConfig';
+import { heroImage } from '../../assets/images';
 
 interface NewsSectionProps {
   selectedNews: NewsItem | null;
@@ -142,7 +143,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     referrerPolicy="no-referrer"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = './assets/images/hero_education_district_1794303548345.jpg';
+                      (e.target as HTMLImageElement).src = heroImage;
                     }}
                   />
                   <div className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-xs text-white text-[11px] font-semibold px-2.5 py-1 rounded">
@@ -216,7 +217,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
                   referrerPolicy="no-referrer"
                   onClick={() => setIsLightboxOpen(true)}
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = './assets/images/hero_education_district_1794303548345.jpg';
+                    (e.target as HTMLImageElement).src = heroImage;
                   }}
                 />
 

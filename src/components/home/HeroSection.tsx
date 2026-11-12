@@ -13,6 +13,7 @@ import {
 import { usePortal } from '../../context/PortalContext';
 import { NewsItem } from '../../types';
 import { heroImage } from '../../assets/images';
+import { resolveAssetUrl } from '../../utils/assetUrl';
 
 interface HeroSectionProps {
   onSelectNews: (news: NewsItem) => void;
@@ -161,7 +162,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
           <div className="lg:col-span-5 relative">
             <div className="w-full h-full min-h-[320px] lg:min-h-[420px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 relative group">
               <img
-                src={settings.heroImageUrl || heroImage}
+                src={resolveAssetUrl(settings.heroImageUrl) || heroImage}
                 alt="Qo'shko'pir tumani zamonaviy maktab binosi"
                 className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
                 referrerPolicy="no-referrer"
