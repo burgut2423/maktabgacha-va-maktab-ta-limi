@@ -161,7 +161,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_appeals`, JSON.stringify(appeals));
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_settings`, JSON.stringify(settings));
     } catch (e) {
-      console.warn("Mahalliy xotiraga yozishda cheklov:", e);
+      console.warn("Mahalliy xotiraga yozişda çeklov:", e);
     }
   }, [news, organizations, leaders, documents, appeals, settings]);
 
@@ -198,11 +198,11 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         error: null
       }));
     } catch (err: any) {
-      console.error("Google Sheets sinxronlashda xatolik:", err);
+      console.error("Google Sheets sinxronlaşda xatolik:", err);
       setGoogleSyncStatus(prev => ({
         ...prev,
         syncing: false,
-        error: err.message || "Google Sheets bilan bog'lanishda xatolik"
+        error: err.message || "Google Sheets bilan boğlanişda xatolik"
       }));
     }
   }, [news, organizations, leaders, documents, appeals, settings, googleSyncStatus.spreadsheetId]);
@@ -241,7 +241,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               setSettings(loaded.settings);
             }
           } catch (err: any) {
-            console.warn("Google Sheets dastlabki tekshiruvida xatolik:", err);
+            console.warn("Google Sheets dastlabki tekşiruvida xatolik:", err);
             setGoogleSyncStatus(prev => ({
               ...prev,
               isConnected: true,
@@ -314,7 +314,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         error: null
       }));
     } catch (err: any) {
-      console.warn("Google Sheets yangilanishida ogohlantirish:", err);
+      console.warn("Google Sheets yangilanişida ogohlantiriş:", err);
       setGoogleSyncStatus(prev => ({
         ...prev,
         syncing: false
@@ -394,7 +394,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         try {
           folderId = await getOrCreatePortalFolder();
         } catch (e) {
-          console.warn("Drive jild yaratishda ogohlantirish:", e);
+          console.warn("Drive jild yaratişda ogohlantiriş:", e);
         }
 
         setGoogleSyncStatus(prev => ({
@@ -508,7 +508,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setGoogleSyncStatus(prev => ({
         ...prev,
         syncing: false,
-        error: "Google Sheets jadvaliga ulanishda xatolik: " + err.message
+        error: "Google Sheets jadvaliga ulanişda xatolik: " + err.message
       }));
       return false;
     }
