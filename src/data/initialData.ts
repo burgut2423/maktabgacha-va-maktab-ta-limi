@@ -2,7 +2,7 @@ import { NewsItem, Organization, Leader, DocumentItem, CitizenAppeal, PortalSett
 import { heroImage, headPortrait, preschoolBuilding, conferenceImage } from '../assets/images';
 
 export const INITIAL_SETTINGS: PortalSettings = {
-  districtName: "Qöşköpir tumani maktabgaça va maktab ta'limi bölimi",
+  districtName: "Qöşköpir tuman ta'lim bölimi",
   departmentPhone: "+998 (62) 352-14-25",
   trustPhone: "+998 (62) 352-11-02",
   email: "qoshkopir.mmtb@edu.uz",
@@ -21,7 +21,7 @@ export const INITIAL_SETTINGS: PortalSettings = {
 
   // Asosiy sahifa sozlamalari
   heroTitle: "Ta'lim va tarbiya — kelajak poydevori, ma'rifatli avlod kafolati",
-  heroSubtitle: "Qöşköpir tumani maktabgaça va maktab ta'limi bölimi tizimidagi 54 ta umumta'lim maktabi hamda 42 ta davlat va xususiy MTTlar faoliyatini yagona raqamli platforma orqali kuzatib boring.",
+  heroSubtitle: "Qöşköpir tuman ta'lim bölimi tizimidagi 54 ta umumta'lim maktabi hamda 42 ta davlat va xususiy MTTlar faoliyatini yagona raqamli platforma orqali kuzatib boring.",
   heroBadgeText: "Xorazm viloyati · Qöşköpir tumani",
   heroImageUrl: heroImage,
   quickServices: [
@@ -76,7 +76,7 @@ export const INITIAL_SETTINGS: PortalSettings = {
   ],
 
   // Bo'lim haqida (About Department) ma'lumotlari
-  departmentHistory: "Qöşköpir tumani xalq ta'limi bölimi 1935-yilda taşkil topgan bölib, ötgan yillar davomida tumanda minglab yetuk mutaxassislar, olimlar va davlat arboblarini tarbiyalab voyaga yetkazdi. Bugungi kunda Özbekiston Respublikasi Prezidentining 2023-yilgi qaroriga muvofiq, maktabgaça ta'lim va maktab ta'limi tizimlari birlaştirilib, zamonaviy Qöşköpir tumani maktabgaça va maktab ta'limi bölimi sifatida faoliyat yuritmoqda.",
+  departmentHistory: "Qöşköpir tumani xalq ta'limi bölimi 1935-yilda taşkil topgan bölib, ötgan yillar davomida tumanda minglab yetuk mutaxassislar, olimlar va davlat arboblarini tarbiyalab voyaga yetkazdi. Bugungi kunda Özbekiston Respublikasi Prezidentining 2023-yilgi qaroriga muvofiq, maktabgaça ta'lim va maktab ta'limi tizimlari birlaştirilib, zamonaviy Qöşköpir tuman ta'lim bölimi sifatida faoliyat yuritmoqda.",
   departmentMission: "Tumanda yaşovçi har bir bolaga teng, sifatli va zamonaviy ta'lim-tarbiya oliş imkoniyatini yaratiş, pedagoglarning kasbiy mahoratini oşiriş, zamonaviy axborot texnologiyalari va ilğor xorijiy tajribalarni ta'lim jarayoniga keng tatbiq etiş.",
   departmentCharter: "Bölim Özbekiston Respublikasi Konstitutsiyasi, 'Ta'lim töğrisida'gi Qonun, Maktabgaça va maktab ta'limi vazirligi Nizomi hamda Qöşköpir tumani hokimligi qarorlari asosida iş yuritadi.",
   tasksList: [
@@ -148,7 +148,7 @@ export const INITIAL_LEADERS: Leader[] = [
     id: "lead-1",
     name: "Raximov Mansur Davlatoviç",
     position: "Bölim boşliği",
-    department: "Qöşköpir tumani maktabgaça va maktab ta'limi bölimi",
+    department: "Qöşköpir tuman ta'lim bölimi",
     phone: "+998 (62) 352-14-25",
     email: "m.raximov@qoshkopir-edu.uz",
     receptionDays: "Har haftaning çorşanba va juma kunlari",
