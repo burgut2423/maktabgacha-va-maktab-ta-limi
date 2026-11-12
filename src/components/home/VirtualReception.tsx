@@ -12,7 +12,7 @@ export const VirtualReception: React.FC = () => {
     phone: '',
     email: '',
     address: '',
-    organizationType: 'Qo\'shko\'pir tumani MMTB',
+    organizationType: 'Qo\'şko\'pir tumani MMTB',
     subject: '',
     message: ''
   });
@@ -28,7 +28,7 @@ export const VirtualReception: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.fullName || !formData.phone || !formData.message) {
-      alert("Iltimos, barcha majburiy maydonlarni to'ldiring.");
+      alert("Iltimos, barça majburiy maydonlarni töldiring.");
       return;
     }
 
@@ -41,12 +41,12 @@ export const VirtualReception: React.FC = () => {
         phone: '',
         email: '',
         address: '',
-        organizationType: 'Qo\'shko\'pir tumani MMTB',
+        organizationType: 'Qo\'şko\'pir tumani MMTB',
         subject: '',
         message: ''
       });
     } catch (err: any) {
-      alert("Murojaatni yuborishda xatolik: " + err.message);
+      alert("Murojaatni yuborişda xatolik: " + err.message);
     } finally {
       setSubmitting(false);
     }
@@ -75,21 +75,21 @@ export const VirtualReception: React.FC = () => {
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800">
             <Clock className="w-3.5 h-3.5" />
-            <span>Ko'rib chiqish jarayonida</span>
+            <span>Körib çiqiş jarayonida</span>
           </span>
         );
       case 'rad_etildi':
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-800">
             <AlertCircle className="w-3.5 h-3.5" />
-            <span>Rad etilgan / Tushuntirish berilgan</span>
+            <span>Rad etilgan / Tuşuntiriş berilgan</span>
           </span>
         );
       default:
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-100 text-sky-800">
             <FileText className="w-3.5 h-3.5" />
-            <span>Yangi kelib tushgan</span>
+            <span>Yangi kelib tuşgan</span>
           </span>
         );
     }
@@ -103,10 +103,10 @@ export const VirtualReception: React.FC = () => {
             Fuqarolar bilan muloqot
           </span>
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
-            Bo'lim boshlig'i virtual qabulxonasi
+            Bölim boşliği virtual qabulxonasi
           </h2>
           <p className="text-slate-600 text-sm mt-1 max-w-xl mx-auto">
-            Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi rahbariyatiga to'g'ridan-to'g'ri elektron murojaat yo'llang
+            Qöşköpir tumani maktabgaça va maktab ta'limi bölimi rahbariyatiga töğridan-töğri elektron murojaat yöllang
           </p>
         </div>
 
@@ -120,7 +120,7 @@ export const VirtualReception: React.FC = () => {
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            Yangi murojaat yuborish
+            Yangi murojaat yuboriş
           </button>
           <button
             onClick={() => setActiveTab('check')}
@@ -130,7 +130,7 @@ export const VirtualReception: React.FC = () => {
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
-            Murojaat holatini tekshirish
+            Murojaat holatini tekşiriş
           </button>
         </div>
 
@@ -146,7 +146,7 @@ export const VirtualReception: React.FC = () => {
                   Murojaatingiz muvaffaqiyatli qabul qilindi!
                 </h3>
                 <p className="text-slate-600 text-sm mb-6 max-w-md mx-auto">
-                  Murojaatingiz Qo'shko'pir tumani MMTB ro'yxatiga olindi va Google Sheets ma'lumotlar bazasiga kiritildi.
+                  Murojaatingiz Qöşköpir tumani MMTB röyxatiga olindi va Google Sheets ma'lumotlar bazasiga kiritildi.
                 </p>
 
                 <div className="bg-sky-50 border border-sky-200 rounded-xl p-4 max-w-sm mx-auto mb-6">
@@ -157,7 +157,7 @@ export const VirtualReception: React.FC = () => {
                 </div>
 
                 <p className="text-xs text-slate-500 mb-6">
-                  Ushbu kodni saqlab qo'ying, murojaatingiz holatini tekshirish uchun zarur bo'ladi.
+                  Uşbu kodni saqlab qöying, murojaatingiz holatini tekşiriş uçun zarur böladi.
                 </p>
 
                 <div className="flex justify-center gap-3">
@@ -168,13 +168,13 @@ export const VirtualReception: React.FC = () => {
                     }}
                     className="px-5 py-2.5 bg-sky-800 text-white text-xs font-semibold rounded-lg hover:bg-sky-900"
                   >
-                    Holatni tekshirish
+                    Holatni tekşiriş
                   </button>
                   <button
                     onClick={() => setGeneratedCode(null)}
                     className="px-5 py-2.5 bg-slate-100 text-slate-700 text-xs font-semibold rounded-lg hover:bg-slate-200"
                   >
-                    Yana murojaat yozish
+                    Yana murojaat yoziş
                   </button>
                 </div>
               </div>
@@ -183,7 +183,7 @@ export const VirtualReception: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      F.I.O. (Familiya, Ism, Sharifingiz) *
+                      F.I.O. (Familiya, Ism, Şarifingiz) *
                     </label>
                     <input
                       type="text"
@@ -213,7 +213,7 @@ export const VirtualReception: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Elektron pochta (ixtiyoriy)
+                      Elektron poçta (ixtiyoriy)
                     </label>
                     <input
                       type="email"
@@ -226,11 +226,11 @@ export const VirtualReception: React.FC = () => {
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Yashash manzilingiz (mahalla/qishloq)
+                      Yaşaş manzilingiz (mahalla/qişloq)
                     </label>
                     <input
                       type="text"
-                      placeholder="Qo'shko'pir tumani, Navro'z mahallasi"
+                      placeholder="Qöşköpir tumani, Navröz mahallasi"
                       value={formData.address}
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                       className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-sky-600 focus:bg-white"
@@ -241,16 +241,16 @@ export const VirtualReception: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Tegishli muassasa yoki bo'lim
+                      Tegişli muassasa yoki bölim
                     </label>
                     <select
                       value={formData.organizationType}
                       onChange={(e) => setFormData({ ...formData, organizationType: e.target.value })}
                       className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-sky-600 focus:bg-white"
                     >
-                      <option value="Qo'shko'pir tumani MMTB">Qo'shko'pir tumani MMTB rahbariyati</option>
-                      <option value="Maktabgacha ta'lim (Bog'chalar)">Maktabgacha ta'lim (Bog'chalar bo'yicha)</option>
-                      <option value="Umumiy o'rta ta'lim (Maktablar)">Umumiy o'rta ta'lim (Maktablar bo'yicha)</option>
+                      <option value="Qo'shko'pir tumani MMTB">Qöşköpir tumani MMTB rahbariyati</option>
+                      <option value="Maktabgacha ta'lim (Bog'chalar)">Maktabgaça ta'lim (Boğçalar böyiça)</option>
+                      <option value="Umumiy o'rta ta'lim (Maktablar)">Umumiy örta ta'lim (Maktablar böyiça)</option>
                       {organizations.map(org => (
                         <option key={org.id} value={org.name}>{org.name}</option>
                       ))}
@@ -264,7 +264,7 @@ export const VirtualReception: React.FC = () => {
                     <input
                       type="text"
                       required
-                      placeholder="Masalan: 1-sinfga qabul yoki to'garaklar"
+                      placeholder="Masalan: 1-sinfga qabul yoki tögaraklar"
                       value={formData.subject}
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                       className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-sky-600 focus:bg-white"
@@ -288,7 +288,7 @@ export const VirtualReception: React.FC = () => {
 
                 <div className="pt-2 flex items-center justify-between">
                   <span className="text-xs text-slate-500">
-                    * Yulduzcha bilan belgilangan maydonlar to'ldirilishi shart
+                    * Yulduzça bilan belgilangan maydonlar töldirilişi şart
                   </span>
                   <button
                     type="submit"
@@ -296,7 +296,7 @@ export const VirtualReception: React.FC = () => {
                     className="px-6 py-2.5 bg-sky-800 hover:bg-sky-900 disabled:opacity-50 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors flex items-center gap-2"
                   >
                     <Send className="w-4 h-4" />
-                    <span>{submitting ? 'Yuborilmoqda...' : 'Murojaatni yuborish'}</span>
+                    <span>{submitting ? 'Yuborilmoqda...' : 'Murojaatni yuboriş'}</span>
                   </button>
                 </div>
               </form>
@@ -324,7 +324,7 @@ export const VirtualReception: React.FC = () => {
                   className="px-5 py-2.5 bg-sky-800 hover:bg-sky-900 text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5"
                 >
                   <Search className="w-4 h-4" />
-                  <span>Tekshirish</span>
+                  <span>Tekşiriş</span>
                 </button>
               </div>
             </form>
@@ -376,7 +376,7 @@ export const VirtualReception: React.FC = () => {
               ) : (
                 <div className="text-center py-8 text-slate-500 text-sm">
                   <AlertCircle className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                  <p>Bunday kodli murojaat topilmadi. Kodni qayta tekshirib ko'ring.</p>
+                  <p>Bunday kodli murojaat topilmadi. Kodni qayta tekşirib köring.</p>
                 </div>
               )
             )}

@@ -10,23 +10,23 @@ export const StatsStrip: React.FC = () => {
       label: "Umumta'lim maktablari",
       value: settings.schoolsCount,
       suffix: " ta",
-      sub: "Barcha mahallalarda",
+      sub: "Barça mahallalarda",
       icon: School,
       color: "text-blue-600 bg-blue-50"
     },
     {
-      label: "Maktabgacha tashkilotlar (MTT)",
+      label: "Maktabgaça taşkilotlar (MTT)",
       value: settings.mttsCount,
       suffix: " ta",
-      sub: "Davlat va xususiy bog'chalar",
+      sub: "Davlat va xususiy boğçalar",
       icon: Baby,
       color: "text-emerald-600 bg-emerald-50"
     },
     {
-      label: "O'quvchi yoshlar",
+      label: "Öquvçi yoşlar",
       value: settings.studentsTotal.toLocaleString(),
       suffix: "+",
-      sub: "1-11-sinf o'quvchilari",
+      sub: "1-11-sinf öquvçilari",
       icon: GraduationCap,
       color: "text-purple-600 bg-purple-50"
     },
@@ -39,7 +39,7 @@ export const StatsStrip: React.FC = () => {
       color: "text-amber-600 bg-amber-50"
     },
     {
-      label: "Oliy toifali o'qituvchilar",
+      label: "Oliy toifali öqituvçilar",
       value: settings.higherCategoryTeachersCount.toLocaleString(),
       suffix: "+",
       sub: "Attestatsiya natijalari",
@@ -50,7 +50,7 @@ export const StatsStrip: React.FC = () => {
       label: "Olimpiada sovrindorlari",
       value: 142,
       suffix: "+",
-      sub: "2026-yilgi fan bellashuvlari",
+      sub: "2026-yilgi fan bellaşuvlari",
       icon: Award,
       color: "text-rose-600 bg-rose-50"
     }
@@ -64,7 +64,7 @@ export const StatsStrip: React.FC = () => {
             Raqamlarda tuman ta'limi
           </span>
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-1">
-            Qo'shko'pir tumani ta'lim tizimining asosiy ko'rsatkichlari
+            Qöşköpir tumani ta'lim tizimining asosiy körsatkiçlari
           </h2>
         </div>
 

@@ -23,23 +23,23 @@ export const AboutSection: React.FC = () => {
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-8">
           <span className="text-xs uppercase tracking-wider font-semibold text-sky-800">
-            Bo'lim faoliyati
+            Bölim faoliyati
           </span>
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
-            Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi haqida
+            Qöşköpir tumani maktabgaça va maktab ta'limi bölimi haqida
           </h2>
           <p className="text-slate-600 text-sm mt-2 leading-relaxed">
-            {settings.departmentMission || "Tumanda ta'lim sifatini oshirish, barkamol va ma'rifatli yoshlarni tarbiyalash bo'yicha tashkiliy tizim"}
+            {settings.departmentMission || "Tumanda ta'lim sifatini oşiriş, barkamol va ma'rifatli yoşlarni tarbiyalaş böyiça taşkiliy tizim"}
           </p>
         </div>
 
         {/* Navigation Tabs */}
         <div className="flex items-center justify-center gap-2 mb-8 border-b border-slate-200 pb-3 overflow-x-auto">
           {[
-            { id: 'rahbariyat', label: `Bo'lim rahbariyati (${leaders.length})`, icon: Users },
-            { id: 'tuzilma', label: `Tashkiliy tuzilma va sho'balar (${settings.branches?.length || 0})`, icon: Building2 },
+            { id: 'rahbariyat', label: `Bölim rahbariyati (${leaders.length})`, icon: Users },
+            { id: 'tuzilma', label: `Taşkiliy tuzilma va şöbalar (${settings.branches?.length || 0})`, icon: Building2 },
             { id: 'vazifalar', label: "Asosiy vazifa va funksiyalar", icon: FileCheck2 },
-            { id: 'tarix', label: "Bo'lim tarixi va me'yoriy asos", icon: BookOpen },
+            { id: 'tarix', label: "Bölim tarixi va me'yoriy asos", icon: BookOpen },
           ].map(tab => {
             const Icon = tab.icon;
             return (
@@ -124,7 +124,7 @@ export const AboutSection: React.FC = () => {
                     title={lead.email}
                   >
                     <Mail className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">Pochta</span>
+                    <span className="hidden sm:inline">Poçta</span>
                   </a>
                 </div>
               </div>
@@ -136,7 +136,7 @@ export const AboutSection: React.FC = () => {
         {activeTab === 'tuzilma' && (
           <div className="space-y-4 max-w-4xl mx-auto">
             <div className="bg-sky-50 border border-sky-200 rounded-xl p-4 text-xs text-sky-900 mb-4">
-              <strong>Eslatma:</strong> Bo'lim tuzilmasi O'zbekiston Respublikasi Maktabgacha va maktab ta'limi vazirligi namunaviy shtat jadvaliga asosan tasdiqlangan. Barcha sho'balar va ularning mas'ullari admin panel orqali to'ldirib boriladi.
+              <strong>Eslatma:</strong> Bölim tuzilmasi Özbekiston Respublikasi Maktabgaça va maktab ta'limi vazirligi namunaviy ştat jadvaliga asosan tasdiqlangan. Barça şöbalar va ularning mas'ullari admin panel orqali töldirib boriladi.
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -160,7 +160,7 @@ export const AboutSection: React.FC = () => {
 
                   <div className="pt-2 border-t border-slate-200 text-xs flex flex-wrap items-center justify-between gap-2 text-slate-700">
                     <div>
-                      <span className="text-slate-500">Sho'ba mudiri: </span>
+                      <span className="text-slate-500">Şöba mudiri: </span>
                       <strong className="text-slate-900">{branch.head}</strong>
                     </div>
                     <a
@@ -182,7 +182,7 @@ export const AboutSection: React.FC = () => {
           <div className="max-w-4xl mx-auto bg-slate-50 rounded-2xl border border-slate-200 p-6 sm:p-8">
             <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-sky-700" />
-              <span>Bo'limning qonunchilik bilan belgilangan asosiy vazifalari</span>
+              <span>Bölimning qonunçilik bilan belgilangan asosiy vazifalari</span>
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -206,7 +206,7 @@ export const AboutSection: React.FC = () => {
           <div className="max-w-4xl mx-auto bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-5">
             <div>
               <h3 className="text-lg font-bold text-slate-900 mb-2">
-                Tarixiy ma'lumot va rivojlanish bosqichlari
+                Tarixiy ma'lumot va rivojlaniş bosqiçlari
               </h3>
               <p className="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line">
                 {settings.departmentHistory}

@@ -10,13 +10,13 @@ export const LeadershipSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-xs uppercase tracking-wider font-semibold text-sky-800">
-            Bo'lim tuzilmasi
+            Bölim tuzilmasi
           </span>
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
-            Bo'lim rahbariyati va fuqarolarni qabul qilish jadvali
+            Bölim rahbariyati va fuqarolarni qabul qiliş jadvali
           </h2>
           <p className="text-slate-600 text-sm mt-2">
-            Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi mas'ul rahbarlari
+            Qöşköpir tumani maktabgaça va maktab ta'limi bölimi mas'ul rahbarlari
           </p>
         </div>
 
@@ -83,7 +83,7 @@ export const LeadershipSection: React.FC = () => {
                   title={lead.email}
                 >
                   <Mail className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Pochta</span>
+                  <span className="hidden sm:inline">Poçta</span>
                 </a>
               </div>
             </div>

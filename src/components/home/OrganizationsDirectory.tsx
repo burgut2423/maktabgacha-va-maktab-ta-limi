@@ -27,13 +27,13 @@ export const OrganizationsDirectory: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div>
             <span className="text-xs uppercase tracking-wider font-semibold text-sky-800">
-              Ta'lim muassasalari tarmog'i
+              Ta'lim muassasalari tarmoği
             </span>
             <h2 className="text-2xl font-bold text-slate-900 mt-1">
-              Maktablar va Maktabgacha ta'lim tashkilotlari (MTT)
+              Maktablar va Maktabgaça ta'lim taşkilotlari (MTT)
             </h2>
             <p className="text-slate-600 text-sm mt-1">
-              Qo'shko'pir tumanidagi barcha ta'lim maskanlari ma'lumotlari, manzillari va rahbarlari
+              Qöşköpir tumanidagi barça ta'lim maskanlari ma'lumotlari, manzillari va rahbarlari
             </p>
           </div>
 
@@ -45,7 +45,7 @@ export const OrganizationsDirectory: React.FC = () => {
                 filterType === 'all' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              Barchasi ({organizations.length})
+              Barçasi ({organizations.length})
             </button>
             <button
               onClick={() => setFilterType('maktab')}
@@ -61,7 +61,7 @@ export const OrganizationsDirectory: React.FC = () => {
                 filterType === 'mtt' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              Bog'chalar - MTT ({organizations.filter(o => o.type === 'mtt').length})
+              Boğçalar - MTT ({organizations.filter(o => o.type === 'mtt').length})
             </button>
             <button
               onClick={() => setFilterType('ixtisos')}
@@ -69,7 +69,7 @@ export const OrganizationsDirectory: React.FC = () => {
                 filterType === 'ixtisos' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              Ixtisoslashgan ({organizations.filter(o => o.type === 'ixtisos').length})
+              Ixtisoslaşgan ({organizations.filter(o => o.type === 'ixtisos').length})
             </button>
           </div>
         </div>
@@ -80,7 +80,7 @@ export const OrganizationsDirectory: React.FC = () => {
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Raqam, mahalla yoki direktor bo'yicha qidirish..."
+              placeholder="Raqam, mahalla yoki direktor böyiça qidiriş..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-4 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-sky-600 focus:bg-white"
@@ -90,7 +90,7 @@ export const OrganizationsDirectory: React.FC = () => {
                 onClick={() => setSearchQuery('')}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs"
               >
-                Tozalash
+                Tozalaş
               </button>
             )}
           </div>
@@ -113,10 +113,10 @@ export const OrganizationsDirectory: React.FC = () => {
               }}
               disabled={isRefreshing || googleSyncStatus.syncing}
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold border border-emerald-200 transition-colors shadow-2xs cursor-pointer"
-              title="Google Sheets bazasidagi o'zgarishlarni yuklab olish"
+              title="Google Sheets bazasidagi özgarişlarni yuklab oliş"
             >
               <RefreshCw className={`w-3.5 h-3.5 text-emerald-600 ${isRefreshing || googleSyncStatus.syncing ? 'animate-spin' : ''}`} />
-              <span>{isRefreshing || googleSyncStatus.syncing ? "Yuklanmoqda..." : "Baza bilan yangilash"}</span>
+              <span>{isRefreshing || googleSyncStatus.syncing ? "Yuklanmoqda..." : "Baza bilan yangilaş"}</span>
             </button>
           </div>
         </div>
@@ -135,7 +135,7 @@ export const OrganizationsDirectory: React.FC = () => {
                   <div className="flex items-center justify-between mb-3">
                     <span className="flex items-center gap-1.5 text-xs font-semibold text-slate-500">
                       {isSchool ? <School className="w-4 h-4 text-blue-600" /> : <Baby className="w-4 h-4 text-emerald-600" />}
-                      <span>{org.type === 'mtt' ? 'Maktabgacha tashkilot' : org.type === 'ixtisos' ? 'Ixtisoslashgan maktab' : 'Umumta\'lim maktabi'}</span>
+                      <span>{org.type === 'mtt' ? 'Maktabgaça taşkilot' : org.type === 'ixtisos' ? 'Ixtisoslaşgan maktab' : 'Umumta\'lim maktabi'}</span>
                     </span>
 
                     <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded flex items-center gap-1">
@@ -166,7 +166,7 @@ export const OrganizationsDirectory: React.FC = () => {
 
                 <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
                   <div className="text-slate-500 font-medium">
-                    {org.studentsCount} {isSchool ? "o'quvchi" : "tarbiyalanuvchi"} · {org.teachersCount} pedagog
+                    {org.studentsCount} {isSchool ? "öquvçi" : "tarbiyalanuvchi"} · {org.teachersCount} pedagog
                   </div>
                   <span className="text-sky-700 font-semibold group-hover:underline">
                     Batafsil
@@ -179,7 +179,7 @@ export const OrganizationsDirectory: React.FC = () => {
 
         {filteredOrgs.length === 0 && (
           <div className="text-center py-12 bg-slate-50 rounded-xl border border-slate-200">
-            <p className="text-sm text-slate-500">So'rovingizga mos muassasa topilmadi.</p>
+            <p className="text-sm text-slate-500">Sörovingizga mos muassasa topilmadi.</p>
           </div>
         )}
       </div>
@@ -197,7 +197,7 @@ export const OrganizationsDirectory: React.FC = () => {
 
             <div className="flex items-center gap-2 text-xs font-semibold text-sky-800 mb-2">
               <Building2 className="w-4 h-4" />
-              <span>{selectedOrg.type === 'mtt' ? 'Maktabgacha ta\'lim tashkiloti' : 'Umumta\'lim muassasasi'}</span>
+              <span>{selectedOrg.type === 'mtt' ? 'Maktabgaça ta\'lim taşkiloti' : 'Umumta\'lim muassasasi'}</span>
             </div>
 
             <h2 className="text-lg font-bold text-slate-900 mb-4 leading-snug">
@@ -217,7 +217,7 @@ export const OrganizationsDirectory: React.FC = () => {
                   </a>
                 </div>
                 <div>
-                  <span className="text-xs text-slate-500 block">Elektron pochta:</span>
+                  <span className="text-xs text-slate-500 block">Elektron poçta:</span>
                   <span className="text-slate-800 text-xs">{selectedOrg.email}</span>
                 </div>
               </div>
@@ -227,11 +227,11 @@ export const OrganizationsDirectory: React.FC = () => {
               </div>
               <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-200 text-center">
                 <div>
-                  <span className="text-xs text-slate-500 block">Sig'im:</span>
+                  <span className="text-xs text-slate-500 block">Siğim:</span>
                   <span className="font-bold text-slate-900">{selectedOrg.studentsCount} nafar</span>
                 </div>
                 <div>
-                  <span className="text-xs text-slate-500 block">O'qituvchilar:</span>
+                  <span className="text-xs text-slate-500 block">Öqituvçilar:</span>
                   <span className="font-bold text-slate-900">{selectedOrg.teachersCount} nafar</span>
                 </div>
                 <div>
@@ -246,14 +246,14 @@ export const OrganizationsDirectory: React.FC = () => {
                 onClick={() => setSelectedOrg(null)}
                 className="px-4 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg"
               >
-                Yopish
+                Yopiş
               </button>
               <a
                 href={`tel:${selectedOrg.phone.replace(/\D/g, '')}`}
                 className="px-4 py-2 text-xs font-semibold text-white bg-sky-800 hover:bg-sky-900 rounded-lg flex items-center gap-1.5"
               >
                 <Phone className="w-3.5 h-3.5" />
-                <span>Qo'ng'iroq qilish</span>
+                <span>Qönğiroq qiliş</span>
               </a>
             </div>
           </div>

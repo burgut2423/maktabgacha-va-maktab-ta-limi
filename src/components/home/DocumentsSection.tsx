@@ -30,13 +30,13 @@ export const DocumentsSection: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div>
             <span className="text-xs uppercase tracking-wider font-semibold text-sky-800">
-              Qonunchilik bazasi
+              Qonunçilik bazasi
             </span>
             <h2 className="text-2xl font-bold text-slate-900 mt-1">
               Me'yoriy-huquqiy hujjatlar va buyruqlar
             </h2>
             <p className="text-slate-600 text-sm mt-1">
-              Vazirlik qarorlari, tuman hokimi qarorlari hamda bo'limning rasmiy buyruqlari
+              Vazirlik qarorlari, tuman hokimi qarorlari hamda bölimning rasmiy buyruqlari
             </p>
           </div>
 
@@ -63,7 +63,7 @@ export const DocumentsSection: React.FC = () => {
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Hujjat nomi yoki raqami bo'yicha qidiruv..."
+              placeholder="Hujjat nomi yoki raqami böyiça qidiruv..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-4 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-sky-600"
@@ -113,7 +113,7 @@ export const DocumentsSection: React.FC = () => {
                     className="flex items-center gap-1.5 px-4 py-2 bg-sky-800 hover:bg-sky-900 text-white text-xs font-semibold rounded-lg shadow-xs transition-colors"
                   >
                     <Download className="w-3.5 h-3.5" />
-                    <span>Yuklab olish</span>
+                    <span>Yuklab oliş</span>
                   </a>
                 </div>
               </div>
@@ -122,7 +122,7 @@ export const DocumentsSection: React.FC = () => {
 
           {filteredDocs.length === 0 && (
             <div className="text-center py-12 text-slate-500 text-sm">
-              Qidiruv bo'yicha hech qanday me'yoriy hujjat topilmadi.
+              Qidiruv böyiça heç qanday me'yoriy hujjat topilmadi.
             </div>
           )}
         </div>

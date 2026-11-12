@@ -32,15 +32,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
         {
           id: "srv-1",
           title: "1-sinfga qabul",
-          desc: "Umumta'lim maktablariga elektron ariza topshirish",
+          desc: "Umumta'lim maktablariga elektron ariza topşiriş",
           link: "https://adm.edu.uz",
           isExternal: true,
           color: "bg-blue-600 text-white"
         },
         {
           id: "srv-2",
-          title: "Bog'chaga navbat",
-          desc: "Davlat MTTlariga navbatga qo'yish va tekshirish",
+          title: "Boğçaga navbat",
+          desc: "Davlat MTTlariga navbatga qöyiş va tekşiriş",
           link: "https://my.gov.uz",
           isExternal: true,
           color: "bg-emerald-600 text-white"
@@ -56,7 +56,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
         {
           id: "srv-4",
           title: "Fan olimpiadalari",
-          desc: "Tuman va viloyat bosqichlari natijalari",
+          desc: "Tuman va viloyat bosqiçlari natijalari",
           link: "#yangiliklar",
           isExternal: false,
           color: "bg-indigo-600 text-white"
@@ -72,7 +72,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
         {
           id: "srv-6",
           title: "Virtual qabulxona",
-          desc: "Bo'lim rahbariyatiga to'g'ridan-to'g'ri murojaat",
+          desc: "Bölim rahbariyatiga töğridan-töğri murojaat",
           link: "#murojaat",
           isExternal: false,
           color: "bg-sky-700 text-white"
@@ -99,7 +99,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
               {/* Region Tag */}
               <div className="flex items-center gap-2 text-xs font-semibold text-sky-800 uppercase tracking-widest mb-3">
                 <MapPin className="w-3.5 h-3.5" />
-                <span>{settings.heroBadgeText || "Xorazm viloyati · Qo'shko'pir tumani"}</span>
+                <span>{settings.heroBadgeText || "Xorazm viloyati · Qöşköpir tumani"}</span>
               </div>
 
               {/* Main Headline */}
@@ -108,7 +108,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
               </h1>
 
               <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-6 max-w-2xl">
-                {settings.heroSubtitle || "Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi tizimidagi 54 ta umumta'lim maktabi hamda 42 ta davlat va xususiy MTTlar faoliyatini yagona raqamli platforma orqali kuzatib boring."}
+                {settings.heroSubtitle || "Qöşköpir tumani maktabgaça va maktab ta'limi bölimi tizimidagi 54 ta umumta'lim maktabi hamda 42 ta davlat va xususiy MTTlar faoliyatini yagona raqamli platforma orqali kuzatib boring."}
               </p>
 
               {/* Featured News Card */}
@@ -122,7 +122,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
                     <span>·</span>
                     <span className="text-slate-500 font-normal">{featuredNews.date}</span>
                     <span>·</span>
-                    <span className="text-slate-500 font-normal">{featuredNews.views} ko'rildi</span>
+                    <span className="text-slate-500 font-normal">{featuredNews.views} körildi</span>
                   </div>
                   <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-sky-700 transition-colors line-clamp-2 mb-2">
                     {featuredNews.title}
@@ -131,7 +131,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
                     {featuredNews.summary}
                   </p>
                   <div className="flex items-center text-xs font-semibold text-sky-700 group-hover:translate-x-1 transition-transform">
-                    <span>Batafsil o'qish</span>
+                    <span>Batafsil öqiş</span>
                     <ArrowRight className="w-3.5 h-3.5 ml-1" />
                   </div>
                 </div>
@@ -145,7 +145,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
                 className="px-5 py-2.5 bg-sky-800 hover:bg-sky-900 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors flex items-center gap-2"
               >
                 <Send className="w-4 h-4" />
-                <span>Murojaat yo'llash</span>
+                <span>Murojaat yöllaş</span>
               </button>
 
               <button
@@ -163,7 +163,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
             <div className="w-full h-full min-h-[320px] lg:min-h-[420px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 relative group">
               <img
                 src={resolveAssetUrl(settings.heroImageUrl) || heroImage}
-                alt="Qo'shko'pir tumani zamonaviy maktab binosi"
+                alt="Qöşköpir tumani zamonaviy maktab binosi"
                 className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
                 referrerPolicy="no-referrer"
               />
@@ -171,13 +171,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
               
               <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-300 block mb-1">
-                  Yangi o'quv majmuasi
+                  Yangi öquv majmuasi
                 </span>
                 <p className="text-sm font-bold leading-snug">
-                  14-sonli umumiy o'rta ta'lim maktabining zamonaviy o'quv korpusi
+                  14-sonli umumiy örta ta'lim maktabining zamonaviy öquv korpusi
                 </p>
                 <p className="text-xs text-slate-300 mt-1">
-                  STEM laboratoriyalari va sport inshootlariga ega zamonaviy ta'lim maskani
+                  STEM laboratoriyalari va sport inşootlariga ega zamonaviy ta'lim maskani
                 </p>
               </div>
             </div>
