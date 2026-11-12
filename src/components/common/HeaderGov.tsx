@@ -212,7 +212,7 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
               Xorazm viloyati
             </span>
             <span className="text-base sm:text-lg font-bold text-slate-900 tracking-tight leading-snug">
-              Qöşköpir Tumani Maktabgaça va Maktab Ta'limi Bölimi
+              Qöşköpir tuman ta'lim bölimi
             </span>
             <span className="text-xs text-slate-500 hidden sm:block">
               Rasmiy axborot va xizmatlar portali

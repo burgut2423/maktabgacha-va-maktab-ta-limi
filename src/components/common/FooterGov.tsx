@@ -37,13 +37,13 @@ export const FooterGov: React.FC<{ onOpenAdmin: () => void; onNavigate: (s: stri
                   Xorazm viloyati
                 </span>
                 <span className="text-sm font-bold text-white block">
-                  Qöşköpir Tumani Maktabgaça va Maktab Ta'limi Bölimi
+                  Qöşköpir tuman ta'lim bölimi
                 </span>
               </div>
             </div>
 
             <p className="text-xs text-slate-400 leading-relaxed">
-              Saytdan olingan barça axborotlardan foydalanilganda Qöşköpir tumani maktabgaça va maktab ta'limi bölimi rasmiy veb-saytiga havola berilişi şart.
+              Saytdan olingan barça axborotlardan foydalanilganda Qöşköpir tuman ta'lim bölimi rasmiy veb-saytiga havola berilişi şart.
             </p>
 
             <div className="pt-2 text-xs text-slate-400 space-y-1">
@@ -123,7 +123,7 @@ export const FooterGov: React.FC<{ onOpenAdmin: () => void; onNavigate: (s: stri
         {/* Bottom copyright and admin login trigger */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>
-            © {new Date().getFullYear()} Qöşköpir tumani maktabgaça va maktab ta'limi bölimi. Barça huquqlar himoyalangan.
+            © {new Date().getFullYear()} Qöşköpir tuman ta'lim bölimi. Barça huquqlar himoyalangan.
           </p>
 
           <div className="flex items-center gap-4">
