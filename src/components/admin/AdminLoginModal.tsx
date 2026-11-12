@@ -108,7 +108,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
 
     // 3. Validate math captcha
     if (parseInt(captchaAnswer) !== (captchaNum1 + captchaNum2)) {
-      setErrorMessage("Xavfsizlik hisobi (anti-robot) noto‘g‘ri kiritildi.");
+      setErrorMessage("Xavfsizlik hisobi (anti-robot) notöğri kiritildi.");
       generateCaptcha();
       return;
     }
@@ -131,12 +131,12 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
         if (locked) {
           const secs = getRemainingLockSeconds();
           setLockSeconds(secs);
-          setErrorMessage("Ko‘p marotaba xato urinishlar tufayli tizim xavfsizlik maqsadida 15 daqiqaga bloklandi!");
+          setErrorMessage("Köp marotaba xato urinişlar tufayli tizim xavfsizlik maqsadida 15 daqiqaga bloklandi!");
         } else {
           const attempts = getFailedAttemptsCount();
           const left = Math.max(0, 5 - attempts);
           setRemainingAttempts(left);
-          setErrorMessage(`Login yoki parol noto‘g‘ri! Qolgan urinishlar soni: ${left} ta`);
+          setErrorMessage(`Login yoki parol notöğri! Qolgan urinişlar soni: ${left} ta`);
         }
       }
     } catch (err: any) {
@@ -164,10 +164,10 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
             <span className="bg-sky-600 text-white px-2 py-0.5 rounded text-sm font-black">
               AdminLTE
             </span>
-            <span>Qo‘shko‘pir MMTB</span>
+            <span>Qöşköpir MMTB</span>
           </h2>
           <p className="text-xs text-slate-300 mt-1 font-medium">
-            Rasmiy Ma’muriyat Boshqaruv Tizimi
+            Rasmiy Ma’muriyat Boşqaruv Tizimi
           </p>
         </div>
 
@@ -179,7 +179,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                 Xavfsiz Avtorizatsiya
               </span>
               <p className="text-xs text-slate-600 mt-0.5">
-                Boshqaruv paneliga kirish uchun login va maxfiy parolingizni kiriting
+                Boşqaruv paneliga kiriş uçun login va maxfiy parolingizni kiriting
               </p>
             </div>
 
@@ -191,7 +191,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                   <span>Xavfsizlik Tizimi Bloklandi</span>
                 </div>
                 <p className="leading-relaxed">
-                  5 marta ketma-ket xato parol kiritilganligi sababli kirish vaqtincha cheklandi.
+                  5 marta ketma-ket xato parol kiritilganligi sababli kiriş vaqtinça çeklandi.
                 </p>
                 <div className="flex items-center gap-1.5 font-mono font-bold text-red-800 text-sm bg-red-100 px-2.5 py-1.5 rounded border border-red-200">
                   <Clock className="w-4 h-4 text-red-600" />
@@ -208,7 +208,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                   <div className="font-semibold">{errorMessage}</div>
                   {remainingAttempts !== null && remainingAttempts > 0 && (
                     <div className="text-[11px] text-red-600">
-                      Urinishlar tugagach tizim 15 daqiqaga bloklanadi.
+                      Urinişlar tugagaç tizim 15 daqiqaga bloklanadi.
                     </div>
                   )}
                 </div>
@@ -259,7 +259,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                     disabled={lockSeconds > 0}
                     onClick={() => setShowPassword(!showPassword)}
                     className="p-1 rounded text-slate-400 hover:text-slate-700 absolute right-3 top-2.5 transition-colors"
-                    title={showPassword ? "Parolni yashirish" : "Parolni ko‘rsatish"}
+                    title={showPassword ? "Parolni yaşiriş" : "Parolni körsatiş"}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -271,16 +271,16 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                 <div className="flex items-center justify-between text-xs font-semibold text-slate-700 mb-1.5">
                   <span className="flex items-center gap-1">
                     <KeyRound className="w-3.5 h-3.5 text-sky-700" />
-                    <span>Robotlarga qarshi tekshiruv:</span>
+                    <span>Robotlarga qarşi tekşiruv:</span>
                   </span>
                   <button
                     type="button"
                     onClick={generateCaptcha}
                     className="text-sky-700 hover:text-sky-900 flex items-center gap-1 text-[11px]"
-                    title="Boshqa misol olish"
+                    title="Boşqa misol oliş"
                   >
                     <RefreshCw className="w-3 h-3" />
-                    <span>Yangilash</span>
+                    <span>Yangilaş</span>
                   </button>
                 </div>
                 <div className="flex items-center gap-2">
@@ -308,7 +308,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                     onChange={e => setRememberMe(e.target.checked)}
                     className="rounded text-sky-700 focus:ring-sky-600"
                   />
-                  <span>Meni eslab qolish (24 soat)</span>
+                  <span>Meni eslab qoliş (24 soat)</span>
                 </label>
               </div>
 
@@ -321,12 +321,12 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                 {isLoading ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin" />
-                    <span>Xavfsiz tekshirilmoqda...</span>
+                    <span>Xavfsiz tekşirilmoqda...</span>
                   </>
                 ) : (
                   <>
                     <Lock className="w-4 h-4" />
-                    <span>Tizimga Kirish</span>
+                    <span>Tizimga Kiriş</span>
                   </>
                 )}
               </button>
@@ -344,7 +344,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
               onClick={onClose}
               className="text-slate-600 hover:text-slate-900 font-semibold"
             >
-              Yopish
+              Yopiş
             </button>
           </div>
         </div>

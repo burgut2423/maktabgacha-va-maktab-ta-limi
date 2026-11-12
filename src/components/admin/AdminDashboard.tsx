@@ -321,9 +321,9 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
       try {
         const dataUrl = await fileToDataUrl(file);
         onSuccess(dataUrl, undefined, `${(file.size / (1024 * 1024)).toFixed(1)} MB`);
-        alert("Eslatma: Google hisobiga ulanmagansiz. Rasm vaqtinchalik brauzerga yuklandi. Google Drive'ga (1xBvm3Oz0j4_n8YZB4sYPmA3EqcnqUp8d) saqlash uchun avval 'Google bilan kirish' tugmasini bosing.");
+        alert("Eslatma: Google hisobiga ulanmagansiz. Rasm vaqtinçalik brauzerga yuklandi. Google Drive'ga (1xBvm3Oz0j4_n8YZB4sYPmA3EqcnqUp8d) saqlaş uçun avval 'Google bilan kiriş' tugmasini bosing.");
       } catch (err: any) {
-        alert("Faylni o'qishda xatolik: " + err.message);
+        alert("Faylni öqişda xatolik: " + err.message);
       }
       return;
     }
@@ -341,9 +341,9 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
       try {
         const dataUrl = await fileToDataUrl(file);
         onSuccess(dataUrl, undefined, `${(file.size / (1024 * 1024)).toFixed(1)} MB`);
-        alert(`Google Drive'ga yuklashda ogohlantirish (${err.message}). Rasm lokal xotiraga olindi.`);
+        alert(`Google Drive'ga yuklaşda ogohlantiriş (${err.message}). Rasm lokal xotiraga olindi.`);
       } catch {
-        alert("Google Drive'ga yuklashda xatolik: " + err.message);
+        alert("Google Drive'ga yuklaşda xatolik: " + err.message);
       }
     } finally {
       setIsUploading(false);
@@ -376,9 +376,9 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
             images: combined
           }
         }));
-        alert("Eslatma: Google hisobingizga kirmagansiz, shuning uchun rasmlar vaqtinchalik brauzerga yuklandi. Rasmlarni rasmiy Google Drive jildiga (1xBvm3Oz0j4_n8YZB4sYPmA3EqcnqUp8d) saqlash uchun avval yuqoridagi 'Google bilan kirish' tugmasini bosing.");
+        alert("Eslatma: Google hisobingizga kirmagansiz, şuning uçun rasmlar vaqtinçalik brauzerga yuklandi. Rasmlarni rasmiy Google Drive jildiga (1xBvm3Oz0j4_n8YZB4sYPmA3EqcnqUp8d) saqlaş uçun avval yuqoridagi 'Google bilan kiriş' tugmasini bosing.");
       } catch (err: any) {
-        alert("Rasmlarni yuklashda xatolik: " + err.message);
+        alert("Rasmlarni yuklaşda xatolik: " + err.message);
       } finally {
         setIsUploading(false);
         e.target.value = '';
@@ -433,7 +433,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
             images: combined
           }
         }));
-        alert(`Google Drive'ga yuklashda ogohlantirish (${err.message}). Rasmlar vaqtinchalik lokal xotiraga olindi.`);
+        alert(`Google Drive'ga yuklaşda ogohlantiriş (${err.message}). Rasmlar vaqtinçalik lokal xotiraga olindi.`);
       } catch {}
     } finally {
       setIsUploading(false);
@@ -464,7 +464,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
     } else {
       setTelegramTestStatus({
         loading: false,
-        message: result.error || "Telegramga ulanishda xatolik yuz berdi.",
+        message: result.error || "Telegramga ulanişda xatolik yuz berdi.",
         isError: true
       });
     }
@@ -492,7 +492,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
     } else {
       setInstagramTestStatus({
         loading: false,
-        message: result.error || "Instagram akkauntiga ulanib bo‘lmadi.",
+        message: result.error || "Instagram akkauntiga ulanib bölmadi.",
         isError: true
       });
     }
@@ -502,7 +502,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
   const menuItems = [
     {
       id: 'overview',
-      label: 'Dashboard (Bosh sahifa)',
+      label: 'Dashboard (Boş sahifa)',
       icon: BarChart3,
       badge: 'AdminLTE',
       badgeClass: 'bg-primary text-white'
@@ -516,7 +516,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
     },
     {
       id: 'about',
-      label: '2. Bo‘lim haqida (Sho‘balar)',
+      label: '2. Bölim haqida (Şöbalar)',
       icon: Building2,
       badge: `${localSettings.branches?.length || 0}`,
       badgeClass: 'bg-secondary text-white'
@@ -565,7 +565,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
     },
     {
       id: 'contacts',
-      label: '9. Aloqa & Ish tartibi',
+      label: '9. Aloqa & Iş tartibi',
       icon: PhoneCall,
       badge: 'Manzil',
       badgeClass: 'bg-secondary text-white'
@@ -594,7 +594,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="p-2 rounded hover:bg-slate-100 text-slate-600 transition-colors"
-            title="Menyuni yashirish / ko‘rsatish"
+            title="Menyuni yaşiriş / körsatiş"
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -605,7 +605,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
               <span className="bg-sky-700 text-white px-2 py-0.5 rounded font-black text-xs tracking-wider">
                 AdminLTE
               </span>
-              <span className="hidden sm:inline font-bold text-slate-700">Qo‘shko‘pir MMTB</span>
+              <span className="hidden sm:inline font-bold text-slate-700">Qöşköpir MMTB</span>
             </span>
           </div>
 
@@ -615,7 +615,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
             onClick={(e) => { e.preventDefault(); onClose(); }}
             className="hidden md:inline-flex items-center gap-1 text-xs text-sky-700 hover:text-sky-900 font-medium ml-2 px-2 py-1 rounded hover:bg-sky-50"
           >
-            <span>Portalga qaytish</span>
+            <span>Portalga qaytiş</span>
             <ExternalLink className="w-3 h-3" />
           </a>
         </div>
@@ -627,7 +627,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
             onClick={syncNow}
             disabled={googleSyncStatus.syncing}
             className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 transition-colors"
-            title="Google Sheets bilan hoziroq sinxronlash"
+            title="Google Sheets bilan hoziroq sinxronlaş"
           >
             <RefreshCw className={`w-3.5 h-3.5 text-sky-600 ${googleSyncStatus.syncing ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">
@@ -642,7 +642,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
               target="_blank"
               rel="noopener noreferrer"
               className="hidden lg:inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100"
-              title="Google Drive fayllar jildini ochish"
+              title="Google Drive fayllar jildini oçiş"
             >
               <HardDrive className="w-3.5 h-3.5 text-amber-600" />
               <span>Drive Jildi ↗</span>
@@ -656,7 +656,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
               target="_blank"
               rel="noopener noreferrer"
               className="hidden lg:inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100"
-              title="Google Sheets jadvalini ochish"
+              title="Google Sheets jadvalini oçiş"
             >
               <Database className="w-3.5 h-3.5 text-emerald-600" />
               <span>Sheets Baza ↗</span>
@@ -686,23 +686,23 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
               <button
                 onClick={loginWithGoogle}
                 className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-sky-700 hover:bg-sky-800 text-white text-xs font-bold transition-colors shadow-xs"
-                title="Google hisobi orqali kirish (Oyna / Popup)"
+                title="Google hisobi orqali kiriş (Oyna / Popup)"
               >
                 <Database className="w-3.5 h-3.5" />
-                <span>Google bilan ulanish</span>
+                <span>Google bilan ulaniş</span>
               </button>
               <button
                 onClick={loginWithGoogleRedirect}
                 className="hidden xl:inline-flex items-center px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold border border-slate-300 transition-colors"
-                title="Mobil brauzerlar yoki popup bloklangan holatda yo‘naltirish orqali kirish"
+                title="Mobil brauzerlar yoki popup bloklangan holatda yönaltiriş orqali kiriş"
               >
-                Yo‘naltirish (Redirect)
+                Yönaltiriş (Redirect)
               </button>
               {(googleSyncStatus.unauthorizedDomain || (googleSyncStatus.error && googleSyncStatus.error.toLowerCase().includes('unauthorized'))) && (
                 <button
                   onClick={() => setDomainGuideModalOpen(true)}
                   className="p-1 rounded bg-amber-100 text-amber-800 hover:bg-amber-200 border border-amber-300 animate-pulse"
-                  title="Domen xatoligi va ko‘rsatma"
+                  title="Domen xatoligi va körsatma"
                 >
                   <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
                 </button>
@@ -717,16 +717,16 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
               onClose();
             }}
             className="inline-flex items-center gap-1.5 px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-colors shadow-2xs ml-1"
-            title="Admin seansini yakunlash va chiqish"
+            title="Admin seansini yakunlaş va çiqiş"
           >
             <LogOut className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Chiqish</span>
+            <span className="hidden sm:inline">Çiqiş</span>
           </button>
 
           <button
             onClick={onClose}
             className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 border border-slate-200 transition-colors"
-            title="Panelni yashirish"
+            title="Panelni yaşiriş"
           >
             <X className="w-5 h-5" />
           </button>
@@ -767,7 +767,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
             <div className="relative">
               <input
                 type="text"
-                placeholder="Bo‘limlarni qidirish..."
+                placeholder="Bölimlarni qidiriş..."
                 value={menuSearch}
                 onChange={e => setMenuSearch(e.target.value)}
                 className="w-full bg-[#3f474e] text-xs text-white placeholder-slate-400 rounded px-2.5 py-1.5 pr-8 border border-transparent focus:border-sky-500 focus:outline-hidden"
@@ -779,7 +779,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
           {/* Sidebar Menu - AdminLTE Treeview */}
           <nav className="flex-1 p-2 space-y-1">
             <div className="px-3 py-1.5 text-[10px] uppercase font-bold tracking-wider text-slate-400">
-              Asosiy boshqaruv
+              Asosiy boşqaruv
             </div>
             {filteredMenuItems.map(item => {
               const Icon = item.icon;
@@ -814,7 +814,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
 
           {/* Sidebar Footer info */}
           <div className="p-3 border-t border-[#4f5962] text-[11px] text-slate-400 text-center">
-            <div>Qo‘shko‘pir tumani MMTB</div>
+            <div>Qöşköpir tumani MMTB</div>
             <div className="text-[10px] text-slate-500 mt-0.5">AdminLTE v3.2.0 &bull; 2026</div>
           </div>
         </aside>
@@ -831,7 +831,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
               </h1>
               <div className="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
                 <span className="hover:text-slate-700 cursor-pointer" onClick={() => setActiveTab('overview')}>
-                  Boshqaruv
+                  Boşqaruv
                 </span>
                 <ChevronRight className="w-3 h-3 text-slate-400" />
                 <span className="text-slate-700 font-medium">
@@ -850,7 +850,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       item: {
                         date: new Date().toISOString().split('T')[0],
                         category: "Boshlang'ich ta'lim",
-                        author: "Qo‘shko‘pir MMTB Matbuot xizmati",
+                        author: "Qöşköpir MMTB Matbuot xizmati",
                         views: 120
                       },
                       isEdit: false,
@@ -862,7 +862,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-sky-700 hover:bg-sky-800 text-white font-semibold text-xs shadow-xs transition-colors"
                 >
                   <Plus className="w-4 h-4" />
-                  <span>Yangi yangilik qo‘shish</span>
+                  <span>Yangi yangilik qöşiş</span>
                 </button>
               )}
 
@@ -878,7 +878,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs shadow-xs transition-colors"
                 >
                   <Plus className="w-4 h-4" />
-                  <span>Yangi maktab/MTT qo‘shish</span>
+                  <span>Yangi maktab/MTT qöşiş</span>
                 </button>
               )}
 
@@ -919,10 +919,10 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                 <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                 <div>
                   <strong className="font-bold text-amber-950 block text-sm">
-                    GitHub Pages domeni ({googleSyncStatus.unauthorizedDomain || (typeof window !== 'undefined' ? window.location.hostname : 'github.io')}) Firebase loyihasida tasdiqlanishi lozim
+                    GitHub Pages domeni ({googleSyncStatus.unauthorizedDomain || (typeof window !== 'undefined' ? window.location.hostname : 'github.io')}) Firebase loyihasida tasdiqlanişi lozim
                   </strong>
                   <p className="mt-0.5 text-amber-800 leading-relaxed">
-                    Google xavfsizlik siyosati bo‘yicha OAuth kirish faqat ro‘yxatdan o‘tgan domenlarda ishlaydi. <code>potent-tempest-05xj8</code> loyihasiga GitHub domeningizni 20 soniyada qo‘shish mumkin.
+                    Google xavfsizlik siyosati böyiça OAuth kiriş faqat röyxatdan ötgan domenlarda işlaydi. <code>potent-tempest-05xj8</code> loyihasiga GitHub domeningizni 20 soniyada qöşiş mumkin.
                   </p>
                 </div>
               </div>
@@ -932,7 +932,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   className="px-3 py-1.5 rounded bg-amber-600 hover:bg-amber-700 text-white font-bold flex items-center gap-1.5 shadow-xs transition-colors"
                 >
                   <HelpCircle className="w-3.5 h-3.5" />
-                  <span>Ko‘rsatma va Yechim</span>
+                  <span>Körsatma va Yeçim</span>
                 </button>
                 <a
                   href="https://console.firebase.google.com/project/potent-tempest-05xj8/authentication/settings"
@@ -969,7 +969,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       onClick={() => setActiveTab('news')}
                       className="w-full bg-black/15 hover:bg-black/25 text-white py-1 px-4 text-xs font-semibold flex items-center justify-center gap-1 transition-colors"
                     >
-                      <span>Batafsil boshqarish</span>
+                      <span>Batafsil boşqariş</span>
                       <ChevronRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -987,7 +987,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       onClick={() => setActiveTab('orgs')}
                       className="w-full bg-black/15 hover:bg-black/25 text-white py-1 px-4 text-xs font-semibold flex items-center justify-center gap-1 transition-colors"
                     >
-                      <span>Ro‘yxatni ko‘rish</span>
+                      <span>Röyxatni köriş</span>
                       <ChevronRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -1023,7 +1023,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       onClick={() => setActiveTab('appeals')}
                       className="w-full bg-black/15 hover:bg-black/25 text-white py-1 px-4 text-xs font-semibold flex items-center justify-center gap-1 transition-colors"
                     >
-                      <span>Arizalarga javob berish</span>
+                      <span>Arizalarga javob beriş</span>
                       <ChevronRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -1036,7 +1036,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       <School className="w-6 h-6" />
                     </div>
                     <div>
-                      <span className="text-[11px] font-bold text-slate-500 uppercase block">O‘quvchilar soni</span>
+                      <span className="text-[11px] font-bold text-slate-500 uppercase block">Öquvçilar soni</span>
                       <span className="text-xl font-bold text-slate-900">{localSettings.studentsTotal?.toLocaleString()} nafar</span>
                     </div>
                   </div>
@@ -1058,7 +1058,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                     <div>
                       <span className="text-[11px] font-bold text-slate-500 uppercase block">Telegram Kanali</span>
                       <span className="text-sm font-bold text-slate-900">@{localSettings.telegramChannelUsername || 'qoshkopir_mmtb'}</span>
-                      <span className="text-[10px] text-emerald-600 block font-semibold">Avto-yuborish faol</span>
+                      <span className="text-[10px] text-emerald-600 block font-semibold">Avto-yuboriş faol</span>
                     </div>
                   </div>
 
@@ -1082,12 +1082,12 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       <span>Google Sheets Ma’lumotlar Bazasi va Google Drive Ombori Holati</span>
                     </h3>
                     <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">
-                      Qo‘shko‘pir MMTB
+                      Qöşköpir MMTB
                     </span>
                   </div>
                   <div className="p-4 sm:p-6 space-y-4 text-xs">
                     <p className="text-slate-600 leading-relaxed">
-                      Saytning barcha bo‘limlari (maktablar, MTTlar, me’yoriy hujjatlar, yangiliklar, murojaatlar va sozlamalar) Google Sheets jadvali bilan integratsiya qilingan. Barcha fayllar avtomatik tarzda Google Drive xizmatiga yuklanadi.
+                      Saytning barça bölimlari (maktablar, MTTlar, me’yoriy hujjatlar, yangiliklar, murojaatlar va sozlamalar) Google Sheets jadvali bilan integratsiya qilingan. Barça fayllar avtomatik tarzda Google Drive xizmatiga yuklanadi.
                     </p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1098,7 +1098,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                         </strong>
                         <div>Nomi: <code className="bg-white px-1.5 py-0.5 rounded border border-slate-300 font-mono text-slate-800">Qo'shko'pir_MMTB_Rasmiy_Baza</code></div>
                         <div>
-                          Jadval ID: <span className="font-mono text-slate-700">{googleSyncStatus.spreadsheetId || "Avtomatik bog‘langan"}</span>
+                          Jadval ID: <span className="font-mono text-slate-700">{googleSyncStatus.spreadsheetId || "Avtomatik boğlangan"}</span>
                         </div>
                         {googleSyncStatus.spreadsheetId && (
                           <a
@@ -1107,7 +1107,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-900 font-semibold"
                           >
-                            <span>Jadvalni to‘g‘ridan-to‘g‘ri Google Sheets da ochish</span>
+                            <span>Jadvalni töğridan-töğri Google Sheets da oçiş</span>
                             <ExternalLink className="w-3 h-3" />
                           </a>
                         )}
@@ -1120,7 +1120,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                         </strong>
                         <div>Jild nomi: <code className="bg-white px-1.5 py-0.5 rounded border border-slate-300 font-mono text-slate-800">Qo'shko'pir_MMTB_Fayllar</code></div>
                         <div>
-                          Jild ID: <span className="font-mono text-slate-700">{googleSyncStatus.folderId || "Avtomatik bog‘langan"}</span>
+                          Jild ID: <span className="font-mono text-slate-700">{googleSyncStatus.folderId || "Avtomatik boğlangan"}</span>
                         </div>
                         {googleSyncStatus.folderId && (
                           <a
@@ -1129,7 +1129,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 text-amber-700 hover:text-amber-900 font-semibold"
                           >
-                            <span>Fayllar jildini Google Drive da ochish</span>
+                            <span>Fayllar jildini Google Drive da oçiş</span>
                             <ExternalLink className="w-3 h-3" />
                           </a>
                         )}
@@ -1183,7 +1183,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                     </div>
                     <div>
                       <label className="font-bold text-slate-700 block mb-1">
-                        Kichik Sarlavha (Badge matni)
+                        Kiçik Sarlavha (Badge matni)
                       </label>
                       <input
                         type="text"
@@ -1216,7 +1216,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                         />
                         <label className="cursor-pointer px-3 py-2 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 font-semibold text-slate-700 flex items-center gap-1 shrink-0">
                           <Upload className="w-3.5 h-3.5 text-sky-600" />
-                          <span>Yuklash</span>
+                          <span>Yuklaş</span>
                           <input
                             type="file"
                             accept="image/*"
@@ -1237,7 +1237,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       className="px-4 py-2 rounded bg-sky-700 hover:bg-sky-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs"
                     >
                       <Save className="w-4 h-4" />
-                      <span>O‘zgarishlarni Saqlash</span>
+                      <span>Özgarişlarni Saqlaş</span>
                     </button>
                   </div>
                 </div>
@@ -1250,7 +1250,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                         Asosiy Sahifadagi Tezkor Xizmatlar Kartalari
                       </h3>
                       <p className="text-xs text-slate-500">
-                        Fuqarolar va o‘qituvchilar uchun qulay navigatsiya tugmalari
+                        Fuqarolar va öqituvçilar uçun qulay navigatsiya tugmalari
                       </p>
                     </div>
                     <button
@@ -1267,7 +1267,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       className="px-3 py-1.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs flex items-center gap-1 shadow-xs"
                     >
                       <Plus className="w-3.5 h-3.5" />
-                      <span>Xizmat qo‘shish</span>
+                      <span>Xizmat qöşiş</span>
                     </button>
                   </div>
 
@@ -1297,8 +1297,8 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                           <button
                             onClick={() => {
                               requestDelete(
-                                "Xizmatni o‘chirish",
-                                `Haqiqatan ham "${srv.title}" xizmatini o‘chirmoqchimisiz?`,
+                                "Xizmatni öçiriş",
+                                `Haqiqatan ham "${srv.title}" xizmatini öçirmoqçimisiz?`,
                                 async () => {
                                   const updated = localSettings.quickServices.filter((_, i) => i !== idx);
                                   const newSettings = { ...localSettings, quickServices: updated };
@@ -1308,7 +1308,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                               );
                             }}
                             className="p-1 rounded hover:bg-red-50 text-red-600"
-                            title="O‘chirish"
+                            title="Öçiriş"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -1328,7 +1328,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                 <div className="bg-white rounded border border-slate-200 border-t-4 border-t-sky-600 shadow-xs p-6 space-y-4">
                   <div className="flex items-center justify-between border-b pb-3">
                     <h3 className="font-bold text-slate-800 text-sm">
-                      2. Bo‘lim Haqida Asosiy Ma’lumotlar
+                      2. Bölim Haqida Asosiy Ma’lumotlar
                     </h3>
                     <UzbekLetterHelper
                       compact
@@ -1352,7 +1352,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   <div className="space-y-4 text-xs">
                     <div>
                       <label className="font-bold text-slate-700 block mb-1">
-                        Bo‘limning Maqsadi va Missiyasi
+                        Bölimning Maqsadi va Missiyasi
                       </label>
                       <textarea
                         rows={3}
@@ -1364,7 +1364,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
 
                     <div>
                       <label className="font-bold text-slate-700 block mb-1">
-                        Bo‘lim Tarixi va Tashkil Topishi
+                        Bölim Tarixi va Taşkil Topişi
                       </label>
                       <textarea
                         rows={3}
@@ -1391,12 +1391,12 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                     <button
                       onClick={async () => {
                         await updateSettings(localSettings);
-                        alert("Bo‘lim ma’lumotlari muvaffaqiyatli saqlandi!");
+                        alert("Bölim ma’lumotlari muvaffaqiyatli saqlandi!");
                       }}
                       className="px-4 py-2 rounded bg-sky-700 hover:bg-sky-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs"
                     >
                       <Save className="w-4 h-4" />
-                      <span>Saqlash</span>
+                      <span>Saqlaş</span>
                     </button>
                   </div>
                 </div>
@@ -1406,10 +1406,10 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   <div className="flex items-center justify-between border-b pb-3">
                     <div>
                       <h3 className="font-bold text-slate-800 text-sm">
-                        Bo‘lim Sho‘balari va Tarkibiy Tuzilmasi
+                        Bölim Şöbalari va Tarkibiy Tuzilmasi
                       </h3>
                       <p className="text-xs text-slate-500">
-                        Metodika, kadrlash, moliya va axborot texnologiyalari sho‘balari
+                        Metodika, kadrlaş, moliya va axborot texnologiyalari şöbalari
                       </p>
                     </div>
                     <button
@@ -1423,7 +1423,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       className="px-3 py-1.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs flex items-center gap-1 shadow-xs"
                     >
                       <Plus className="w-3.5 h-3.5" />
-                      <span>Sho‘ba qo‘shish</span>
+                      <span>Şöba qöşiş</span>
                     </button>
                   </div>
 
@@ -1450,8 +1450,8 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                             <button
                               onClick={() => {
                                 requestDelete(
-                                  "Sho‘bani o‘chirish",
-                                  `"${branch.name}" sho‘basini o‘chirmoqchimisiz?`,
+                                  "Şöbani öçiriş",
+                                  `"${branch.name}" şöbasini öçirmoqçimisiz?`,
                                   async () => {
                                     const updated = localSettings.branches.filter((_, i) => i !== idx);
                                     const newSettings = { ...localSettings, branches: updated };
@@ -1461,7 +1461,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                                 );
                               }}
                               className="p-1 rounded hover:bg-red-50 text-red-600"
-                              title="O‘chirish"
+                              title="Öçiriş"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -1485,10 +1485,10 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4">
                   <div>
                     <h3 className="font-bold text-slate-800 text-sm">
-                      3. Ta’lim Muassasalari (Maktab va Bog‘chalar Boshqaruvi)
+                      3. Ta’lim Muassasalari (Maktab va Boğçalar Boşqaruvi)
                     </h3>
                     <p className="text-xs text-slate-500">
-                      Qo‘shko‘pir tumanidagi barcha 54 ta umumta’lim maktabi va 38 ta MTT ro‘yxati
+                      Qöşköpir tumanidagi barça 54 ta umumta’lim maktabi va 38 ta MTT röyxati
                     </p>
                   </div>
                   <button
@@ -1502,7 +1502,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                     className="px-3 py-1.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs flex items-center gap-1 shadow-xs"
                   >
                     <Plus className="w-4 h-4" />
-                    <span>Yangi Muassasa Qo‘shish</span>
+                    <span>Yangi Muassasa Qöşiş</span>
                   </button>
                 </div>
 
@@ -1515,7 +1515,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                         <th className="p-2.5">Direktor</th>
                         <th className="p-2.5">Manzil</th>
                         <th className="p-2.5">Telefon</th>
-                        <th className="p-2.5">O‘quvchi/Tarbiyalanuvchi</th>
+                        <th className="p-2.5">Öquvçi/Tarbiyalanuvçi</th>
                         <th className="p-2.5 text-right">Amallar</th>
                       </tr>
                     </thead>
@@ -1545,15 +1545,15 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                             <button
                               onClick={() => {
                                 requestDelete(
-                                  "Muassasani o‘chirish",
-                                  `Haqiqatan ham "${org.name}" muassasasini bazadan o‘chirmoqchimisiz?`,
+                                  "Muassasani öçiriş",
+                                  `Haqiqatan ham "${org.name}" muassasasini bazadan öçirmoqçimisiz?`,
                                   async () => {
                                     await deleteOrganization(org.id);
                                   }
                                 );
                               }}
                               className="p-1 rounded text-red-500 hover:text-red-700 hover:bg-red-50"
-                              title="O‘chirish"
+                              title="Öçiriş"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -1574,10 +1574,10 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4">
                   <div>
                     <h3 className="font-bold text-slate-800 text-sm">
-                      4. Bo‘lim Rahbariyati Tarkibi
+                      4. Bölim Rahbariyati Tarkibi
                     </h3>
                     <p className="text-xs text-slate-500">
-                      Bo‘lim mudiri, o‘rinbosarlari va fuqarolarni qabul qilish kunlari
+                      Bölim mudiri, örinbosarlari va fuqarolarni qabul qiliş kunlari
                     </p>
                   </div>
                   <button
@@ -1591,7 +1591,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                     className="px-3 py-1.5 rounded bg-sky-700 hover:bg-sky-800 text-white font-semibold text-xs flex items-center gap-1 shadow-xs"
                   >
                     <Plus className="w-4 h-4" />
-                    <span>Yangi Rahbar Qo‘shish</span>
+                    <span>Yangi Rahbar Qöşiş</span>
                   </button>
                 </div>
 
@@ -1614,13 +1614,13 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                             onClick={() => setLeaderModal({ isOpen: true, item: ldr, isEdit: true })}
                             className="text-xs font-semibold text-sky-700 hover:underline"
                           >
-                            Tahrirlash
+                            Tahrirlaş
                           </button>
                           <button
                             onClick={() => {
                               requestDelete(
-                                "Rahbarni o‘chirish",
-                                `"${ldr.name}"ni ro‘yxatdan o‘chirmoqchimisiz?`,
+                                "Rahbarni öçiriş",
+                                `"${ldr.name}"ni röyxatdan öçirmoqçimisiz?`,
                                 async () => {
                                   await deleteLeader(ldr.id);
                                 }
@@ -1628,7 +1628,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                             }}
                             className="text-xs font-semibold text-red-600 hover:underline"
                           >
-                            O‘chirish
+                            Öçiriş
                           </button>
                         </div>
                       </div>
@@ -1667,7 +1667,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                     className="px-3 py-1.5 rounded bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs flex items-center gap-1 shadow-xs"
                   >
                     <Plus className="w-4 h-4" />
-                    <span>Yangi Hujjat Qo‘shish</span>
+                    <span>Yangi Hujjat Qöşiş</span>
                   </button>
                 </div>
 
@@ -1720,8 +1720,8 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                             <button
                               onClick={() => {
                                 requestDelete(
-                                  "Hujjatni o‘chirish",
-                                  `Haqiqatan ham "${doc.title}" hujjatini o‘chirmoqchimisiz?`,
+                                  "Hujjatni öçiriş",
+                                  `Haqiqatan ham "${doc.title}" hujjatini öçirmoqçimisiz?`,
                                   async () => {
                                     if (doc.driveFileId) {
                                       await deleteFileFromDrive(doc.driveFileId);
@@ -1731,7 +1731,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                                 );
                               }}
                               className="p-1 rounded text-red-500 hover:text-red-700 hover:bg-red-50"
-                              title="O‘chirish"
+                              title="Öçiriş"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -1753,10 +1753,10 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   <div>
                     <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
                       <FileText className="w-4 h-4 text-sky-600" />
-                      <span>6. Yangiliklar va Ijtimoiy Tarmoqlarga Tarqatish (Telegram, Instagram, Facebook)</span>
+                      <span>6. Yangiliklar va Ijtimoiy Tarmoqlarga Tarqatiş (Telegram, Instagram, Facebook)</span>
                     </h3>
                     <p className="text-xs text-slate-500">
-                      Yangilik kiritilganda bir vaqtning o‘zida Telegram kanal, Instagram va Facebook sahifasiga yuboriladi
+                      Yangilik kiritilganda bir vaqtning özida Telegram kanal, Instagram va Facebook sahifasiga yuboriladi
                     </p>
                   </div>
                   <button
@@ -1766,7 +1766,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                         item: {
                           date: new Date().toISOString().split('T')[0],
                           category: "Boshlang'ich ta'lim",
-                          author: "Qo‘shko‘pir MMTB Matbuot xizmati",
+                          author: "Qöşköpir MMTB Matbuot xizmati",
                           views: 100
                         },
                         isEdit: false,
@@ -1778,7 +1778,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                     className="px-3 py-1.5 rounded bg-sky-700 hover:bg-sky-800 text-white font-semibold text-xs flex items-center gap-1 shadow-xs"
                   >
                     <Plus className="w-4 h-4" />
-                    <span>Yangi Yangilik Kiritish</span>
+                    <span>Yangi Yangilik Kiritiş</span>
                   </button>
                 </div>
 
@@ -1819,21 +1819,21 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                             {item.sentToTelegram && (
                               <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-sky-100 text-sky-700 font-semibold text-[10px]">
                                 <Send className="w-3 h-3" />
-                                <span>Telegramda ulashildi</span>
+                                <span>Telegramda ulaşildi</span>
                               </span>
                             )}
 
                             {item.sentToInstagram && (
                               <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-pink-100 text-pink-700 font-semibold text-[10px]">
                                 <Instagram className="w-3 h-3" />
-                                <span>Instagramda ulashildi</span>
+                                <span>Instagramda ulaşildi</span>
                               </span>
                             )}
 
                             {item.sentToFacebook && (
                               <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 font-semibold text-[10px]">
                                 <Facebook className="w-3 h-3" />
-                                <span>Facebookda ulashildi</span>
+                                <span>Facebookda ulaşildi</span>
                               </span>
                             )}
                           </div>
@@ -1847,11 +1847,11 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                           onClick={() => {
                             const caption = formatInstagramCaption(item);
                             navigator.clipboard.writeText(caption);
-                            alert("Instagram uchun post matni va hashtaglari nusxalandi! Endi Instagram sahifangizga rasm bilan joylashingiz mumkin.");
+                            alert("Instagram uçun post matni va hashtaglari nusxalandi! Endi Instagram sahifangizga rasm bilan joylaşingiz mumkin.");
                             window.open(localSettings.instagramPage || 'https://instagram.com', '_blank');
                           }}
                           className="px-2 py-1 rounded bg-pink-50 hover:bg-pink-100 text-pink-700 font-semibold border border-pink-200 flex items-center gap-1"
-                          title="Instagramda ulashish (Matnni nusxalash)"
+                          title="Instagramda ulaşiş (Matnni nusxalaş)"
                         >
                           <Instagram className="w-3.5 h-3.5" />
                           <span className="hidden sm:inline">Instagram</span>
@@ -1863,7 +1863,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                           target="_blank"
                           rel="noopener noreferrer"
                           className="px-2 py-1 rounded bg-sky-50 hover:bg-sky-100 text-sky-700 font-semibold border border-sky-200 flex items-center gap-1"
-                          title="Telegramda qo‘lda ulashish"
+                          title="Telegramda qölda ulaşiş"
                         >
                           <Send className="w-3.5 h-3.5" />
                           <span className="hidden sm:inline">Telegram</span>
@@ -1896,15 +1896,15 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                         <button
                           onClick={() => {
                             requestDelete(
-                              "Yangilikni o‘chirish",
-                              `Haqiqatan ham "${item.title}" xabarini o‘chirmoqchimisiz?`,
+                              "Yangilikni öçiriş",
+                              `Haqiqatan ham "${item.title}" xabarini öçirmoqçimisiz?`,
                               async () => {
                                 await deleteNews(item.id);
                               }
                             );
                           }}
                           className="p-1.5 rounded hover:bg-red-50 text-red-600"
-                          title="O‘chirish"
+                          title="Öçiriş"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -1926,7 +1926,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       7. Virtual Qabulxona (Fuqarolar va Ota-onalar Murojaatlari)
                     </h3>
                     <p className="text-xs text-slate-500">
-                      Kelib tushgan arizalar, holatlar, ko‘rib chiqish muddati va rasmiy javob xatlari
+                      Kelib tuşgan arizalar, holatlar, körib çiqiş muddati va rasmiy javob xatlari
                     </p>
                   </div>
                 </div>
@@ -1980,26 +1980,26 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                                   isOpen: true,
                                   item: apl,
                                   replyText: apl.replyMessage || '',
-                                  officer: apl.officer || 'Qo‘shko‘pir tumani MMTB ijrochisi',
+                                  officer: apl.officer || 'Qöşköpir tumani MMTB ijroçisi',
                                   status: apl.status
                                 })
                               }
                               className="px-2.5 py-1 rounded bg-sky-700 hover:bg-sky-800 text-white font-semibold text-[11px] mr-1"
                             >
-                              Ko‘rib chiqish
+                              Körib çiqiş
                             </button>
                             <button
                               onClick={() => {
                                 requestDelete(
-                                  "Murojaatni o‘chirish",
-                                  `Haqiqatan ham ushbu murojaatni o‘chirmoqchimisiz?`,
+                                  "Murojaatni öçiriş",
+                                  `Haqiqatan ham uşbu murojaatni öçirmoqçimisiz?`,
                                   async () => {
                                     await deleteAppeal(apl.id);
                                   }
                                 );
                               }}
                               className="p-1 rounded text-red-500 hover:text-red-700 hover:bg-red-50"
-                              title="O‘chirish"
+                              title="Öçiriş"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -2035,7 +2035,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                         }
                         className="rounded text-sky-600 focus:ring-sky-500"
                       />
-                      <span>Yangiliklarni avtomatik Telegramga yuborish</span>
+                      <span>Yangiliklarni avtomatik Telegramga yuboriş</span>
                     </label>
                   </div>
 
@@ -2054,7 +2054,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                         className="w-full px-3 py-2 rounded border border-slate-300 focus:border-sky-500 font-mono"
                       />
                       <span className="text-[11px] text-slate-500 block mt-1">
-                        Botni o‘z kanalingizga qo‘shib, unga <strong>"Administrator"</strong> (Post xabarlarini yuborish) huquqini bering.
+                        Botni öz kanalingizga qöşib, unga <strong>"Administrator"</strong> (Post xabarlarini yuboriş) huquqini bering.
                       </span>
                     </div>
 
@@ -2072,7 +2072,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                         className="w-full px-3 py-2 rounded border border-slate-300 focus:border-sky-500 font-mono"
                       />
                       <span className="text-[11px] text-slate-500 block mt-1">
-                        Ommaviy kanal bo‘lsa <code>@kanal_nomi</code>, yopiq bo‘lsa ID kiriting.
+                        Ommaviy kanal bölsa <code>@kanal_nomi</code>, yopiq bölsa ID kiriting.
                       </span>
                     </div>
                   </div>
@@ -2095,7 +2095,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       disabled={telegramTestStatus.loading}
                       className="px-3.5 py-1.5 rounded bg-sky-100 hover:bg-sky-200 text-sky-800 font-bold border border-sky-300 transition-colors"
                     >
-                      {telegramTestStatus.loading ? "Tekshirilmoqda..." : "Telegram Aloqasini Tekshirish"}
+                      {telegramTestStatus.loading ? "Tekshirilmoqda..." : "Telegram Aloqasini Tekşiriş"}
                     </button>
 
                     <button
@@ -2105,7 +2105,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       }}
                       className="px-4 py-1.5 rounded bg-sky-700 hover:bg-sky-800 text-white font-bold"
                     >
-                      Saqlash
+                      Saqlaş
                     </button>
                   </div>
                 </div>
@@ -2116,7 +2116,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                     <div className="flex items-center gap-2">
                       <Instagram className="w-5 h-5 text-pink-600" />
                       <h3 className="font-bold text-slate-800 text-sm">
-                        Instagram Akkaunt va Tarqatish Sozlamalari
+                        Instagram Akkaunt va Tarqatiş Sozlamalari
                       </h3>
                     </div>
                     <label className="flex items-center gap-2 font-semibold text-slate-700 cursor-pointer">
@@ -2128,14 +2128,14 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                         }
                         className="rounded text-pink-600 focus:ring-pink-500"
                       />
-                      <span>Instagramga avtomatik yuborish (Graph API)</span>
+                      <span>Instagramga avtomatik yuboriş (Graph API)</span>
                     </label>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="font-bold text-slate-700 block mb-1">
-                        Instagram Sahifasi Havolasi (Veb saytda ko‘rsatiladigan link)
+                        Instagram Sahifasi Havolasi (Veb saytda körsatiladigan link)
                       </label>
                       <input
                         type="text"
@@ -2178,7 +2178,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       />
                       <span className="text-[11px] text-slate-500 block mt-1">
                         Facebook Developer portali orqali Instagram Business akkauntiga ulangan uzoq muddatli Access Token.
-                        Agar API mavjud bo‘lmasa, yangilik kiritishda <strong>1-click "Instagram matnini nusxalash"</strong> orqali tayyor post va hashtaglarni to‘g‘ridan-to‘g‘ri joylashingiz mumkin!
+                        Agar API mavjud bölmasa, yangilik kiritişda <strong>1-click "Instagram matnini nusxalaş"</strong> orqali tayyor post va hashtaglarni töğridan-töğri joylaşingiz mumkin!
                       </span>
                     </div>
                   </div>
@@ -2201,7 +2201,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       disabled={instagramTestStatus.loading}
                       className="px-3.5 py-1.5 rounded bg-pink-100 hover:bg-pink-200 text-pink-800 font-bold border border-pink-300 transition-colors"
                     >
-                      {instagramTestStatus.loading ? "Tekshirilmoqda..." : "Instagram Aloqasini Tekshirish"}
+                      {instagramTestStatus.loading ? "Tekshirilmoqda..." : "Instagram Aloqasini Tekşiriş"}
                     </button>
 
                     <button
@@ -2211,7 +2211,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       }}
                       className="px-4 py-1.5 rounded bg-pink-700 hover:bg-pink-800 text-white font-bold"
                     >
-                      Saqlash
+                      Saqlaş
                     </button>
                   </div>
                 </div>
@@ -2234,7 +2234,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                         }
                         className="rounded text-blue-600 focus:ring-blue-500"
                       />
-                      <span>Facebook sahifasiga avtomatik yuborish</span>
+                      <span>Facebook sahifasiga avtomatik yuboriş</span>
                     </label>
                   </div>
 
@@ -2277,7 +2277,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       }}
                       className="px-4 py-1.5 rounded bg-blue-700 hover:bg-blue-800 text-white font-bold"
                     >
-                      Saqlash
+                      Saqlaş
                     </button>
                   </div>
                 </div>
@@ -2291,7 +2291,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
               <div className="bg-white rounded border border-slate-200 border-t-4 border-t-sky-600 shadow-xs p-6 space-y-4 text-xs">
                 <div className="flex items-center justify-between border-b pb-3">
                   <h3 className="font-bold text-slate-800 text-sm">
-                    9. Aloqa Ma’lumotlari, Ish Tartibi va Tuman Statistikasi
+                    9. Aloqa Ma’lumotlari, Iş Tartibi va Tuman Statistikasi
                   </h3>
                   <UzbekLetterHelper
                     compact
@@ -2324,7 +2324,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Bo‘lim Telefon Raqami</label>
+                    <label className="font-bold text-slate-700 block mb-1">Bölim Telefon Raqami</label>
                     <input
                       type="text"
                       value={localSettings.departmentPhone}
@@ -2334,7 +2334,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Ishonch Telefoni</label>
+                    <label className="font-bold text-slate-700 block mb-1">Işonç Telefoni</label>
                     <input
                       type="text"
                       value={localSettings.trustPhone}
@@ -2344,7 +2344,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Rasmiy Elektron Pochta</label>
+                    <label className="font-bold text-slate-700 block mb-1">Rasmiy Elektron Poçta</label>
                     <input
                       type="email"
                       value={localSettings.email}
@@ -2354,7 +2354,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Ish Tartibi (Ish vaqti)</label>
+                    <label className="font-bold text-slate-700 block mb-1">Iş Tartibi (Iş vaqti)</label>
                     <input
                       type="text"
                       value={localSettings.workingHours}
@@ -2364,7 +2364,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Pochta Manzili</label>
+                    <label className="font-bold text-slate-700 block mb-1">Poçta Manzili</label>
                     <input
                       type="text"
                       value={localSettings.address}
@@ -2374,7 +2374,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Jami O‘quvchilar Soni</label>
+                    <label className="font-bold text-slate-700 block mb-1">Jami Öquvçilar Soni</label>
                     <input
                       type="number"
                       value={localSettings.studentsTotal}
@@ -2384,7 +2384,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Jami O‘qituvchilar Soni</label>
+                    <label className="font-bold text-slate-700 block mb-1">Jami Öqituvçilar Soni</label>
                     <input
                       type="number"
                       value={localSettings.teachersTotal}
@@ -2394,7 +2394,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Oliy Toifali O‘qituvchilar Soni</label>
+                    <label className="font-bold text-slate-700 block mb-1">Oliy Toifali Öqituvçilar Soni</label>
                     <input
                       type="number"
                       value={localSettings.higherCategoryTeachersCount}
@@ -2405,7 +2405,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
 
                   <div className="md:col-span-2 lg:col-span-3">
                     <label className="font-bold text-slate-700 block mb-1">
-                      Sayt Yuqorisidagi Yuguruvchi Satr Matni (Marquee)
+                      Sayt Yuqorisidagi Yuguruvçi Satr Matni (Marquee)
                     </label>
                     <input
                       type="text"
@@ -2425,7 +2425,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                     className="px-4 py-2 rounded bg-sky-700 hover:bg-sky-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs"
                   >
                     <Save className="w-4 h-4" />
-                    <span>Saqlash</span>
+                    <span>Saqlaş</span>
                   </button>
                 </div>
               </div>
@@ -2439,10 +2439,10 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                 <div className="border-b pb-3">
                   <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
                     <Database className="w-5 h-5 text-emerald-600" />
-                    <span>Google Sheets va Google Drive Bilan To‘liq Integratsiya</span>
+                    <span>Google Sheets va Google Drive Bilan Töliq Integratsiya</span>
                   </h3>
                   <p className="text-slate-500 mt-0.5">
-                    Saytdagi barcha ma’lumotlar bazasi Google Sheets va Google Drive hisobingiz bilan bevosita sinxronlanadi
+                    Saytdagi barça ma’lumotlar bazasi Google Sheets va Google Drive hisobingiz bilan bevosita sinxronlanadi
                   </p>
                 </div>
 
@@ -2459,11 +2459,11 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       }`} />
                       <div>
                         <strong className="font-bold text-slate-900 block text-sm">
-                          GitHub Pages Domeni Bo‘yicha Ruxsat:
+                          GitHub Pages Domeni Böyiça Ruxsat:
                         </strong>
                         <p className="text-slate-700 mt-1 leading-relaxed">
                           Sayt manzili: <code className="bg-white px-2 py-0.5 rounded border font-mono font-bold text-slate-900">{typeof window !== 'undefined' ? window.location.hostname : 'github.io'}</code>.
-                          Google OAuth xavfsizlik talabiga binoan, GitHub Pages orqali Google bilan kirish uchun ushbu domen Firebase loyihasining "Authorized domains" ro‘yxatiga qo‘shilishi kerak.
+                          Google OAuth xavfsizlik talabiga binoan, GitHub Pages orqali Google bilan kiriş uçun uşbu domen Firebase loyihasining "Authorized domains" röyxatiga qöşilişi kerak.
                         </p>
                       </div>
                     </div>
@@ -2480,7 +2480,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       className="px-3 py-1.5 rounded bg-white hover:bg-slate-100 text-slate-800 font-semibold border border-slate-300 flex items-center gap-1.5 shadow-2xs transition-colors"
                     >
                       {domainCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
-                      <span>{domainCopied ? "Domen nusxalandi!" : "Domen nomidan nusxa olish"}</span>
+                      <span>{domainCopied ? "Domen nusxalandi!" : "Domen nomidan nusxa oliş"}</span>
                     </button>
 
                     <a
@@ -2490,7 +2490,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       className="px-3 py-1.5 rounded bg-sky-700 hover:bg-sky-800 text-white font-semibold flex items-center gap-1.5 shadow-2xs transition-colors"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
-                      <span>Firebase Console'da Qo‘shish (20 soniya)</span>
+                      <span>Firebase Console'da Qöşiş (20 soniya)</span>
                     </a>
 
                     <button
@@ -2498,7 +2498,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       className="px-3 py-1.5 rounded bg-amber-600 hover:bg-amber-700 text-white font-semibold flex items-center gap-1.5 shadow-2xs transition-colors"
                     >
                       <HelpCircle className="w-3.5 h-3.5" />
-                      <span>Qadamma-qadam ko‘rsatma</span>
+                      <span>Qadamma-qadam körsatma</span>
                     </button>
                   </div>
                 </div>
@@ -2506,7 +2506,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                 {/* Google Connection Status Card */}
                 <div className="p-4 rounded bg-slate-50 border border-slate-200 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-slate-800 text-sm">Google Hisobiga Ulanish Holati:</span>
+                    <span className="font-bold text-slate-800 text-sm">Google Hisobiga Ulaniş Holati:</span>
                     <span className={`px-2.5 py-1 rounded text-xs font-bold ${
                       googleSyncStatus.isConnected ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-amber-100 text-amber-800 border border-amber-300'
                     }`}>
@@ -2526,7 +2526,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                             rel="noopener noreferrer"
                             className="text-sky-700 hover:underline font-bold inline-flex items-center gap-1"
                           >
-                            <span>Jadvalni ochish</span>
+                            <span>Jadvalni oçiş</span>
                             <ExternalLink className="w-3 h-3" />
                           </a>
                         </div>
@@ -2540,7 +2540,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                             rel="noopener noreferrer"
                             className="text-sky-700 hover:underline font-bold inline-flex items-center gap-1"
                           >
-                            <span>Jildni ochish</span>
+                            <span>Jildni oçiş</span>
                             <ExternalLink className="w-3 h-3" />
                           </a>
                         </div>
@@ -2563,13 +2563,13 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                           className="px-3 py-1.5 rounded bg-sky-700 hover:bg-sky-800 text-white font-semibold flex items-center gap-1.5 shadow-2xs"
                         >
                           <RefreshCw className={`w-3.5 h-3.5 ${googleSyncStatus.syncing ? 'animate-spin' : ''}`} />
-                          <span>{googleSyncStatus.syncing ? "Sinxronlanmoqda..." : "Hoziroq Sinxronlash"}</span>
+                          <span>{googleSyncStatus.syncing ? "Sinxronlanmoqda..." : "Hoziroq Sinxronlaş"}</span>
                         </button>
                         <button
                           onClick={logoutGoogle}
                           className="px-3 py-1.5 rounded bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold shadow-2xs"
                         >
-                          Google Hisobidan Chiqish
+                          Google Hisobidan Çiqiş
                         </button>
                       </>
                     ) : (
@@ -2580,17 +2580,17 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                           className="px-3 py-1.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-semibold flex items-center gap-1.5 shadow-2xs transition-colors"
                         >
                           <Database className="w-3.5 h-3.5" />
-                          <span>Google Bilan Kirish (Oyna / Popup)</span>
+                          <span>Google Bilan Kiriş (Oyna / Popup)</span>
                         </button>
 
                         <button
                           onClick={loginWithGoogleRedirect}
                           disabled={googleSyncStatus.syncing}
                           className="px-3 py-1.5 rounded bg-sky-700 hover:bg-sky-800 text-white font-semibold flex items-center gap-1.5 shadow-2xs transition-colors"
-                          title="Agar oyna ochilmasa yoki mobil telefonda bo‘lsangiz bosing"
+                          title="Agar oyna oçilmasa yoki mobil telefonda bölsangiz bosing"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
-                          <span>Google Bilan Kirish (Yo‘naltirish / Redirect)</span>
+                          <span>Google Bilan Kiriş (Yönaltiriş / Redirect)</span>
                         </button>
                       </>
                     )}
@@ -2602,11 +2602,11 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   <div className="flex items-center gap-2 text-emerald-950">
                     <Database className="w-5 h-5 text-emerald-700" />
                     <span className="font-bold text-sm">
-                      Google Sheets Bazasini Saytga O‘rnatish va Bog‘lash (Instalizatsiya)
+                      Google Sheets Bazasini Saytga Örnatiş va Boğlaş (Instalizatsiya)
                     </span>
                   </div>
                   <p className="text-slate-700 text-xs leading-relaxed">
-                    Ushbu maydonga Google Sheets jadvalingizning to‘liq havolasini (masalan: <code className="bg-white px-1.5 py-0.5 rounded border text-slate-800">https://docs.google.com/spreadsheets/d/.../edit</code>) yoki faqat ID sini kiriting va <strong>«O‘rnatish va Bog‘lash»</strong> tugmasini bosing.
+                    Uşbu maydonga Google Sheets jadvalingizning töliq havolasini (masalan: <code className="bg-white px-1.5 py-0.5 rounded border text-slate-800">https://docs.google.com/spreadsheets/d/.../edit</code>) yoki faqat ID sini kiriting va <strong>«Örnatiş va Boğlaş»</strong> tugmasini bosing.
                   </p>
 
                   <div className="flex flex-col sm:flex-row gap-2">
@@ -2630,16 +2630,16 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                           if (success) {
                             setManualSheetMsg({
                               isError: false,
-                              text: `Muvaffaqiyatli o‘rnatildi! Google Sheets bazasi bog‘landi (${organizations.length} ta tashkilot yuklandi). Sayt har 30 soniyada va har safar jadvaldan qaytganingizda avtomatik yangilanadi!`
+                              text: `Muvaffaqiyatli örnatildi! Google Sheets bazasi boğlandi (${organizations.length} ta taşkilot yuklandi). Sayt har 30 soniyada va har safar jadvaldan qaytganingizda avtomatik yangilanadi!`
                             });
                           } else {
                             setManualSheetMsg({
                               isError: true,
-                              text: "Google Sheets jadvaliga ulanib bo‘lmadi. Jadvalda «Поделиться» (Share) tugmasini bosib, «Все, у кого есть ссылка» (Havolasi bo‘lgan har kim - Читатель) qilib qo‘yilganligini tekshiring."
+                              text: "Google Sheets jadvaliga ulanib bölmadi. Jadvalda «Поделиться» (Share) tugmasini bosib, «Все, у кого есть ссылка» (Havolasi bölgan har kim - Читатель) qilib qöyilganligini tekşiring."
                             });
                           }
                         } catch (e: any) {
-                          setManualSheetMsg({ isError: true, text: e.message || "Ulanishda xatolik yuz berdi." });
+                          setManualSheetMsg({ isError: true, text: e.message || "Ulanişda xatolik yuz berdi." });
                         } finally {
                           setManualSheetConnecting(false);
                         }
@@ -2648,7 +2648,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       className="px-5 py-2 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-bold flex items-center justify-center gap-1.5 shadow-xs transition-colors cursor-pointer"
                     >
                       {manualSheetConnecting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                      <span>{manualSheetConnecting ? "O‘rnatilmoqda..." : "O‘rnatish va Bog‘lash"}</span>
+                      <span>{manualSheetConnecting ? "Örnatilmoqda..." : "Örnatiş va Boğlaş"}</span>
                     </button>
                   </div>
 
@@ -2662,11 +2662,11 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
 
                   {/* Real-time synchronization explanation */}
                   <div className="bg-white p-3.5 rounded border border-slate-200 text-xs text-slate-700 space-y-2">
-                    <span className="font-bold text-slate-900 block text-xs">Jadvalda o‘zgarish bo‘lganda sayt qanday avtomatik yangilanadi?</span>
+                    <span className="font-bold text-slate-900 block text-xs">Jadvalda özgariş bölganda sayt qanday avtomatik yangilanadi?</span>
                     <ul className="list-disc list-inside space-y-1 text-slate-600">
-                      <li><strong>Tab Focus (Tezkor)</strong>: Google Sheets’da katakni o‘zgartirib, sayt oynasiga qaytishingiz bilanoq, sayt o‘z-o‘zidan darhol yangilanadi.</li>
-                      <li><strong>Fonda avto-tekshirish</strong>: Sayt ochiq turganda ham har 30 soniyada Google Sheets’dan yangi o‘zgarishlarni tortib oladi.</li>
-                      <li><strong>Tashkilotlar sahifasida tugma</strong>: Sayt bosh sahifasidagi «Baza bilan yangilash» tugmasi orqali ham istalgan paytda bir bosishda yangilash mumkin.</li>
+                      <li><strong>Tab Focus (Tezkor)</strong>: Google Sheets’da katakni özgartirib, sayt oynasiga qaytişingiz bilanoq, sayt öz-özidan darhol yangilanadi.</li>
+                      <li><strong>Fonda avto-tekşiriş</strong>: Sayt oçiq turganda ham har 30 soniyada Google Sheets’dan yangi özgarişlarni tortib oladi.</li>
+                      <li><strong>Taşkilotlar sahifasida tugma</strong>: Sayt boş sahifasidagi «Baza bilan yangilaş» tugmasi orqali ham istalgan paytda bir bosişda yangilaş mumkin.</li>
                     </ul>
                   </div>
 
@@ -2674,7 +2674,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   <div className="bg-slate-900 text-slate-100 p-4 rounded-lg space-y-2.5">
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-xs text-emerald-400">
-                        Google Apps Script (onEdit) avtomatlashtirish kodi:
+                        Google Apps Script (onEdit) avtomatlaştiriş kodi:
                       </span>
                       <button
                         onClick={() => {
@@ -2693,7 +2693,7 @@ function onEdit(e) {
                         className="px-2.5 py-1 rounded bg-slate-700 hover:bg-slate-600 text-white text-[11px] font-semibold flex items-center gap-1 transition-colors"
                       >
                         {scriptCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                        <span>{scriptCopied ? "Nusxalandi!" : "Kodni nusxalash"}</span>
+                        <span>{scriptCopied ? "Nusxalandi!" : "Kodni nusxalaş"}</span>
                       </button>
                     </div>
                     <pre className="text-[11px] font-mono text-emerald-300 overflow-x-auto p-2 bg-black/40 rounded">
@@ -2704,7 +2704,7 @@ function onEdit(e) {
 }`}
                     </pre>
                     <p className="text-[11px] text-slate-400 leading-normal">
-                      O‘rnatish: Google Sheets jadvalingizda <strong>Расширения (Extensions) &rarr; Apps Script</strong> ni bosing, ushbu kodni qo‘yib <strong>Сохранить (Save)</strong> tugmasini bosing.
+                      Örnatiş: Google Sheets jadvalingizda <strong>Расширения (Extensions) &rarr; Apps Script</strong> ni bosing, uşbu kodni qöyib <strong>Сохранить (Save)</strong> tugmasini bosing.
                     </p>
                   </div>
                 </div>
@@ -2714,9 +2714,9 @@ function onEdit(e) {
                   <div className="p-4 rounded border border-slate-200 space-y-2">
                     <span className="font-bold text-slate-800 block text-sm">Google Sheets Varaqlari (Tabs):</span>
                     <ul className="list-disc list-inside space-y-1 text-slate-600">
-                      <li><code>Yangiliklar</code> - Barcha matbuot xabarlari</li>
-                      <li><code>Tashkilotlar</code> - 54 maktab va 38 MTT ro‘yxati</li>
-                      <li><code>Rahbariyat</code> - Bo‘lim mudiri va o‘rinbosarlari</li>
+                      <li><code>Yangiliklar</code> - Barça matbuot xabarlari</li>
+                      <li><code>Taşkilotlar</code> - 54 maktab va 38 MTT röyxati</li>
+                      <li><code>Rahbariyat</code> - Bölim mudiri va örinbosarlari</li>
                       <li><code>Hujjatlar</code> - Buyruqlar va qarorlar</li>
                       <li><code>Arizalar</code> - Fuqaro murojaatlari</li>
                       <li><code>Sozlamalar</code> - Aloqa, ijtimoiy tarmoqlar va banner</li>
@@ -2726,7 +2726,7 @@ function onEdit(e) {
                   <div className="p-4 rounded border border-slate-200 space-y-2">
                     <span className="font-bold text-slate-800 block text-sm">Google Drive Ombori:</span>
                     <p className="text-slate-600 leading-relaxed">
-                      Hujjatlar bo‘limiga yuklangan barcha PDF fayllar hamda yangiliklar rasmlari avtomatik ravishda Drive’dagi maxsus <code>Qo'shko'pir_MMTB_Fayllar</code> papkasiga saqlanadi.
+                      Hujjatlar bölimiga yuklangan barça PDF fayllar hamda yangiliklar rasmlari avtomatik ravişda Drive’dagi maxsus <code>Qo'shko'pir_MMTB_Fayllar</code> papkasiga saqlanadi.
                     </p>
                   </div>
                 </div>
@@ -2746,7 +2746,7 @@ function onEdit(e) {
             <div className="bg-slate-800 text-white px-5 py-3.5 flex items-center justify-between border-b border-slate-700">
               <h3 className="font-bold text-sm flex items-center gap-2">
                 <FileText className="w-4 h-4 text-sky-400" />
-                <span>{newsModal.isEdit ? "Yangilikni Tahrirlash" : "Yangi Yangilik Kiritish va Ijtimoiy Tarmoqlarga Tarqatish"}</span>
+                <span>{newsModal.isEdit ? "Yangilikni Tahrirlaş" : "Yangi Yangilik Kiritiş va Ijtimoiy Tarmoqlarga Tarqatiş"}</span>
               </h3>
               <button
                 onClick={() => setNewsModal({ ...newsModal, isOpen: false })}
@@ -2787,7 +2787,7 @@ function onEdit(e) {
                 <label className="font-bold text-slate-800 block mb-1">Yangilik Sarlavhasi</label>
                 <input
                   type="text"
-                  placeholder="masalan: Qo‘shko‘pir tumanida yangi innovatsion maktab binosi foydalanishga topshirildi"
+                  placeholder="masalan: Qöşköpir tumanida yangi innovatsion maktab binosi foydalanişga topşirildi"
                   value={newsModal.item.title || ''}
                   onChange={e =>
                     setNewsModal({
@@ -2812,13 +2812,13 @@ function onEdit(e) {
                     }
                     className="w-full px-3 py-2 rounded border border-slate-300"
                   >
-                    <option value="Boshlang'ich ta'lim">Boshlang‘ich ta’lim</option>
+                    <option value="Boshlang'ich ta'lim">Boşlanğiç ta’lim</option>
                     <option value="Olimpiada">Olimpiada va fan tanlovlari</option>
                     <option value="Pedagogika">Pedagogika va metodika</option>
-                    <option value="MTT">Maktabgacha ta’lim (MTT)</option>
+                    <option value="MTT">Maktabgaça ta’lim (MTT)</option>
                     <option value="E'lon">Rasmiy e’lon</option>
                     <option value="Tadbirlar">Tadbirlar va bayramlar</option>
-                    <option value="Boshqaruv">Bo‘lim boshqaruvi</option>
+                    <option value="Boshqaruv">Bölim boşqaruvi</option>
                   </select>
                 </div>
 
@@ -2841,7 +2841,7 @@ function onEdit(e) {
                   <label className="font-bold text-slate-700 block mb-1">Muallif / Manba</label>
                   <input
                     type="text"
-                    value={newsModal.item.author || "Qo‘shko‘pir MMTB Matbuot xizmati"}
+                    value={newsModal.item.author || "Qöşköpir MMTB Matbuot xizmati"}
                     onChange={e =>
                       setNewsModal({
                         ...newsModal,
@@ -2855,7 +2855,7 @@ function onEdit(e) {
 
               <div>
                 <label className="font-bold text-slate-700 block mb-1">
-                  Qisqacha mazmun (Lenta va Ijtimoiy tarmoqlar anonsi)
+                  Qisqaça mazmun (Lenta va Ijtimoiy tarmoqlar anonsi)
                 </label>
                 <textarea
                   rows={2}
@@ -2871,7 +2871,7 @@ function onEdit(e) {
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">To‘liq Matn</label>
+                <label className="font-bold text-slate-700 block mb-1">Töliq Matn</label>
                 <textarea
                   rows={6}
                   value={newsModal.item.content || ''}
@@ -2892,10 +2892,10 @@ function onEdit(e) {
                     <label className="font-bold text-slate-900 block text-sm flex items-center gap-1.5">
                       <Images className="w-4 h-4 text-sky-700" />
                       <span>Yangilik Rasmlari va Fotogalereya</span>
-                      <span className="text-xs font-normal text-slate-500">(1 yoki bir nechta rasm)</span>
+                      <span className="text-xs font-normal text-slate-500">(1 yoki bir neçta rasm)</span>
                     </label>
                     <p className="text-[11px] text-slate-500 mt-0.5">
-                      Rasmlar Google Drive’dagi rasmiy jild (<code>1xBvm3Oz0j4...</code>) ichida yangilik uchun ochilgan alohida papkaga saqlanadi.
+                      Rasmlar Google Drive’dagi rasmiy jild (<code>1xBvm3Oz0j4...</code>) içida yangilik uçun oçilgan alohida papkaga saqlanadi.
                     </p>
                   </div>
 
@@ -2907,7 +2907,7 @@ function onEdit(e) {
                       className="inline-flex items-center gap-1 text-xs text-sky-700 hover:text-sky-900 font-semibold bg-sky-50 px-2.5 py-1 rounded border border-sky-200 shrink-0"
                     >
                       <FolderOpen className="w-3.5 h-3.5 text-amber-500" />
-                      <span>Drive papkasini ochish</span>
+                      <span>Drive papkasini oçiş</span>
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   )}
@@ -2925,7 +2925,7 @@ function onEdit(e) {
                     <span>
                       {multiUploadProgress.uploading
                         ? `Yuklanmoqda: ${multiUploadProgress.current}/${multiUploadProgress.total}...`
-                        : "Kompyuter/telefondan rasm yuklash (1 yoki ko'p)"}
+                        : "Kompyuter/telefondan rasm yuklaş (1 yoki köp)"}
                     </span>
                     <input
                       type="file"
@@ -2940,7 +2940,7 @@ function onEdit(e) {
                   {/* Single file upload button (Drive) */}
                   <label className="cursor-pointer px-3 py-2 rounded-lg bg-white hover:bg-slate-100 border border-slate-300 font-semibold text-slate-700 text-xs flex items-center gap-1.5 shadow-2xs transition-colors">
                     <Plus className="w-3.5 h-3.5 text-sky-600" />
-                    <span>Yana rasm qo‘shish</span>
+                    <span>Yana rasm qöşiş</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -3016,7 +3016,7 @@ function onEdit(e) {
                     }}
                     className="px-3 py-1.5 rounded bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-semibold"
                   >
-                    + Havolani qo‘shish
+                    + Havolani qöşiş
                   </button>
                 </div>
 
@@ -3070,9 +3070,9 @@ function onEdit(e) {
                                   }));
                                 }}
                                 className="absolute top-1 left-1 opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 hover:bg-black text-white text-[10px] font-semibold px-1.5 py-0.5 rounded shadow-xs"
-                                title="Ushbu rasmni asosiy muqova qilish"
+                                title="Uşbu rasmni asosiy muqova qiliş"
                               >
-                                Asosiy qilish
+                                Asosiy qiliş
                               </button>
                             )}
 
@@ -3094,7 +3094,7 @@ function onEdit(e) {
                                 }));
                               }}
                               className="absolute top-1 right-1 p-1 rounded-full bg-red-600/90 hover:bg-red-700 text-white opacity-0 group-hover:opacity-100 transition-opacity shadow-xs"
-                              title="O‘chirish"
+                              title="Öçiriş"
                             >
                               <X className="w-3 h-3" />
                             </button>
@@ -3113,7 +3113,7 @@ function onEdit(e) {
               {/* Social Media Broadcast Options (Telegram, Instagram, Facebook) */}
               <div className="p-4 rounded-lg bg-sky-50/70 border border-sky-200 space-y-3">
                 <span className="font-bold text-slate-900 block text-xs">
-                  Ijtimoiy Tarmoqlarga Avtomatik Yuborish Sozlamalari:
+                  Ijtimoiy Tarmoqlarga Avtomatik Yuboriş Sozlamalari:
                 </span>
 
                 <div className="flex flex-wrap gap-4">
@@ -3160,7 +3160,7 @@ function onEdit(e) {
                 {/* Instagram Quick Copy Helper */}
                 <div className="pt-2 border-t border-sky-200/60 flex items-center justify-between">
                   <span className="text-[11px] text-slate-600">
-                    Instagram uchun tayyor post matni va hashtaglarini nusxalash:
+                    Instagram uçun tayyor post matni va hashtaglarini nusxalaş:
                   </span>
                   <button
                     type="button"
@@ -3184,7 +3184,7 @@ function onEdit(e) {
                     className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-white hover:bg-pink-50 border border-pink-300 text-pink-700 font-semibold text-[11px]"
                   >
                     {copiedCaption ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedCaption ? "Nusxalandi!" : "Instagram matnini nusxalash"}</span>
+                    <span>{copiedCaption ? "Nusxalandi!" : "Instagram matnini nusxalaş"}</span>
                   </button>
                 </div>
               </div>
@@ -3196,7 +3196,7 @@ function onEdit(e) {
                 onClick={() => setNewsModal({ ...newsModal, isOpen: false })}
                 className="px-4 py-1.5 rounded bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold text-xs"
               >
-                Bekor qilish
+                Bekor qiliş
               </button>
 
               <button
@@ -3223,7 +3223,7 @@ function onEdit(e) {
                     driveFileId: newsModal.item.driveFileId,
                     driveFolderId: newsModal.item.driveFolderId,
                     driveFolderUrl: newsModal.item.driveFolderUrl,
-                    author: fixUzbekText(newsModal.item.author || "Qo‘shko‘pir MMTB Matbuot xizmati"),
+                    author: fixUzbekText(newsModal.item.author || "Qöşköpir MMTB Matbuot xizmati"),
                     views: newsModal.item.views || 100,
                     isPinned: newsModal.item.isPinned,
                     sentToTelegram: newsModal.item.sentToTelegram,
@@ -3281,7 +3281,7 @@ function onEdit(e) {
                 className="px-5 py-1.5 rounded bg-sky-700 hover:bg-sky-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs"
               >
                 <Save className="w-4 h-4" />
-                <span>{newsModal.isEdit ? "O‘zgarishlarni Saqlash" : "Yangilikni Joylash & Tarqatish"}</span>
+                <span>{newsModal.isEdit ? "Özgarişlarni Saqlaş" : "Yangilikni Joylaş & Tarqatiş"}</span>
               </button>
             </div>
           </div>
@@ -3296,7 +3296,7 @@ function onEdit(e) {
           <div className="bg-white rounded-lg w-full max-w-2xl flex flex-col shadow-2xl border border-slate-300 overflow-hidden my-auto">
             <div className="bg-slate-800 text-white px-5 py-3.5 flex items-center justify-between border-b border-slate-700">
               <h3 className="font-bold text-sm">
-                {orgModal.isEdit ? "Muassasani Tahrirlash" : "Yangi Maktab yoki MTT Qo‘shish"}
+                {orgModal.isEdit ? "Muassasani Tahrirlaş" : "Yangi Maktab yoki MTT Qöşiş"}
               </h3>
               <button onClick={() => setOrgModal({ ...orgModal, isOpen: false })} className="text-slate-400 hover:text-white">
                 <X className="w-5 h-5" />
@@ -3344,7 +3344,7 @@ function onEdit(e) {
                     className="w-full px-3 py-2 rounded border border-slate-300"
                   >
                     <option value="maktab">Umumta’lim Maktabi</option>
-                    <option value="mtt">Maktabgacha Ta’lim Tashkiloti (MTT)</option>
+                    <option value="mtt">Maktabgaça Ta’lim Taşkiloti (MTT)</option>
                   </select>
                 </div>
 
@@ -3369,7 +3369,7 @@ function onEdit(e) {
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">O‘quvchilar / Tarbiyalanuvchilar soni</label>
+                  <label className="font-bold text-slate-700 block mb-1">Öquvçilar / Tarbiyalanuvçilar soni</label>
                   <input
                     type="number"
                     value={orgModal.item.studentsCount || 0}
@@ -3379,7 +3379,7 @@ function onEdit(e) {
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">O‘qituvchilar / Tarbiyachilar soni</label>
+                  <label className="font-bold text-slate-700 block mb-1">Öqituvçilar / Tarbiyaçilar soni</label>
                   <input
                     type="number"
                     value={orgModal.item.teachersCount || 0}
@@ -3389,7 +3389,7 @@ function onEdit(e) {
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="font-bold text-slate-700 block mb-1">Manzil (Mahalla, ko‘cha)</label>
+                  <label className="font-bold text-slate-700 block mb-1">Manzil (Mahalla, köça)</label>
                   <input
                     type="text"
                     value={orgModal.item.address || ''}
@@ -3405,7 +3405,7 @@ function onEdit(e) {
                 onClick={() => setOrgModal({ ...orgModal, isOpen: false })}
                 className="px-4 py-1.5 rounded bg-slate-200 text-slate-700 font-semibold"
               >
-                Bekor qilish
+                Bekor qiliş
               </button>
               <button
                 onClick={async () => {
@@ -3440,7 +3440,7 @@ function onEdit(e) {
                 }}
                 className="px-4 py-1.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-bold"
               >
-                Saqlash
+                Saqlaş
               </button>
             </div>
           </div>
@@ -3455,7 +3455,7 @@ function onEdit(e) {
           <div className="bg-white rounded-lg w-full max-w-xl flex flex-col shadow-2xl border border-slate-300 overflow-hidden my-auto">
             <div className="bg-slate-800 text-white px-5 py-3.5 flex items-center justify-between border-b border-slate-700">
               <h3 className="font-bold text-sm">
-                {docModal.isEdit ? "Hujjatni Tahrirlash" : "Yangi Me’yoriy Hujjat Joylash"}
+                {docModal.isEdit ? "Hujjatni Tahrirlaş" : "Yangi Me’yoriy Hujjat Joylaş"}
               </h3>
               <button onClick={() => setDocModal({ ...docModal, isOpen: false })} className="text-slate-400 hover:text-white">
                 <X className="w-5 h-5" />
@@ -3485,7 +3485,7 @@ function onEdit(e) {
                 <label className="font-bold text-slate-700 block mb-1">Hujjat Sarlavhasi</label>
                 <input
                   type="text"
-                  placeholder="masalan: 2026/2027 o‘quv yiliga tayyorgarlik to‘g‘risida bo‘lim buyrug‘i"
+                  placeholder="masalan: 2026/2027 öquv yiliga tayyorgarlik töğrisida bölim buyruği"
                   value={docModal.item.title || ''}
                   onChange={e => setDocModal({ ...docModal, item: { ...docModal.item, title: e.target.value } })}
                   className="w-full px-3 py-2 rounded border border-slate-300 font-semibold"
@@ -3521,11 +3521,11 @@ function onEdit(e) {
                     onChange={e => setDocModal({ ...docModal, item: { ...docModal.item, category: e.target.value as any } })}
                     className="w-full px-3 py-2 rounded border border-slate-300"
                   >
-                    <option value="Bo'lim buyruqlari">Bo‘lim buyruqlari</option>
+                    <option value="Bo'lim buyruqlari">Bölim buyruqlari</option>
                     <option value="Vazirlik buyruqlari">Vazirlik buyruqlari</option>
                     <option value="Hokim qarorlari">Hokim qarorlari</option>
                     <option value="Nizom va qoidalar">Nizom va qoidalar</option>
-                    <option value="O'quv dasturlari">O‘quv dasturlari</option>
+                    <option value="O'quv dasturlari">Öquv dasturlari</option>
                   </select>
                 </div>
 
@@ -3541,7 +3541,7 @@ function onEdit(e) {
                     />
                     <label className="cursor-pointer px-3 py-2 rounded bg-amber-50 hover:bg-amber-100 border border-amber-300 font-semibold text-amber-800 flex items-center gap-1 shrink-0">
                       <Upload className="w-3.5 h-3.5 text-amber-600" />
-                      <span>Drive’ga yuklash</span>
+                      <span>Drive’ga yuklaş</span>
                       <input
                         type="file"
                         accept=".pdf,.doc,.docx,.xls,.xlsx"
@@ -3571,7 +3571,7 @@ function onEdit(e) {
                 onClick={() => setDocModal({ ...docModal, isOpen: false })}
                 className="px-4 py-1.5 rounded bg-slate-200 text-slate-700 font-semibold"
               >
-                Bekor qilish
+                Bekor qiliş
               </button>
               <button
                 onClick={async () => {
@@ -3599,7 +3599,7 @@ function onEdit(e) {
                 }}
                 className="px-4 py-1.5 rounded bg-amber-600 hover:bg-amber-700 text-white font-bold"
               >
-                Saqlash
+                Saqlaş
               </button>
             </div>
           </div>
@@ -3614,7 +3614,7 @@ function onEdit(e) {
           <div className="bg-white rounded-lg w-full max-w-xl flex flex-col shadow-2xl border border-slate-300 overflow-hidden my-auto">
             <div className="bg-slate-800 text-white px-5 py-3.5 flex items-center justify-between border-b border-slate-700">
               <h3 className="font-bold text-sm">
-                Fuqaro Murojaatini Ko‘rib Chiqish (№ {appealModal.item.trackingCode})
+                Fuqaro Murojaatini Körib Çiqiş (№ {appealModal.item.trackingCode})
               </h3>
               <button onClick={() => setAppealModal({ ...appealModal, isOpen: false })} className="text-slate-400 hover:text-white">
                 <X className="w-5 h-5" />
@@ -3656,14 +3656,14 @@ function onEdit(e) {
                   className="w-full px-3 py-2 rounded border border-slate-300 font-semibold"
                 >
                   <option value="yangi">Yangi (Qabul qilindi)</option>
-                  <option value="jarayonda">Jarayonda (O‘rganilmoqda)</option>
+                  <option value="jarayonda">Jarayonda (Örganilmoqda)</option>
                   <option value="ijro_etildi">Ijro etildi (Javob berildi)</option>
                   <option value="rad_etildi">Rad etildi (Asossiz deb topildi)</option>
                 </select>
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Mas’ul Ijrochi / Lavozimi</label>
+                <label className="font-bold text-slate-700 block mb-1">Mas’ul Ijroçi / Lavozimi</label>
                 <input
                   type="text"
                   value={appealModal.officer}
@@ -3689,7 +3689,7 @@ function onEdit(e) {
                 onClick={() => setAppealModal({ ...appealModal, isOpen: false })}
                 className="px-4 py-1.5 rounded bg-slate-200 text-slate-700 font-semibold"
               >
-                Bekor qilish
+                Bekor qiliş
               </button>
               <button
                 onClick={async () => {
@@ -3705,7 +3705,7 @@ function onEdit(e) {
                 }}
                 className="px-4 py-1.5 rounded bg-sky-700 hover:bg-sky-800 text-white font-bold"
               >
-                Javobni Saqlash
+                Javobni Saqlaş
               </button>
             </div>
           </div>
@@ -3720,7 +3720,7 @@ function onEdit(e) {
           <div className="bg-white rounded-lg w-full max-w-xl flex flex-col shadow-2xl border border-slate-300 overflow-hidden my-auto">
             <div className="bg-slate-800 text-white px-5 py-3.5 flex items-center justify-between border-b border-slate-700">
               <h3 className="font-bold text-sm">
-                {leaderModal.isEdit ? "Rahbar Ma’lumotini Tahrirlash" : "Yangi Rahbar Qo‘shish"}
+                {leaderModal.isEdit ? "Rahbar Ma’lumotini Tahrirlaş" : "Yangi Rahbar Qöşiş"}
               </h3>
               <button onClick={() => setLeaderModal({ ...leaderModal, isOpen: false })} className="text-slate-400 hover:text-white">
                 <X className="w-5 h-5" />
@@ -3751,7 +3751,7 @@ function onEdit(e) {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="sm:col-span-2">
-                  <label className="font-bold text-slate-700 block mb-1">F.I.O (Ism, familiya, sharifi)</label>
+                  <label className="font-bold text-slate-700 block mb-1">F.I.O (Ism, familiya, şarifi)</label>
                   <input
                     type="text"
                     value={leaderModal.item.name || ''}
@@ -3784,7 +3784,7 @@ function onEdit(e) {
                   <label className="font-bold text-slate-700 block mb-1">Qabul Kunlari</label>
                   <input
                     type="text"
-                    value={leaderModal.item.receptionDays || 'Dushanba - Juma'}
+                    value={leaderModal.item.receptionDays || 'Duşanba - Juma'}
                     onChange={e => setLeaderModal({ ...leaderModal, item: { ...leaderModal.item, receptionDays: e.target.value } })}
                     className="w-full px-3 py-2 rounded border border-slate-300"
                   />
@@ -3811,7 +3811,7 @@ function onEdit(e) {
                     />
                     <label className="cursor-pointer px-3 py-2 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 font-semibold text-slate-700 flex items-center gap-1 shrink-0">
                       <Upload className="w-3.5 h-3.5 text-sky-600" />
-                      <span>Yuklash</span>
+                      <span>Yuklaş</span>
                       <input
                         type="file"
                         accept="image/*"
@@ -3836,7 +3836,7 @@ function onEdit(e) {
                 onClick={() => setLeaderModal({ ...leaderModal, isOpen: false })}
                 className="px-4 py-1.5 rounded bg-slate-200 text-slate-700 font-semibold"
               >
-                Bekor qilish
+                Bekor qiliş
               </button>
               <button
                 onClick={async () => {
@@ -3866,7 +3866,7 @@ function onEdit(e) {
                 }}
                 className="px-4 py-1.5 rounded bg-sky-700 hover:bg-sky-800 text-white font-bold"
               >
-                Saqlash
+                Saqlaş
               </button>
             </div>
           </div>
@@ -3881,7 +3881,7 @@ function onEdit(e) {
           <div className="bg-white rounded-lg w-full max-w-xl flex flex-col shadow-2xl border border-slate-300 overflow-hidden my-auto">
             <div className="bg-slate-800 text-white px-5 py-3.5 flex items-center justify-between border-b border-slate-700">
               <h3 className="font-bold text-sm">
-                {branchModal.isEdit ? "Sho‘bani Tahrirlash" : "Yangi Bo‘lim Sho‘basi Qo‘shish"}
+                {branchModal.isEdit ? "Şöbani Tahrirlaş" : "Yangi Bölim Şöbasi Qöşiş"}
               </h3>
               <button onClick={() => setBranchModal({ ...branchModal, isOpen: false })} className="text-slate-400 hover:text-white">
                 <X className="w-5 h-5" />
@@ -3911,7 +3911,7 @@ function onEdit(e) {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="sm:col-span-2">
-                  <label className="font-bold text-slate-700 block mb-1">Sho‘ba Nomi</label>
+                  <label className="font-bold text-slate-700 block mb-1">Şöba Nomi</label>
                   <input
                     type="text"
                     value={branchModal.item.name || ''}
@@ -3921,7 +3921,7 @@ function onEdit(e) {
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Sho‘ba Rahbari</label>
+                  <label className="font-bold text-slate-700 block mb-1">Şöba Rahbari</label>
                   <input
                     type="text"
                     value={branchModal.item.head || ''}
@@ -3951,7 +3951,7 @@ function onEdit(e) {
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="font-bold text-slate-700 block mb-1">Qisqacha Vazifasi</label>
+                  <label className="font-bold text-slate-700 block mb-1">Qisqaça Vazifasi</label>
                   <textarea
                     rows={3}
                     value={branchModal.item.description || ''}
@@ -3967,12 +3967,12 @@ function onEdit(e) {
                 onClick={() => setBranchModal({ ...branchModal, isOpen: false })}
                 className="px-4 py-1.5 rounded bg-slate-200 text-slate-700 font-semibold"
               >
-                Bekor qilish
+                Bekor qiliş
               </button>
               <button
                 onClick={async () => {
                   if (!branchModal.item.name) {
-                    alert("Sho‘ba nomini kiriting!");
+                    alert("Şöba nomini kiriting!");
                     return;
                   }
                   const finalBranch: DepartmentBranch = {
@@ -3998,7 +3998,7 @@ function onEdit(e) {
                 }}
                 className="px-4 py-1.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-bold"
               >
-                Saqlash
+                Saqlaş
               </button>
             </div>
           </div>
@@ -4013,7 +4013,7 @@ function onEdit(e) {
           <div className="bg-white rounded-lg w-full max-w-lg flex flex-col shadow-2xl border border-slate-300 overflow-hidden my-auto">
             <div className="bg-slate-800 text-white px-5 py-3.5 flex items-center justify-between border-b border-slate-700">
               <h3 className="font-bold text-sm">
-                {serviceModal.isEdit ? "Xizmatni Tahrirlash" : "Yangi Tezkor Xizmat Qo‘shish"}
+                {serviceModal.isEdit ? "Xizmatni Tahrirlaş" : "Yangi Tezkor Xizmat Qöşiş"}
               </h3>
               <button onClick={() => setServiceModal({ ...serviceModal, isOpen: false })} className="text-slate-400 hover:text-white">
                 <X className="w-5 h-5" />
@@ -4051,7 +4051,7 @@ function onEdit(e) {
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Qisqacha Ta’rif</label>
+                <label className="font-bold text-slate-700 block mb-1">Qisqaça Ta’rif</label>
                 <input
                   type="text"
                   value={serviceModal.item.desc || ''}
@@ -4079,7 +4079,7 @@ function onEdit(e) {
                   onChange={e => setServiceModal({ ...serviceModal, item: { ...serviceModal.item, isExternal: e.target.checked } })}
                   className="rounded text-sky-600"
                 />
-                <label htmlFor="srvExternal" className="text-slate-700 font-medium">Tashqi portal havolasi (yangi oynada ochiladi)</label>
+                <label htmlFor="srvExternal" className="text-slate-700 font-medium">Taşqi portal havolasi (yangi oynada oçiladi)</label>
               </div>
             </div>
 
@@ -4088,7 +4088,7 @@ function onEdit(e) {
                 onClick={() => setServiceModal({ ...serviceModal, isOpen: false })}
                 className="px-4 py-1.5 rounded bg-slate-200 text-slate-700 font-semibold"
               >
-                Bekor qilish
+                Bekor qiliş
               </button>
               <button
                 onClick={async () => {
@@ -4119,7 +4119,7 @@ function onEdit(e) {
                 }}
                 className="px-4 py-1.5 rounded bg-sky-700 hover:bg-sky-800 text-white font-bold"
               >
-                Saqlash
+                Saqlaş
               </button>
             </div>
           </div>
@@ -4144,13 +4144,13 @@ function onEdit(e) {
                 onClick={() => setConfirmModal({ ...confirmModal, isOpen: false })}
                 className="px-4 py-2 rounded bg-slate-200 text-slate-700 font-semibold"
               >
-                Bekor qilish
+                Bekor qiliş
               </button>
               <button
                 onClick={confirmModal.onConfirm}
                 className="px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white font-bold"
               >
-                Ha, o‘chirilsin
+                Ha, öçirilsin
               </button>
             </div>
           </div>
@@ -4168,7 +4168,7 @@ function onEdit(e) {
                 <ShieldCheck className="w-6 h-6 text-sky-700 shrink-0" />
                 <div>
                   <h3 className="font-bold text-base text-slate-900">
-                    GitHub Pages Orqali Google Kirishni Faollashtirish
+                    GitHub Pages Orqali Google Kirişni Faollaştiriş
                   </h3>
                   <p className="text-slate-500 text-[11px]">
                     Firebase loyihasi: <code className="font-mono text-slate-700 font-bold">potent-tempest-05xj8</code>
@@ -4185,15 +4185,15 @@ function onEdit(e) {
 
             <div className="space-y-4 text-slate-700 leading-relaxed">
               <div className="bg-sky-50 border border-sky-200 rounded p-3 text-sky-950 space-y-1">
-                <span className="font-bold text-sm block">Nega bu xatolik faqat GitHub’da chiqdi?</span>
+                <span className="font-bold text-sm block">Nega bu xatolik faqat GitHub’da çiqdi?</span>
                 <p>
-                  Google AI Studio muhitida Google Cloud manzillari avtomatik ruxsat etilgan bo‘ladi.
-                  Saytni GitHub Pages’ga (masalan: <code>burgutsony.github.io</code>) yuklaganingizda, Google xavfsizlik devori begona saytlardan ma’lumotlarni o‘g‘irlashning oldini olish maqsadida faqat tasdiqlangan domenlardan kelgan so‘rovlarni qabul qiladi.
+                  Google AI Studio muhitida Google Cloud manzillari avtomatik ruxsat etilgan böladi.
+                  Saytni GitHub Pages’ga (masalan: <code>burgutsony.github.io</code>) yuklaganingizda, Google xavfsizlik devori begona saytlardan ma’lumotlarni öğirlaşning oldini oliş maqsadida faqat tasdiqlangan domenlardan kelgan sörovlarni qabul qiladi.
                 </p>
               </div>
 
               <div className="space-y-3">
-                <span className="font-bold text-slate-900 text-sm block">Bajarilishi kerak bo‘lgan 3 ta oddiy qadam (20 soniya):</span>
+                <span className="font-bold text-slate-900 text-sm block">Bajarilişi kerak bölgan 3 ta oddiy qadam (20 soniya):</span>
 
                 {/* Step 1 */}
                 <div className="flex items-start gap-3 p-3 rounded border border-slate-200 bg-slate-50">
@@ -4219,7 +4219,7 @@ function onEdit(e) {
                         className="px-3 py-1.5 rounded bg-sky-700 hover:bg-sky-800 text-white font-bold flex items-center gap-1 shrink-0"
                       >
                         {domainCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                        <span>{domainCopied ? "Nusxalandi!" : "Nusxa olish"}</span>
+                        <span>{domainCopied ? "Nusxalandi!" : "Nusxa oliş"}</span>
                       </button>
                     </div>
                   </div>
@@ -4231,9 +4231,9 @@ function onEdit(e) {
                     2
                   </div>
                   <div className="space-y-1.5 flex-1">
-                    <span className="font-bold text-slate-900 block">Firebase Console sozlamalarini oching:</span>
+                    <span className="font-bold text-slate-900 block">Firebase Console sozlamalarini oçing:</span>
                     <p className="text-slate-600">
-                      Quyidagi tugmani bosing va <strong>"Authorized domains"</strong> bo‘limiga o‘ting:
+                      Quyidagi tugmani bosing va <strong>"Authorized domains"</strong> bölimiga öting:
                     </p>
                     <a
                       href="https://console.firebase.google.com/project/potent-tempest-05xj8/authentication/settings"
@@ -4241,7 +4241,7 @@ function onEdit(e) {
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-bold shadow-xs transition-colors"
                     >
-                      <span>Firebase Console Authorized Domains Sahifasini Ochish</span>
+                      <span>Firebase Console Authorized Domains Sahifasini Oçiş</span>
                       <ExternalLink className="w-3.5 h-3.5" />
                     </a>
                   </div>
@@ -4253,12 +4253,12 @@ function onEdit(e) {
                     3
                   </div>
                   <div className="space-y-1 flex-1">
-                    <span className="font-bold text-slate-900 block">Domenni qo‘shing va Saqlang:</span>
+                    <span className="font-bold text-slate-900 block">Domenni qöşing va Saqlang:</span>
                     <p className="text-slate-600">
                       U yerda <strong>"Add domain"</strong> tugmasini bosing, nusxalangan domenni (masalan: <code>burgutsony.github.io</code>) kiritib <strong>"Save"</strong> tugmasini bosing.
                     </p>
                     <p className="text-emerald-700 font-semibold mt-1">
-                      Tayyor! Shundan so‘ng GitHub Pages saytida "Google bilan ulanish" tugmasi bir zumda ishlaydi.
+                      Tayyor! Şundan söng GitHub Pages saytida "Google bilan ulaniş" tugmasi bir zumda işlaydi.
                     </p>
                   </div>
                 </div>
@@ -4273,7 +4273,7 @@ function onEdit(e) {
                 onClick={() => setDomainGuideModalOpen(false)}
                 className="px-5 py-2 rounded bg-sky-700 hover:bg-sky-800 text-white font-bold text-xs"
               >
-                Tushundim, Yopish
+                Tuşundim, Yopiş
               </button>
             </div>
           </div>
