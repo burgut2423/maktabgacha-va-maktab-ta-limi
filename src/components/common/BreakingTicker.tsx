@@ -26,7 +26,7 @@ export const BreakingTicker: React.FC<{ onOpenNews?: () => void }> = ({ onOpenNe
             onClick={onOpenNews}
             className="hidden sm:flex items-center gap-1 text-[11px] font-bold text-slate-900 hover:text-white shrink-0 uppercase tracking-wider"
           >
-            <span>Barcha e'lonlar</span>
+            <span>Barça e'lonlar</span>
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
         )}

@@ -41,7 +41,7 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
 
   const navItems = [
     { id: 'asosiy', label: 'Asosiy' },
-    { id: 'bolim-haqida', label: "Bo'lim haqida" },
+    { id: 'bolim-haqida', label: "Bölim haqida" },
     { id: 'muassasalar', label: 'Maktab va MTTlar' },
     { id: 'hujjatlar', label: 'Hujjatlar' },
     { id: 'yangiliklar', label: 'Yangiliklar' },
@@ -58,7 +58,7 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
     if (isSpeaking) {
       stopSpeaking();
     } else {
-      speakText(`${settings.districtName}. Rasmiy davlat portali. Ishonch telefoni: ${settings.trustPhone}`);
+      speakText(`${settings.districtName}. Rasmiy davlat portali. Işonç telefoni: ${settings.trustPhone}`);
     }
   };
 
@@ -71,11 +71,11 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
           <div className="flex items-center gap-2 truncate">
             <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" title="Rasmiy portal faol" />
             <span className="truncate font-medium text-slate-300">
-              O'zbekiston Respublikasi Maktabgacha va maktab ta'limi vazirligi
+              Özbekiston Respublikasi Maktabgaça va maktab ta'limi vazirligi
             </span>
             <span className="hidden md:inline text-slate-500">|</span>
             <span className="hidden md:inline text-slate-400 truncate">
-              Xorazm viloyati Qo'shko'pir tumani bo'limi
+              Xorazm viloyati Qöşköpir tumani bölimi
             </span>
           </div>
 
@@ -85,10 +85,10 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
             <a
               href={`tel:${settings.trustPhone.replace(/\D/g, '')}`}
               className="hidden sm:flex items-center gap-1.5 text-amber-300 hover:text-amber-200 font-medium"
-              title="Ishonch telefoni"
+              title="Işonç telefoni"
             >
               <Phone className="w-3.5 h-3.5" />
-              <span>Ishonch telefoni: {settings.trustPhone}</span>
+              <span>Işonç telefoni: {settings.trustPhone}</span>
             </a>
 
             {/* Accessibility dropdown trigger */}
@@ -107,12 +107,12 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
               {accessibilityOpen && (
                 <div className="absolute right-0 top-full mt-1.5 w-64 bg-white text-slate-900 rounded-lg shadow-xl border border-slate-200 p-3 z-50 text-xs">
                   <div className="font-semibold text-slate-800 mb-2 border-b border-slate-100 pb-1">
-                    Ko'rish imkoniyati cheklanganlar uchun
+                    Köriş imkoniyati çeklanganlar uçun
                   </div>
 
                   {/* Font Size */}
                   <div className="mb-3">
-                    <span className="text-slate-500 block mb-1">Shrift o'lchami:</span>
+                    <span className="text-slate-500 block mb-1">Şrift ölçami:</span>
                     <div className="grid grid-cols-3 gap-1">
                       <button
                         onClick={() => setFontSize('normal')}
@@ -162,7 +162,7 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
 
                   {/* Voice assistant */}
                   <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-slate-600">Ovozli o'qish:</span>
+                    <span className="text-slate-600">Ovozli öqiş:</span>
                     <button
                       onClick={handleSpeechToggle}
                       className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition-colors ${isSpeaking ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
@@ -183,7 +183,7 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
                   ? 'bg-emerald-800 text-emerald-200 hover:bg-emerald-700'
                   : 'bg-sky-900 text-sky-200 hover:bg-sky-800'
               }`}
-              title={googleSyncStatus.isConnected ? "Google Sheets bog'langan" : "Admin boshqaruv tizimi"}
+              title={googleSyncStatus.isConnected ? "Google Sheets boğlangan" : "Admin boşqaruv tizimi"}
             >
               <Database className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">
@@ -203,7 +203,7 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
         >
           <img
             src={stateEmblem}
-            alt="O'zbekiston Davlat Gerbi"
+            alt="Özbekiston Davlat Gerbi"
             className="w-12 h-12 object-contain drop-shadow-xs group-hover:scale-105 transition-transform"
             referrerPolicy="no-referrer"
           />
@@ -212,7 +212,7 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
               Xorazm viloyati
             </span>
             <span className="text-base sm:text-lg font-bold text-slate-900 tracking-tight leading-snug">
-              Qo'shko'pir Tumani Maktabgacha va Maktab Ta'limi Bo'limi
+              Qöşköpir Tumani Maktabgaça va Maktab Ta'limi Bölimi
             </span>
             <span className="text-xs text-slate-500 hidden sm:block">
               Rasmiy axborot va xizmatlar portali
@@ -293,7 +293,7 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
           </ul>
 
           <div className="flex items-center gap-3 text-xs text-sky-200">
-            <span className="hidden xl:inline">Ish vaqti: Dush-Juma 09:00 - 18:00</span>
+            <span className="hidden xl:inline">Iş vaqti: Duş-Juma 09:00 - 18:00</span>
           </div>
         </div>
       </nav>
@@ -325,7 +325,7 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
               }}
               className="w-full py-2.5 text-center text-sm font-semibold text-white bg-sky-800 rounded-md"
             >
-              Virtual qabulxona (Murojaat yuborish)
+              Virtual qabulxona (Murojaat yuboriş)
             </button>
             <button
               onClick={() => {
@@ -334,7 +334,7 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
               }}
               className="w-full py-2.5 text-center text-sm font-medium text-slate-700 bg-slate-100 border border-slate-300 rounded-md"
             >
-              Admin panel (Boshqaruv)
+              Admin panel (Boşqaruv)
             </button>
           </div>
         </div>

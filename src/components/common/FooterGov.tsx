@@ -10,11 +10,11 @@ export const FooterGov: React.FC<{ onOpenAdmin: () => void; onNavigate: (s: stri
   const { settings } = usePortal();
 
   const governmentLinks = [
-    { title: "O'zbekiston Respublikasi Prezidenti", url: "https://president.uz" },
+    { title: "Özbekiston Respublikasi Prezidenti", url: "https://president.uz" },
     { title: "Hukumat portali (gov.uz)", url: "https://gov.uz" },
-    { title: "Maktabgacha va maktab ta'limi vazirligi", url: "https://gov.uz/oz/edu" },
+    { title: "Maktabgaça va maktab ta'limi vazirligi", url: "https://gov.uz/oz/edu" },
     { title: "Yagona interaktiv davlat xizmatlari (my.gov.uz)", url: "https://my.gov.uz" },
-    { title: "Ta'lim sifatini nazorat qilish inspeksiyasi", url: "https://tdi.uz" },
+    { title: "Ta'lim sifatini nazorat qiliş inspeksiyasi", url: "https://tdi.uz" },
     { title: "Xorazm viloyati hokimligi", url: "https://xorazm.uz" },
   ];
 
@@ -37,26 +37,26 @@ export const FooterGov: React.FC<{ onOpenAdmin: () => void; onNavigate: (s: stri
                   Xorazm viloyati
                 </span>
                 <span className="text-sm font-bold text-white block">
-                  Qo'shko'pir Tumani Maktabgacha va Maktab Ta'limi Bo'limi
+                  Qöşköpir Tumani Maktabgaça va Maktab Ta'limi Bölimi
                 </span>
               </div>
             </div>
 
             <p className="text-xs text-slate-400 leading-relaxed">
-              Saytdan olingan barcha axborotlardan foydalanilganda Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi rasmiy veb-saytiga havola berilishi shart.
+              Saytdan olingan barça axborotlardan foydalanilganda Qöşköpir tumani maktabgaça va maktab ta'limi bölimi rasmiy veb-saytiga havola berilişi şart.
             </p>
 
             <div className="pt-2 text-xs text-slate-400 space-y-1">
               <div>Manzil: {settings.address}</div>
-              <div>Ishonch telefoni: <strong className="text-amber-400">{settings.trustPhone}</strong></div>
-              <div>Elektron pochta: {settings.email}</div>
+              <div>Işonç telefoni: <strong className="text-amber-400">{settings.trustPhone}</strong></div>
+              <div>Elektron poçta: {settings.email}</div>
             </div>
           </div>
 
           {/* Col 2: Navigation Links */}
           <div className="lg:col-span-3">
             <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-4">
-              Portal bo'limlari
+              Portal bölimlari
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
@@ -66,12 +66,12 @@ export const FooterGov: React.FC<{ onOpenAdmin: () => void; onNavigate: (s: stri
               </li>
               <li>
                 <button onClick={() => onNavigate('bolim-haqida')} className="hover:text-white transition-colors">
-                  Bo'lim rahbariyati va tuzilma
+                  Bölim rahbariyati va tuzilma
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('muassasalar')} className="hover:text-white transition-colors">
-                  Maktablar va MTTlar ro'yxati
+                  Maktablar va MTTlar röyxati
                 </button>
               </li>
               <li>
@@ -81,7 +81,7 @@ export const FooterGov: React.FC<{ onOpenAdmin: () => void; onNavigate: (s: stri
               </li>
               <li>
                 <button onClick={() => onNavigate('yangiliklar')} className="hover:text-white transition-colors">
-                  So'nggi yangiliklar va e'lonlar
+                  Sönggi yangiliklar va e'lonlar
                 </button>
               </li>
               <li>
@@ -91,7 +91,7 @@ export const FooterGov: React.FC<{ onOpenAdmin: () => void; onNavigate: (s: stri
               </li>
               <li>
                 <button onClick={() => onNavigate('aloqa')} className="hover:text-white transition-colors">
-                  Bog'lanish va manzil
+                  Boğlaniş va manzil
                 </button>
               </li>
             </ul>
@@ -123,7 +123,7 @@ export const FooterGov: React.FC<{ onOpenAdmin: () => void; onNavigate: (s: stri
         {/* Bottom copyright and admin login trigger */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>
-            © {new Date().getFullYear()} Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi. Barcha huquqlar himoyalangan.
+            © {new Date().getFullYear()} Qöşköpir tumani maktabgaça va maktab ta'limi bölimi. Barça huquqlar himoyalangan.
           </p>
 
           <div className="flex items-center gap-4">
@@ -132,7 +132,7 @@ export const FooterGov: React.FC<{ onOpenAdmin: () => void; onNavigate: (s: stri
               className="flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors font-medium"
             >
               <ShieldCheck className="w-4 h-4 text-sky-400" />
-              <span>Admin tizimiga kirish</span>
+              <span>Admin tizimiga kiriş</span>
             </button>
           </div>
         </div>
