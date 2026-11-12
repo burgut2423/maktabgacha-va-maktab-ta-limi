@@ -9,12 +9,12 @@ export const fixUzbekText = (text: string): string => {
   let res = text;
 
   // 1. O' va o' harflari
-  res = res.replace(/O['`ʻ‘]/g, 'O‘');
-  res = res.replace(/o['`ʻ‘]/g, 'o‘');
+  res = res.replace(/O['`ʻ‘]/g, 'Ö');
+  res = res.replace(/o['`ʻ‘]/g, 'ö');
 
   // 2. G' va g' harflari
-  res = res.replace(/G['`ʻ‘]/g, 'G‘');
-  res = res.replace(/g['`ʻ‘]/g, 'g‘');
+  res = res.replace(/G['`ʻ‘]/g, 'Ğ');
+  res = res.replace(/g['`ʻ‘]/g, 'ğ');
 
   // 3. Tutuq belgisi (apostrof): ta'lim -> ta’lim, ma'lumot -> ma’lumot, e'lon -> e’lon, e'tiqod -> e’tiqod, san'at -> san’at, mas'ul -> mas’ul
   res = res.replace(/([a-zA-Z])['`ʻ]([a-zA-Z])/g, '$1’$2');
@@ -25,4 +25,4 @@ export const fixUzbekText = (text: string): string => {
 /**
  * Common Uzbek special letters for virtual keyboard insertion
  */
-export const UZBEK_LETTERS = ['o‘', 'g‘', 'O‘', 'G‘', '’', 'sh', 'ch', 'Sh', 'Ch'];
+export const UZBEK_LETTERS = ['ö', 'ğ', 'ş', 'ç', 'Ö', 'Ğ', 'Ş', 'Ç', '’'];
