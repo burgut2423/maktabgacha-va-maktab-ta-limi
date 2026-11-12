@@ -108,7 +108,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
               </h1>
 
               <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-6 max-w-2xl">
-                {settings.heroSubtitle || "Qöşköpir tumani maktabgaça va maktab ta'limi bölimi tizimidagi 54 ta umumta'lim maktabi hamda 42 ta davlat va xususiy MTTlar faoliyatini yagona raqamli platforma orqali kuzatib boring."}
+                {settings.heroSubtitle || "Qöşköpir tuman ta'lim bölimi tizimidagi 54 ta umumta'lim maktabi hamda 42 ta davlat va xususiy MTTlar faoliyatini yagona raqamli platforma orqali kuzatib boring."}
               </p>
 
               {/* Featured News Card */}

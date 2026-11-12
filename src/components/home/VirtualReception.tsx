@@ -106,7 +106,7 @@ export const VirtualReception: React.FC = () => {
             Bölim boşliği virtual qabulxonasi
           </h2>
           <p className="text-slate-600 text-sm mt-1 max-w-xl mx-auto">
-            Qöşköpir tumani maktabgaça va maktab ta'limi bölimi rahbariyatiga töğridan-töğri elektron murojaat yöllang
+            Qöşköpir tuman ta'lim bölimi rahbariyatiga töğridan-töğri elektron murojaat yöllang
           </p>
         </div>
 

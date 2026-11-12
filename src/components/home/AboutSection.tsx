@@ -26,7 +26,7 @@ export const AboutSection: React.FC = () => {
             Bölim faoliyati
           </span>
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
-            Qöşköpir tumani maktabgaça va maktab ta'limi bölimi haqida
+            Qöşköpir tuman ta'lim bölimi haqida
           </h2>
           <p className="text-slate-600 text-sm mt-2 leading-relaxed">
             {settings.departmentMission || "Tumanda ta'lim sifatini oşiriş, barkamol va ma'rifatli yoşlarni tarbiyalaş böyiça taşkiliy tizim"}

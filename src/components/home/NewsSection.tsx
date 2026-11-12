@@ -101,7 +101,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
               Yangiliklar va rasmiy xabarlar
             </h2>
             <p className="text-slate-600 text-sm mt-1">
-              Qöşköpir tumani maktabgaça va maktab ta'limi tizimidagi muhim voqealar
+              Qöşköpir tuman ta'lim tizimidagi muhim voqealar
             </p>
           </div>
 

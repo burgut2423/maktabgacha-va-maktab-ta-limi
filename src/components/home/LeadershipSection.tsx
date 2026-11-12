@@ -16,7 +16,7 @@ export const LeadershipSection: React.FC = () => {
             Bölim rahbariyati va fuqarolarni qabul qiliş jadvali
           </h2>
           <p className="text-slate-600 text-sm mt-2">
-            Qöşköpir tumani maktabgaça va maktab ta'limi bölimi mas'ul rahbarlari
+            Qöşköpir tuman ta'lim bölimi mas'ul rahbarlari
           </p>
         </div>
 
