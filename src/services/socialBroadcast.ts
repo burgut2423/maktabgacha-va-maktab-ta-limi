@@ -40,7 +40,7 @@ export const formatInstagramCaption = (news: NewsItem): string => {
   return `${news.title}\n\n` +
     `${news.summary}\n\n` +
     `🗓 Sana: ${news.date}\n` +
-    `📍 Qöşköpir tumani maktabgaça va maktab ta’limi bölimi rasmiy axborot xizmati\n\n` +
+    `📍 Qöşköpir tuman ta’lim bölimi rasmiy axborot xizmati\n\n` +
     `Batafsil veb-saytimizda: profil sarlavhasidagi havola orqali\n\n` +
     `#Qoshkopir #Xorazm #Talim #Maktab #Bogcha #MMTB #Yangiliklar #Olimpiada #XalqTalimi`;
 };
@@ -276,7 +276,7 @@ export const postToFacebook = async (
     };
   }
 
-  const message = `${news.title}\n\n${news.summary}\n\nQöşköpir tumani maktabgaça va maktab ta’limi bölimi`;
+  const message = `${news.title}\n\n${news.summary}\n\nQöşköpir tuman ta’lim bölimi`;
 
   try {
     const res = await fetch(`https://graph.facebook.com/v19.0/${pageId}/feed`, {

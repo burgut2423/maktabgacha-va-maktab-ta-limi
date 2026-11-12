@@ -183,7 +183,7 @@ export const getOrCreatePortalFolder = async (): Promise<string> => {
     body: JSON.stringify({
       name: FOLDER_NAME,
       mimeType: 'application/vnd.google-apps.folder',
-      description: "Qöşköpir tumani maktabgaça va maktab ta'limi bölimi portali rasmiy fayllari"
+      description: "Qöşköpir tuman ta'lim bölimi portali rasmiy fayllari"
     })
   });
 
