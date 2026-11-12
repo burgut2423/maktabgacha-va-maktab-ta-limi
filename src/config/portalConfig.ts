@@ -16,7 +16,7 @@ export const PORTAL_CONFIG = {
   GOOGLE_API_KEY: "AIzaSyBszmlCmVIcCdE4zsGwA4JMbk7Xg_HcTCc",
 
   // GitHub Pages va portal domeni
-  PORTAL_DOMAIN: "burgut2423.github.io",
+  PORTAL_DOMAIN: "jassurbekavezov-ai.github.io",
 
   // Avtomatik fon yangilanishi (millisekundda: har 30 soniyada bir marta)
   AUTO_REFRESH_INTERVAL_MS: 30000
