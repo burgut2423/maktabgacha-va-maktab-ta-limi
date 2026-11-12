@@ -2,6 +2,7 @@ import { getAccessToken } from './googleAuth';
 import { NewsItem, Organization, Leader, DocumentItem, CitizenAppeal, PortalSettings } from '../types';
 import { INITIAL_NEWS, INITIAL_ORGANIZATIONS, INITIAL_LEADERS, INITIAL_DOCUMENTS, INITIAL_APPEALS, INITIAL_SETTINGS } from '../data/initialData';
 import { PORTAL_CONFIG } from '../config/portalConfig';
+import { resolveAssetUrl } from '../utils/assetUrl';
 
 const SHEETS_API_URL = 'https://sheets.googleapis.com/v4/spreadsheets';
 const DRIVE_API_URL = 'https://www.googleapis.com/drive/v3';
@@ -393,7 +394,8 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
     if (images.length === 0 && rawImg) {
       images = [rawImg];
     }
-    const primaryImg = images[0] || rawImg || './assets/images/hero_education_district_1794303548345.jpg';
+    images = images.map((u) => resolveAssetUrl(u) as string);
+    const primaryImg = images[0] || resolveAssetUrl(rawImg) || (resolveAssetUrl('hero_education_district_1794303548345') as string);
 
     return {
       id: r[0] || `news-${idx + 1}`,
@@ -478,7 +480,7 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
       shifts: parseInt(r[11] || '1', 10) || 1,
       establishedYear: parseInt(r[12] || '1990', 10) || 1990,
       rating: parseFloat(r[13] || '4.8') || 4.8,
-      photoUrl: r[14] || undefined
+      photoUrl: resolveAssetUrl(r[14]) || undefined
     };
   });
 
@@ -501,7 +503,7 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
     receptionDays: r[6] || '',
     receptionHours: r[7] || '',
     bio: r[8] || '',
-    photoUrl: r[9] || './assets/images/department_head_portrait_1794303519848.jpg',
+    photoUrl: resolveAssetUrl(r[9] || 'department_head_portrait_1794303519848') as string,
     order: parseInt(r[10] || `${idx + 1}`, 10) || idx + 1
   }));
 
