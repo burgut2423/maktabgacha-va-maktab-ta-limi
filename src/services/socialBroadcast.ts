@@ -28,8 +28,8 @@ export const formatTelegramMessage = (news: NewsItem, settings: PortalSettings):
     `📁 <b>Kategoriya:</b> #${news.category.replace(/[^a-zA-Z0-9]/g, '_')}\n` +
     `🗓 <b>Sana:</b> ${news.date}\n` +
     `✍️ <b>Muallif:</b> ${escapeHtml(news.author)}\n\n` +
-    `🌐 <b>Batafsil portalda o‘qish:</b>\n` +
-    `<a href="${currentUrl}">Qo‘shko‘pir tumani MMTB rasmiy portali</a>\n\n` +
+    `🌐 <b>Batafsil portalda öqiş:</b>\n` +
+    `<a href="${currentUrl}">Qöşköpir tumani MMTB rasmiy portali</a>\n\n` +
     `👉 @${settings.telegramChannelUsername ? settings.telegramChannelUsername.replace('@', '') : 'qoshkopir_mmtb'}`;
 };
 
@@ -40,7 +40,7 @@ export const formatInstagramCaption = (news: NewsItem): string => {
   return `${news.title}\n\n` +
     `${news.summary}\n\n` +
     `🗓 Sana: ${news.date}\n` +
-    `📍 Qo‘shko‘pir tumani maktabgacha va maktab ta’limi bo‘limi rasmiy axborot xizmati\n\n` +
+    `📍 Qöşköpir tumani maktabgaça va maktab ta’limi bölimi rasmiy axborot xizmati\n\n` +
     `Batafsil veb-saytimizda: profil sarlavhasidagi havola orqali\n\n` +
     `#Qoshkopir #Xorazm #Talim #Maktab #Bogcha #MMTB #Yangiliklar #Olimpiada #XalqTalimi`;
 };
@@ -57,7 +57,7 @@ export const postToTelegram = async (
   if (!botToken || !channelUsernameOrId) {
     return {
       success: false,
-      error: "Telegram Bot Tokeni yoki Kanal ID si ko‘rsatilmagan"
+      error: "Telegram Bot Tokeni yoki Kanal ID si körsatilmagan"
     };
   }
 
@@ -110,7 +110,7 @@ export const postToTelegram = async (
   } catch (err: any) {
     return {
       success: false,
-      error: err.message || "Telegram serveri bilan bog‘lanib bo‘lmadi"
+      error: err.message || "Telegram serveri bilan boğlanib bölmadi"
     };
   }
 };
@@ -127,7 +127,7 @@ export const testTelegramConnection = async (
     const meData = await meRes.json();
 
     if (!meData.ok) {
-      return { success: false, error: "Bot tokeni noto‘g‘ri: " + meData.description };
+      return { success: false, error: "Bot tokeni notöğri: " + meData.description };
     }
 
     const botName = meData.result.first_name + ` (@${meData.result.username})`;
@@ -143,7 +143,7 @@ export const testTelegramConnection = async (
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: targetChat,
-          text: `🟢 <b>Qo‘shko‘pir tumani MMTB rasmiy portali</b>\n\nTelegram integratsiyasi muvaffaqiyatli sinovdan o‘tkazildi.\nSana: ${new Date().toLocaleString('uz-UZ')}`,
+          text: `🟢 <b>Qöşköpir tumani MMTB rasmiy portali</b>\n\nTelegram integratsiyasi muvaffaqiyatli sinovdan ötkazildi.\nSana: ${new Date().toLocaleString('uz-UZ')}`,
           parse_mode: 'HTML'
         })
       });
@@ -153,7 +153,7 @@ export const testTelegramConnection = async (
         return {
           success: false,
           botName,
-          error: `Bot to‘g‘ri, lekin kanalga yuborib bo‘lmadi: ${sendData.description}. Bot kanalda 'Administrator' ekanligini tekshiring!`
+          error: `Bot töğri, lekin kanalga yuborib bölmadi: ${sendData.description}. Bot kanalda 'Administrator' ekanligini tekşiring!`
         };
       }
     }
@@ -231,11 +231,11 @@ export const postToInstagram = async (
     } else {
       return {
         success: false,
-        error: publishData.error?.message || "Instagram postini nashr qilishda xatolik"
+        error: publishData.error?.message || "Instagram postini naşr qilişda xatolik"
       };
     }
   } catch (err: any) {
-    return { success: false, error: err.message || "Instagram serveriga ulanib bo‘lmadi" };
+    return { success: false, error: err.message || "Instagram serveriga ulanib bölmadi" };
   }
 };
 
@@ -276,7 +276,7 @@ export const postToFacebook = async (
     };
   }
 
-  const message = `${news.title}\n\n${news.summary}\n\nQo‘shko‘pir tumani maktabgacha va maktab ta’limi bo‘limi`;
+  const message = `${news.title}\n\n${news.summary}\n\nQöşköpir tumani maktabgaça va maktab ta’limi bölimi`;
 
   try {
     const res = await fetch(`https://graph.facebook.com/v19.0/${pageId}/feed`, {

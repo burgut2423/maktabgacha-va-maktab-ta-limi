@@ -124,7 +124,7 @@ export const getOrCreateSpreadsheet = async (): Promise<{ id: string; url: strin
 
   if (!createRes.ok) {
     const errText = await createRes.text();
-    throw new Error(`Google Sheets yaratishda xatolik: ${errText}`);
+    throw new Error(`Google Sheets yaratişda xatolik: ${errText}`);
   }
 
   const newSheet = await createRes.json();
@@ -462,7 +462,7 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
     // Determine name
     let name = col3 || col2 || col1 || `${number}-sonli ${type === 'mtt' ? 'MTT' : 'maktab'}`;
     if (/^\d+$/.test(name)) {
-      name = `${name}-sonli ${type === 'mtt' ? 'maktabgacha ta\'lim tashkiloti' : 'umumiy o\'rta ta\'lim maktabi'}`;
+      name = `${name}-sonli ${type === 'mtt' ? 'maktabgaça ta\'lim taşkiloti' : 'umumiy o\'rta ta\'lim maktabi'}`;
     }
 
     return {
@@ -470,8 +470,8 @@ export const fetchAllPortalDataFromSheets = async (spreadsheetId: string): Promi
       type,
       number,
       name,
-      address: col4 || "Qo'shko'pir tumani",
-      mahalla: col5 || "Qo'shko'pir",
+      address: col4 || "Qöşköpir tumani",
+      mahalla: col5 || "Qöşköpir",
       director: col6 || "Rahbar tayinlanmagan",
       phone: col7.includes('#') ? "+998 (62) 352-00-00" : (col7 || "+998 (62) 352-00-00"),
       email: String(r[8] || "").includes('#') ? "" : String(r[8] || ""),
@@ -708,6 +708,6 @@ export const syncAllDataToGoogleSheets = async (
 
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(`Google Sheets yangilashda xatolik: ${err}`);
+    throw new Error(`Google Sheets yangilaşda xatolik: ${err}`);
   }
 };

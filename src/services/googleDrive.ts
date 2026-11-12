@@ -62,7 +62,7 @@ export const setPublicReaderPermission = async (fileId: string, token: string): 
     });
     return res.ok;
   } catch (err) {
-    console.warn("Ruxsat berishda ogohlantirish:", err);
+    console.warn("Ruxsat berişda ogohlantiriş:", err);
     return false;
   }
 };
@@ -76,7 +76,7 @@ export const createSubFolderInDrive = async (
   parentFolderId: string = OFFICIAL_PARENT_FOLDER_ID
 ): Promise<{ id: string; webViewLink: string }> => {
   const token = await getAccessToken();
-  if (!token) throw new Error("Google hisobiga ulanmagan. Iltimos, avval 'Google bilan kirish' tugmasi orqali hisobingizga kiring.");
+  if (!token) throw new Error("Google hisobiga ulanmagan. Iltimos, avval 'Google bilan kiriş' tugmasi orqali hisobingizga kiring.");
 
   // Sanitize folder name
   const safeName = folderTitle.replace(/[/\\?%*:|"<>]/g, ' ').trim() || `Material_${Date.now()}`;
@@ -95,7 +95,7 @@ export const createSubFolderInDrive = async (
         name: safeName,
         mimeType: 'application/vnd.google-apps.folder',
         parents: [parentFolderId],
-        description: `Qo'shko'pir tumani MMTB rasmiy portali materiallari to'plami (${new Date().toLocaleDateString('uz-UZ')})`
+        description: `Qöşköpir tumani MMTB rasmiy portali materiallari töplami (${new Date().toLocaleDateString('uz-UZ')})`
       })
     });
 
@@ -103,10 +103,10 @@ export const createSubFolderInDrive = async (
       newFolder = await res.json();
     } else {
       const errTxt = await res.text();
-      console.warn("Parent papkada jild yaratishda ogohlantirish:", errTxt);
+      console.warn("Parent papkada jild yaratişda ogohlantiriş:", errTxt);
     }
   } catch (err) {
-    console.warn("Drive jild yaratishda xato:", err);
+    console.warn("Drive jild yaratişda xato:", err);
   }
 
   // Fallback: create in user's root or portal folder if parent rejected
@@ -120,13 +120,13 @@ export const createSubFolderInDrive = async (
       body: JSON.stringify({
         name: safeName,
         mimeType: 'application/vnd.google-apps.folder',
-        description: "Qo'shko'pir tumani MMTB rasmlari"
+        description: "Qöşköpir tumani MMTB rasmlari"
       })
     });
 
     if (!fallbackRes.ok) {
       const errTxt = await fallbackRes.text();
-      throw new Error(`Google Drive'da jild yaratib bo'lmadi: ${errTxt}`);
+      throw new Error(`Google Drive'da jild yaratib bölmadi: ${errTxt}`);
     }
     newFolder = await fallbackRes.json();
   }
@@ -183,12 +183,12 @@ export const getOrCreatePortalFolder = async (): Promise<string> => {
     body: JSON.stringify({
       name: FOLDER_NAME,
       mimeType: 'application/vnd.google-apps.folder',
-      description: "Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi portali rasmiy fayllari"
+      description: "Qöşköpir tumani maktabgaça va maktab ta'limi bölimi portali rasmiy fayllari"
     })
   });
 
   if (!createRes.ok) {
-    throw new Error("Google Drive'da jild yaratib bo'lmadi");
+    throw new Error("Google Drive'da jild yaratib bölmadi");
   }
 
   const newFolder = await createRes.json();
@@ -204,7 +204,7 @@ export const uploadFileToFolder = async (
   folderId: string
 ): Promise<DriveUploadedFile> => {
   const token = await getAccessToken();
-  if (!token) throw new Error("Google hisobiga ulanmagan. Iltimos, avval 'Google bilan kirish' tugmasi orqali hisobingizga kiring.");
+  if (!token) throw new Error("Google hisobiga ulanmagan. Iltimos, avval 'Google bilan kiriş' tugmasi orqali hisobingizga kiring.");
 
   const metadata = {
     name: file.name,
@@ -251,7 +251,7 @@ export const uploadFileToFolder = async (
 
   if (!uploadRes.ok) {
     const errorMsg = await uploadRes.text();
-    throw new Error(`Google Drive'ga yuklashda xatolik: ${errorMsg}`);
+    throw new Error(`Google Drive'ga yuklaşda xatolik: ${errorMsg}`);
   }
 
   const uploadedFile = await uploadRes.json();
@@ -338,7 +338,7 @@ export const deleteFileFromDrive = async (fileId: string): Promise<boolean> => {
   });
 
   if (!res.ok && res.status !== 404) {
-    throw new Error("Faylni Google Drive'dan o'chirib bo'lmadi");
+    throw new Error("Faylni Google Drive'dan öçirib bölmadi");
   }
 
   return true;

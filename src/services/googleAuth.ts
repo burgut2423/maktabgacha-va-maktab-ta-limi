@@ -60,7 +60,7 @@ export const initAuth = (
       }
     })
     .catch(err => {
-      console.warn("Redirect natijasini olishda:", err);
+      console.warn("Redirect natijasini olişda:", err);
     });
 
   return onAuthStateChanged(auth, async (user: User | null) => {
@@ -94,7 +94,7 @@ export const googleSignIn = async (): Promise<{ user: User; accessToken: string 
     const result = await signInWithPopup(auth, provider);
     const credential = GoogleAuthProvider.credentialFromResult(result);
     if (!credential?.accessToken) {
-      throw new Error("Google hisobidan kirish tokeni olinmadi");
+      throw new Error("Google hisobidan kiriş tokeni olinmadi");
     }
 
     cachedAccessToken = credential.accessToken;
@@ -104,18 +104,18 @@ export const googleSignIn = async (): Promise<{ user: User; accessToken: string 
     currentUser = result.user;
     return { user: result.user, accessToken: cachedAccessToken };
   } catch (error: any) {
-    console.error("Google kirishda xatolik:", error);
+    console.error("Google kirişda xatolik:", error);
 
     // Provide friendly diagnostic guidance for GitHub Pages
     if (error.code === 'auth/unauthorized-domain') {
       const currentHost = window.location.hostname;
       error.customExplanation =
-        `GitHub Pages domeni (${currentHost}) Firebase loyihasida ruxsat berilgan domenlar ro‘yxatiga qo‘shilishi lozim.`;
+        `GitHub Pages domeni (${currentHost}) Firebase loyihasida ruxsat berilgan domenlar röyxatiga qöşilişi lozim.`;
       error.domainToAdd = currentHost;
       error.projectId = firebaseConfig.projectId;
     } else if (error.code === 'auth/popup-blocked') {
       error.customExplanation =
-        "Brauzer ochiluvchi oynani (popup) blokladi. Iltimos, ochiluvchi oynalarga ruxsat bering yoki sahifani yo‘naltirish (redirect) tugmasidan foydalaning.";
+        "Brauzer oçiluvçi oynani (popup) blokladi. Iltimos, oçiluvçi oynalarga ruxsat bering yoki sahifani yönaltiriş (redirect) tugmasidan foydalaning.";
     }
 
     throw error;
@@ -133,7 +133,7 @@ export const googleSignInRedirect = async (): Promise<void> => {
   } catch (error: any) {
     if (error.code === 'auth/unauthorized-domain') {
       error.customExplanation =
-        `GitHub Pages domeni (${window.location.hostname}) Firebase loyihasida ruxsat berilgan domenlar ro‘yxatiga qo‘shilishi lozim.`;
+        `GitHub Pages domeni (${window.location.hostname}) Firebase loyihasida ruxsat berilgan domenlar röyxatiga qöşilişi lozim.`;
     }
     throw error;
   }

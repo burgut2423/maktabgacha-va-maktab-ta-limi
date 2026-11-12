@@ -75,7 +75,7 @@ export async function verifyAdminCredentials(user: string, pass: string): Promis
       return false;
     }
   } catch (err) {
-    console.error('Kriptografik tekshiruvda xatolik:', err);
+    console.error('Kriptografik tekşiruvda xatolik:', err);
     return false;
   }
 }
