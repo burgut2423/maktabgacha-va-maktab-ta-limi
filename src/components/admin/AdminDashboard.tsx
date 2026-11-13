@@ -2946,10 +2946,10 @@ function onEdit(e) {
                       className="hidden"
                       onChange={e =>
                         handleDriveFileUpload(e, (url, driveId) => {
-                          const current = (newsModal.item.images && newsModal.item.images.length > 0)
+                          const current: string[] = (newsModal.item.images && newsModal.item.images.length > 0)
                             ? newsModal.item.images
                             : (newsModal.item.imageUrl ? [newsModal.item.imageUrl] : []);
-                          const updated = [...current, url];
+                          const updated: string[] = [...current, url].filter((img): img is string => Boolean(img));
                           setNewsModal(prev => ({
                             ...prev,
                             item: {
@@ -2999,10 +2999,10 @@ function onEdit(e) {
                     type="button"
                     onClick={() => {
                       if (!newsImageInputUrl.trim()) return;
-                      const current = (newsModal.item.images && newsModal.item.images.length > 0)
+                      const current: string[] = (newsModal.item.images && newsModal.item.images.length > 0)
                         ? newsModal.item.images
                         : (newsModal.item.imageUrl ? [newsModal.item.imageUrl] : []);
-                      const updated = [...current, newsImageInputUrl.trim()];
+                      const updated: string[] = [...current, newsImageInputUrl.trim()].filter((img): img is string => Boolean(img));
                       setNewsModal(prev => ({
                         ...prev,
                         item: {
@@ -3057,8 +3057,10 @@ function onEdit(e) {
                               <button
                                 type="button"
                                 onClick={() => {
-                                  const current = newsModal.item.images || [];
-                                  const reordered = [imgUrl, ...current.filter((_, i) => i !== idx)];
+                                  const current: string[] = (newsModal.item.images && newsModal.item.images.length > 0)
+                                    ? newsModal.item.images
+                                    : (newsModal.item.imageUrl ? [newsModal.item.imageUrl] : []);
+                                  const reordered: string[] = [imgUrl, ...current.filter((_, i) => i !== idx)].filter((img): img is string => Boolean(img));
                                   setNewsModal(prev => ({
                                     ...prev,
                                     item: {
@@ -3079,10 +3081,10 @@ function onEdit(e) {
                             <button
                               type="button"
                               onClick={() => {
-                                const current = (newsModal.item.images && newsModal.item.images.length > 0)
+                                const current: string[] = (newsModal.item.images && newsModal.item.images.length > 0)
                                   ? newsModal.item.images
                                   : (newsModal.item.imageUrl ? [newsModal.item.imageUrl] : []);
-                                const updated = current.filter((_, i) => i !== idx);
+                                const updated: string[] = current.filter((_, i) => i !== idx).filter((img): img is string => Boolean(img));
                                 setNewsModal(prev => ({
                                   ...prev,
                                   item: {

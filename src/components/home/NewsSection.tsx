@@ -85,8 +85,6 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
         : (selectedNews.imageUrl ? [selectedNews.imageUrl] : []))
     : [];
 
-  const driveLink = selectedNews?.driveFolderUrl || PORTAL_CONFIG.DEFAULT_DRIVE_FOLDER_URL;
-
   return (
     <section id="yangiliklar" className="py-12 bg-slate-50 border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -282,22 +280,6 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
                     </div>
                   )}
                 </div>
-
-                {/* Bottom Bar on Main Image */}
-                <div className="absolute bottom-3 right-3">
-                  {driveLink && (
-                    <a
-                      href={driveLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-900/80 hover:bg-slate-900 text-white text-xs font-medium backdrop-blur-xs transition-colors border border-white/20"
-                    >
-                      <FolderOpen className="w-3.5 h-3.5 text-amber-400" />
-                      <span>Drive jildini ochish</span>
-                      <ExternalLink className="w-3 h-3 text-slate-300" />
-                    </a>
-                  )}
-                </div>
               </div>
 
               {/* Thumbnails Strip */}
@@ -419,19 +401,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
                 </div>
               )}
 
-              <div className="mt-8 pt-6 border-t border-slate-200 flex items-center justify-between">
-                {driveLink ? (
-                  <a
-                    href={driveLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs text-sky-700 hover:text-sky-900 font-semibold"
-                  >
-                    <FolderOpen className="w-4 h-4 text-amber-500" />
-                    <span>Rasmlar papkasi (Google Drive)</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                ) : <span />}
+              <div className="mt-8 pt-6 border-t border-slate-200 flex justify-end">
 
                 <button
                   type="button"
