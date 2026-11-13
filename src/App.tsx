@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PortalProvider } from './context/PortalContext';
+import { PortalProvider, usePortal } from './context/PortalContext';
 import { HeaderGov } from './components/common/HeaderGov';
 import { BreakingTicker } from './components/common/BreakingTicker';
 import { HeroSection } from './components/home/HeroSection';
@@ -18,6 +18,7 @@ import { NewsItem } from './types';
 import { Send, School, ShieldCheck, Home } from 'lucide-react';
 
 function PortalMain() {
+  const { t } = usePortal();
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('asosiy');
@@ -134,7 +135,7 @@ function PortalMain() {
           }`}
         >
           <Home className="w-4 h-4 mb-0.5" />
-          <span>Asosiy</span>
+          <span>{t("Asosiy")}</span>
         </button>
 
         <button
@@ -144,7 +145,7 @@ function PortalMain() {
           }`}
         >
           <School className="w-4 h-4 mb-0.5" />
-          <span>Maktablar</span>
+          <span>{t("Maktablar")}</span>
         </button>
 
         <button
@@ -154,7 +155,7 @@ function PortalMain() {
           }`}
         >
           <Send className="w-4 h-4 mb-0.5" />
-          <span>Murojaat</span>
+          <span>{t("Murojaat")}</span>
         </button>
 
         <button
@@ -162,7 +163,7 @@ function PortalMain() {
           className="flex flex-col items-center justify-center py-1 px-2 rounded-lg text-[10px] font-semibold text-sky-800 bg-sky-50 border border-sky-200"
         >
           <ShieldCheck className="w-4 h-4 mb-0.5 text-sky-700" />
-          <span>Admin</span>
+          <span>{t("Admin")}</span>
         </button>
       </div>
     </div>

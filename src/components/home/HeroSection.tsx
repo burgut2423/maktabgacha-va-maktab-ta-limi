@@ -20,7 +20,7 @@ interface HeroSectionProps {
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNavigate }) => {
-  const { news, settings } = usePortal();
+  const { news, settings, t } = usePortal();
 
   // Find pinned or most recent news
   const featuredNews = news.find(n => n.isPinned) || news[0];
@@ -93,21 +93,21 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
         {/* Main Grid: Featured Hero Story + Image */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch mb-10">
           {/* Left Column: District Mission and Featured Story */}
-          <div className="lg:col-span-7 flex flex-col justify-between">
+          <div className="lg:col-span-7 flex flex-col justify-between w3-animate-left">
             <div>
               {/* Region Tag */}
               <div className="flex items-center gap-2 text-xs font-semibold text-sky-800 uppercase tracking-widest mb-3">
                 <MapPin className="w-3.5 h-3.5" />
-                <span>{settings.heroBadgeText || "Xorazm viloyati · Qo'shko'pir tumani"}</span>
+                <span>{t(settings.heroBadgeText || "Xorazm viloyati · Qo'shko'pir tumani")}</span>
               </div>
 
               {/* Main Headline */}
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight mb-4 text-balance">
-                {settings.heroTitle || "Ta'lim va tarbiya — kelajak poydevori, ma'rifatli avlod kafolati"}
+                {t(settings.heroTitle || "Ta'lim va tarbiya — kelajak poydevori, ma'rifatli avlod kafolati")}
               </h1>
 
               <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-6 max-w-2xl">
-                {settings.heroSubtitle || "Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi tizimidagi 54 ta umumta'lim maktabi hamda 42 ta davlat va xususiy MTTlar faoliyatini yagona raqamli platforma orqali kuzatib boring."}
+                {t(settings.heroSubtitle || "Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi tizimidagi 54 ta umumta'lim maktabi hamda 42 ta davlat va xususiy MTTlar faoliyatini yagona raqamli platforma orqali kuzatib boring.")}
               </p>
 
               {/* Featured News Card */}
@@ -117,20 +117,20 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
                   className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs hover:shadow-md transition-all cursor-pointer group"
                 >
                   <div className="flex items-center gap-2 text-xs text-sky-700 font-semibold mb-1.5">
-                    <span>{featuredNews.category}</span>
+                    <span>{t(featuredNews.category)}</span>
                     <span>·</span>
                     <span className="text-slate-500 font-normal">{featuredNews.date}</span>
                     <span>·</span>
-                    <span className="text-slate-500 font-normal">{featuredNews.views} ko'rildi</span>
+                    <span className="text-slate-500 font-normal">{featuredNews.views} {t("ko'rildi")}</span>
                   </div>
                   <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-sky-700 transition-colors line-clamp-2 mb-2">
-                    {featuredNews.title}
+                    {t(featuredNews.title)}
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed mb-3">
-                    {featuredNews.summary}
+                    {t(featuredNews.summary)}
                   </p>
                   <div className="flex items-center text-xs font-semibold text-sky-700 group-hover:translate-x-1 transition-transform">
-                    <span>Batafsil o'qish</span>
+                    <span>{t("Batafsil o'qish")}</span>
                     <ArrowRight className="w-3.5 h-3.5 ml-1" />
                   </div>
                 </div>
@@ -144,7 +144,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
                 className="px-5 py-2.5 bg-sky-800 hover:bg-sky-900 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors flex items-center gap-2"
               >
                 <Send className="w-4 h-4" />
-                <span>Murojaat yo'llash</span>
+                <span>{t("Murojaat yo'llash")}</span>
               </button>
 
               <button
@@ -152,17 +152,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
                 className="px-5 py-2.5 bg-white hover:bg-slate-50 text-slate-800 text-sm font-semibold rounded-lg border border-slate-300 transition-colors flex items-center gap-2"
               >
                 <GraduationCap className="w-4 h-4 text-sky-700" />
-                <span>Maktablar katalogi</span>
+                <span>{t("Maktablar katalogi")}</span>
               </button>
             </div>
           </div>
 
           {/* Right Column: Hero District School Showcase Image */}
-          <div className="lg:col-span-5 relative">
+          <div className="lg:col-span-5 relative w3-animate-right">
             <div className="w-full h-full min-h-[320px] lg:min-h-[420px] rounded-2xl overflow-hidden shadow-lg border border-slate-200 relative group">
               <img
                 src={settings.heroImageUrl || heroImage}
-                alt="Qo'shko'pir tumani zamonaviy maktab binosi"
+                alt={t("Qo'shko'pir tumani zamonaviy maktab binosi")}
                 className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
                 referrerPolicy="no-referrer"
               />
@@ -170,13 +170,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
               
               <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-300 block mb-1">
-                  Yangi o'quv majmuasi
+                  {t("Yangi o'quv majmuasi")}
                 </span>
                 <p className="text-sm font-bold leading-snug">
-                  14-sonli umumiy o'rta ta'lim maktabining zamonaviy o'quv korpusi
+                  {t("14-sonli umumiy o'rta ta'lim maktabining zamonaviy o'quv korpusi")}
                 </p>
                 <p className="text-xs text-slate-300 mt-1">
-                  STEM laboratoriyalari va sport inshootlariga ega zamonaviy ta'lim maskani
+                  {t("STEM laboratoriyalari va sport inshootlariga ega zamonaviy ta'lim maskani")}
                 </p>
               </div>
             </div>
@@ -184,12 +184,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
         </div>
 
         {/* Quick Electronic Government Services Bar */}
-        <div className="mt-8 pt-8 border-t border-slate-200">
+        <div className="mt-8 pt-8 border-t border-slate-200 w3-animate-bottom">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-bold uppercase tracking-wider text-slate-700">
-              Elektron ta'lim xizmatlari va havolalar
+              {t("Elektron ta'lim xizmatlari va havolalar")}
             </h2>
-            <span className="text-xs text-slate-500">Yagona davlat axborot tizimlari</span>
+            <span className="text-xs text-slate-500">{t("Yagona davlat axborot tizimlari")}</span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -209,11 +209,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
                         <Icon className="w-5 h-5" />
                       </div>
                       <div className="flex items-center gap-1 font-semibold text-xs sm:text-sm text-slate-900 group-hover:text-sky-700 transition-colors">
-                        <span>{srv.title}</span>
+                        <span>{t(srv.title)}</span>
                         <ExternalLink className="w-3 h-3 text-slate-400 shrink-0" />
                       </div>
                       <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">
-                        {srv.desc}
+                        {t(srv.desc)}
                       </p>
                     </div>
                   </a>
@@ -239,10 +239,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSelectNews, onNaviga
                       <Icon className="w-5 h-5" />
                     </div>
                     <div className="font-semibold text-xs sm:text-sm text-slate-900 group-hover:text-sky-700 transition-colors">
-                      {srv.title}
+                      {t(srv.title)}
                     </div>
                     <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">
-                      {srv.desc}
+                      {t(srv.desc)}
                     </p>
                   </div>
                 </button>

@@ -20,6 +20,7 @@ import {
 } from '../services/googleSheets';
 import { getOrCreatePortalFolder } from '../services/googleDrive';
 import { PORTAL_CONFIG } from '../config/portalConfig';
+import { toNewUzbekAlphabet } from '../utils/uzbekTypography';
 
 interface PortalContextType {
   // State
@@ -71,6 +72,11 @@ interface PortalContextType {
   speakText: (text: string) => void;
   stopSpeaking: () => void;
   isSpeaking: boolean;
+
+  // Alphabet Mode (New Uzbek Latin: ş, ç, ö, ğ)
+  useNewAlphabet: boolean;
+  setUseNewAlphabet: (val: boolean) => void;
+  t: (text?: string) => string;
 }
 
 const PortalContext = createContext<PortalContextType | undefined>(undefined);
@@ -150,6 +156,34 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [fontSize, setFontSizeState] = useState<'normal' | 'large' | 'xlarge'>('normal');
   const [contrastMode, setContrastModeState] = useState<'normal' | 'high' | 'grayscale'>('normal');
   const [isSpeaking, setIsSpeaking] = useState(false);
+
+  // Alphabet Mode State (default: true => updated Uzbek alphabet ş, ç, ö, ğ)
+  const [useNewAlphabet, setUseNewAlphabetState] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('qoshkopir_alphabet_new');
+      return saved === null ? true : saved === 'true';
+    } catch {
+      return true;
+    }
+  });
+
+  const setUseNewAlphabet = useCallback((val: boolean) => {
+    setUseNewAlphabetState(val);
+    try {
+      localStorage.setItem('qoshkopir_alphabet_new', String(val));
+    } catch {}
+  }, []);
+
+  const t = useCallback((text?: string): string => {
+    if (!text) return '';
+    return useNewAlphabet ? toNewUzbekAlphabet(text) : text;
+  }, [useNewAlphabet]);
+
+  useEffect(() => {
+    document.title = useNewAlphabet
+      ? "Qöşköpir Tumani Maktabgaça va Maktab Ta'limi Bölimi"
+      : "Qo'shko'pir Tumani Maktabgacha va Maktab Ta'limi Bo'limi";
+  }, [useNewAlphabet]);
 
   // Sync to local storage
   useEffect(() => {
@@ -777,7 +811,10 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setContrastMode,
         speakText,
         stopSpeaking,
-        isSpeaking
+        isSpeaking,
+        useNewAlphabet,
+        setUseNewAlphabet,
+        t
       }}
     >
       {children}

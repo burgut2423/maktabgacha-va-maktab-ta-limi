@@ -20,6 +20,7 @@ import {
   getFailedAttemptsCount,
   createAdminSession
 } from '../../services/adminAuth';
+import { usePortal } from '../../context/PortalContext';
 
 interface AdminLoginModalProps {
   isOpen: boolean;
@@ -32,6 +33,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
   onClose,
   onLoginSuccess
 }) => {
+  const { t } = usePortal();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -47,6 +49,16 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [remainingAttempts, setRemainingAttempts] = useState<number | null>(null);
   const [lockSeconds, setLockSeconds] = useState(0);
+  const [isClosing, setIsClosing] = useState(false);
+
+  const handleClose = () => {
+    if (isClosing) return;
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsClosing(false);
+      onClose();
+    }, 210);
+  };
 
   // Generate new math captcha
   const generateCaptcha = () => {
@@ -102,13 +114,13 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
 
     // 2. Validate empty fields
     if (!username.trim() || !password) {
-      setErrorMessage("Iltimos, login va parolni kiriting.");
+      setErrorMessage(t("Iltimos, login va parolni kiriting."));
       return;
     }
 
     // 3. Validate math captcha
     if (parseInt(captchaAnswer) !== (captchaNum1 + captchaNum2)) {
-      setErrorMessage("Xavfsizlik hisobi (anti-robot) noto‘g‘ri kiritildi.");
+      setErrorMessage(t("Xavfsizlik hisobi (anti-robot) noto‘g‘ri kiritildi."));
       generateCaptcha();
       return;
     }
@@ -131,17 +143,17 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
         if (locked) {
           const secs = getRemainingLockSeconds();
           setLockSeconds(secs);
-          setErrorMessage("Ko‘p marotaba xato urinishlar tufayli tizim xavfsizlik maqsadida 15 daqiqaga bloklandi!");
+          setErrorMessage(t("Ko‘p marotaba xato urinishlar tufayli tizim xavfsizlik maqsadida 15 daqiqaga bloklandi!"));
         } else {
           const attempts = getFailedAttemptsCount();
           const left = Math.max(0, 5 - attempts);
           setRemainingAttempts(left);
-          setErrorMessage(`Login yoki parol noto‘g‘ri! Qolgan urinishlar soni: ${left} ta`);
+          setErrorMessage(t(`Login yoki parol noto‘g‘ri! Qolgan urinishlar soni: ${left} ta`));
         }
       }
     } catch (err: any) {
       setIsLoading(false);
-      setErrorMessage("Avtorizatsiyada xatolik yuz berdi.");
+      setErrorMessage(t("Avtorizatsiyada xatolik yuz berdi."));
     }
   };
 
@@ -152,9 +164,19 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div
+      onClick={handleClose}
+      className={`fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto ${
+        isClosing ? 'w3-animate-opacity-out' : 'w3-animate-opacity'
+      }`}
+    >
       {/* AdminLTE 3 Classic Login Box */}
-      <div className="w-full max-w-md my-auto">
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className={`w-full max-w-md my-auto ${
+          isClosing ? 'w3-animate-zoom-out' : 'w3-animate-zoom'
+        }`}
+      >
         {/* Brand Header */}
         <div className="text-center mb-4">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-sky-700 text-white shadow-xl mb-3 border border-sky-500">
@@ -164,10 +186,10 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
             <span className="bg-sky-600 text-white px-2 py-0.5 rounded text-sm font-black">
               AdminLTE
             </span>
-            <span>Qo‘shko‘pir MMTB</span>
+            <span>{t("Qo‘shko‘pir MMTB")}</span>
           </h2>
           <p className="text-xs text-slate-300 mt-1 font-medium">
-            Rasmiy Ma’muriyat Boshqaruv Tizimi
+            {t("Rasmiy Ma’muriyat Boshqaruv Tizimi")}
           </p>
         </div>
 
@@ -176,10 +198,10 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
           <div className="p-6 sm:p-8 space-y-5">
             <div className="text-center border-b border-slate-100 pb-3">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
-                Xavfsiz Avtorizatsiya
+                {t("Xavfsiz Avtorizatsiya")}
               </span>
               <p className="text-xs text-slate-600 mt-0.5">
-                Boshqaruv paneliga kirish uchun login va maxfiy parolingizni kiriting
+                {t("Boshqaruv paneliga kirish uchun login va maxfiy parolingizni kiriting")}
               </p>
             </div>
 
@@ -188,14 +210,14 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
               <div className="p-4 rounded-lg bg-red-50 border border-red-300 text-red-900 text-xs space-y-2 animate-pulse">
                 <div className="flex items-center gap-2 font-bold text-sm text-red-700">
                   <ShieldAlert className="w-5 h-5 shrink-0" />
-                  <span>Xavfsizlik Tizimi Bloklandi</span>
+                  <span>{t("Xavfsizlik Tizimi Bloklandi")}</span>
                 </div>
                 <p className="leading-relaxed">
-                  5 marta ketma-ket xato parol kiritilganligi sababli kirish vaqtincha cheklandi.
+                  {t("5 marta ketma-ket xato parol kiritilganligi sababli kirish vaqtincha cheklandi.")}
                 </p>
                 <div className="flex items-center gap-1.5 font-mono font-bold text-red-800 text-sm bg-red-100 px-2.5 py-1.5 rounded border border-red-200">
                   <Clock className="w-4 h-4 text-red-600" />
-                  <span>Qolgan vaqt: {formatLockTime(lockSeconds)}</span>
+                  <span>{t("Qolgan vaqt")}: {formatLockTime(lockSeconds)}</span>
                 </div>
               </div>
             )}
@@ -208,7 +230,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                   <div className="font-semibold">{errorMessage}</div>
                   {remainingAttempts !== null && remainingAttempts > 0 && (
                     <div className="text-[11px] text-red-600">
-                      Urinishlar tugagach tizim 15 daqiqaga bloklanadi.
+                      {t("Urinishlar tugagach tizim 15 daqiqaga bloklanadi.")}
                     </div>
                   )}
                 </div>
@@ -219,14 +241,14 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
               {/* Username Input */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Ma’muriy Login
+                  {t("Ma’muriy Login")}
                 </label>
                 <div className="relative">
                   <input
                     type="text"
                     required
                     disabled={lockSeconds > 0 || isLoading}
-                    placeholder="Loginni kiriting"
+                    placeholder={t("Loginni kiriting")}
                     value={username}
                     onChange={e => setUsername(e.target.value)}
                     autoComplete="username"
@@ -239,7 +261,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
               {/* Password Input */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Maxfiy Parol
+                  {t("Maxfiy Parol")}
                 </label>
                 <div className="relative">
                   <input
@@ -259,7 +281,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                     disabled={lockSeconds > 0}
                     onClick={() => setShowPassword(!showPassword)}
                     className="p-1 rounded text-slate-400 hover:text-slate-700 absolute right-3 top-2.5 transition-colors"
-                    title={showPassword ? "Parolni yashirish" : "Parolni ko‘rsatish"}
+                    title={showPassword ? t("Parolni yashirish") : t("Parolni ko‘rsatish")}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -271,16 +293,16 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                 <div className="flex items-center justify-between text-xs font-semibold text-slate-700 mb-1.5">
                   <span className="flex items-center gap-1">
                     <KeyRound className="w-3.5 h-3.5 text-sky-700" />
-                    <span>Robotlarga qarshi tekshiruv:</span>
+                    <span>{t("Robotlarga qarshi tekshiruv:")}</span>
                   </span>
                   <button
                     type="button"
                     onClick={generateCaptcha}
                     className="text-sky-700 hover:text-sky-900 flex items-center gap-1 text-[11px]"
-                    title="Boshqa misol olish"
+                    title={t("Boshqa misol olish")}
                   >
                     <RefreshCw className="w-3 h-3" />
-                    <span>Yangilash</span>
+                    <span>{t("Yangilash")}</span>
                   </button>
                 </div>
                 <div className="flex items-center gap-2">
@@ -291,7 +313,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                     type="number"
                     required
                     disabled={lockSeconds > 0 || isLoading}
-                    placeholder="Javobi"
+                    placeholder={t("Javobi")}
                     value={captchaAnswer}
                     onChange={e => setCaptchaAnswer(e.target.value)}
                     className="w-24 px-3 py-1.5 rounded border border-slate-300 text-sm font-mono text-center focus:border-sky-600 focus:outline-hidden"
@@ -308,7 +330,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                     onChange={e => setRememberMe(e.target.checked)}
                     className="rounded text-sky-700 focus:ring-sky-600"
                   />
-                  <span>Meni eslab qolish (24 soat)</span>
+                  <span>{t("Meni eslab qolish (24 soat)")}</span>
                 </label>
               </div>
 
@@ -321,12 +343,12 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                 {isLoading ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin" />
-                    <span>Xavfsiz tekshirilmoqda...</span>
+                    <span>{t("Xavfsiz tekshirilmoqda...")}</span>
                   </>
                 ) : (
                   <>
                     <Lock className="w-4 h-4" />
-                    <span>Tizimga Kirish</span>
+                    <span>{t("Tizimga Kirish")}</span>
                   </>
                 )}
               </button>
@@ -337,14 +359,14 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
           <div className="bg-slate-50 px-6 py-3 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
             <span className="flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>SHA-512 & PBKDF2 Himoyasi</span>
+              <span>{t("SHA-512 & PBKDF2 Himoyasi")}</span>
             </span>
             <button
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               className="text-slate-600 hover:text-slate-900 font-semibold"
             >
-              Yopish
+              {t("Yopish")}
             </button>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   School,
   Baby,
@@ -23,28 +23,72 @@ import { normalizePhotoUrl, toNewUzbekAlphabet } from '../../utils/uzbekTypograp
 const ITEMS_PER_PAGE = 6;
 
 export const OrganizationsDirectory: React.FC = () => {
-  const { organizations, googleSyncStatus, refreshDataFromSheets } = usePortal();
+  const { organizations, googleSyncStatus, refreshDataFromSheets, useNewAlphabet, setUseNewAlphabet, t } = usePortal();
   const [filterType, setFilterType] = useState<'all' | 'maktab' | 'mtt' | 'ixtisos'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [useNewAlphabet, setUseNewAlphabet] = useState<boolean>(true); // Default to updated alphabet: ş, ç, ö, ğ
   const [photoEnlarged, setPhotoEnlarged] = useState<string | null>(null);
+  const [isClosingOrg, setIsClosingOrg] = useState<boolean>(false);
+  const [isClosingPhoto, setIsClosingPhoto] = useState<boolean>(false);
 
-  // Helper text translator according to selected alphabet
-  const t = (str: string): string => {
-    if (!str) return '';
-    return useNewAlphabet ? toNewUzbekAlphabet(str) : str;
+  const handleOpenOrg = (org: Organization) => {
+    setIsClosingOrg(false);
+    setSelectedOrg(org);
   };
+
+  const handleCloseOrg = useCallback(() => {
+    if (isClosingOrg) return;
+    setIsClosingOrg(true);
+    setTimeout(() => {
+      setSelectedOrg(null);
+      setIsClosingOrg(false);
+    }, 210);
+  }, [isClosingOrg]);
+
+  const handleOpenPhoto = (url: string) => {
+    setIsClosingPhoto(false);
+    setPhotoEnlarged(url);
+  };
+
+  const handleClosePhoto = useCallback(() => {
+    if (isClosingPhoto) return;
+    setIsClosingPhoto(true);
+    setTimeout(() => {
+      setPhotoEnlarged(null);
+      setIsClosingPhoto(false);
+    }, 210);
+  }, [isClosingPhoto]);
+
+  useEffect(() => {
+    if (!selectedOrg && !photoEnlarged) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (photoEnlarged) {
+          handleClosePhoto();
+        } else if (selectedOrg) {
+          handleCloseOrg();
+        }
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [selectedOrg, photoEnlarged, handleCloseOrg, handleClosePhoto]);
+
+  const normalizedQuery = toNewUzbekAlphabet(searchQuery.toLowerCase());
+  const rawQuery = searchQuery.toLowerCase();
 
   const filteredOrgs = organizations.filter(org => {
     const matchesType = filterType === 'all' || org.type === filterType;
     const matchesSearch =
-      org.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      org.name.toLowerCase().includes(rawQuery) ||
+      toNewUzbekAlphabet(org.name.toLowerCase()).includes(normalizedQuery) ||
       org.number.toString().includes(searchQuery) ||
-      org.mahalla.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      org.director.toLowerCase().includes(searchQuery.toLowerCase());
+      org.mahalla.toLowerCase().includes(rawQuery) ||
+      toNewUzbekAlphabet(org.mahalla.toLowerCase()).includes(normalizedQuery) ||
+      org.director.toLowerCase().includes(rawQuery) ||
+      toNewUzbekAlphabet(org.director.toLowerCase()).includes(normalizedQuery);
     return matchesType && matchesSearch;
   });
 
@@ -83,7 +127,7 @@ export const OrganizationsDirectory: React.FC = () => {
                     ? 'bg-sky-50 text-sky-800 border-sky-300'
                     : 'bg-slate-100 text-slate-600 border-slate-300'
                 }`}
-                title="Yangilangan alifboga (ş, ç, ö, ğ) o'girish"
+                title={t("Yangilangan alifboga (ş, ç, ö, ğ) o'girish")}
               >
                 <Sparkles className="w-3 h-3 text-sky-600" />
                 <span>{useNewAlphabet ? "Alifbo: Yangilangan (ş, ç, ö, ğ)" : "Alifbo: Standart (sh, ch, o', g')"}</span>
@@ -173,7 +217,7 @@ export const OrganizationsDirectory: React.FC = () => {
               }}
               disabled={isRefreshing || googleSyncStatus.syncing}
               className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold border border-emerald-200 transition-colors shadow-2xs cursor-pointer"
-              title="Google Sheets jadval (14xTiUicc9...) bazasidagi o'zgarishlarni yuklab olish"
+              title={t("Google Sheets jadval (14xTiUicc9...) bazasidagi o'zgarishlarni yuklab olish")}
             >
               <RefreshCw className={`w-3.5 h-3.5 text-emerald-600 ${isRefreshing || googleSyncStatus.syncing ? 'animate-spin' : ''}`} />
               <span>{isRefreshing || googleSyncStatus.syncing ? t("Yuklanmoqda...") : t("Baza bilan yangilash")}</span>
@@ -189,9 +233,10 @@ export const OrganizationsDirectory: React.FC = () => {
 
             return (
               <div
-                key={`${org.id}-${startIndex + idx}`}
-                onClick={() => setSelectedOrg(org)}
-                className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs hover:border-sky-500 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group"
+                key={`${org.id}-${filterType}-${activePage}-${startIndex + idx}`}
+                onClick={() => handleOpenOrg(org)}
+                style={{ animationDelay: `${idx * 45}ms` }}
+                className="w3-animate-bottom bg-white rounded-xl border border-slate-200 p-5 shadow-xs hover:border-sky-500 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col justify-between group"
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
@@ -227,7 +272,7 @@ export const OrganizationsDirectory: React.FC = () => {
                       {normalizedPhoto ? (
                         <img
                           src={normalizedPhoto}
-                          alt={org.director}
+                          alt={t(org.director)}
                           className="w-6 h-6 rounded-full object-cover border border-slate-300 shrink-0"
                           referrerPolicy="no-referrer"
                           onError={(e) => {
@@ -340,10 +385,20 @@ export const OrganizationsDirectory: React.FC = () => {
 
       {/* Organization Details Modal with Director Photo (From Google Sheets Column O) */}
       {selectedOrg && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-xl w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative my-6">
+        <div
+          onClick={handleCloseOrg}
+          className={`fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto ${
+            isClosingOrg ? 'w3-animate-opacity-out' : 'w3-animate-opacity'
+          }`}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`bg-white rounded-2xl max-w-xl w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative my-6 ${
+              isClosingOrg ? 'w3-animate-zoom-out' : 'w3-animate-zoom'
+            }`}
+          >
             <button
-              onClick={() => setSelectedOrg(null)}
+              onClick={handleCloseOrg}
               className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100 cursor-pointer transition-colors"
               aria-label={t("Yopish")}
             >
@@ -375,17 +430,17 @@ export const OrganizationsDirectory: React.FC = () => {
                   <div className="relative group shrink-0">
                     <img
                       src={normalizePhotoUrl(selectedOrg.photoUrl)}
-                      alt={selectedOrg.director}
+                      alt={t(selectedOrg.director)}
                       className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl object-cover border-2 border-sky-100 shadow-sm cursor-zoom-in group-hover:opacity-90 transition-opacity"
                       referrerPolicy="no-referrer"
-                      onClick={() => setPhotoEnlarged(normalizePhotoUrl(selectedOrg.photoUrl))}
+                      onClick={() => handleOpenPhoto(normalizePhotoUrl(selectedOrg.photoUrl))}
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = './assets/images/department_head_portrait_1794303519848.jpg';
                       }}
                     />
                     <button
                       type="button"
-                      onClick={() => setPhotoEnlarged(normalizePhotoUrl(selectedOrg.photoUrl))}
+                      onClick={() => handleOpenPhoto(normalizePhotoUrl(selectedOrg.photoUrl))}
                       className="absolute inset-0 bg-black/30 text-white rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-zoom-in"
                       title={t("Kattalashtirish")}
                     >
@@ -464,7 +519,7 @@ export const OrganizationsDirectory: React.FC = () => {
             <div className="flex items-center justify-end gap-3">
               <button
                 type="button"
-                onClick={() => setSelectedOrg(null)}
+                onClick={handleCloseOrg}
                 className="px-5 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg cursor-pointer transition-colors"
               >
                 {t("Yopish")}
@@ -484,13 +539,20 @@ export const OrganizationsDirectory: React.FC = () => {
       {/* Enlarged Photo Lightbox Modal */}
       {photoEnlarged && (
         <div
-          className="fixed inset-0 z-60 bg-black/90 flex items-center justify-center p-4 cursor-zoom-out"
-          onClick={() => setPhotoEnlarged(null)}
+          className={`fixed inset-0 z-60 bg-black/90 flex items-center justify-center p-4 cursor-zoom-out ${
+            isClosingPhoto ? 'w3-animate-opacity-out' : 'w3-animate-opacity'
+          }`}
+          onClick={handleClosePhoto}
         >
-          <div className="relative max-w-2xl max-h-[90vh] p-2" onClick={e => e.stopPropagation()}>
+          <div
+            className={`relative max-w-2xl max-h-[90vh] p-2 ${
+              isClosingPhoto ? 'w3-animate-zoom-out' : 'w3-animate-zoom'
+            }`}
+            onClick={e => e.stopPropagation()}
+          >
             <button
               type="button"
-              onClick={() => setPhotoEnlarged(null)}
+              onClick={handleClosePhoto}
               className="absolute -top-10 right-0 p-2 text-white hover:text-slate-300 cursor-pointer"
             >
               <X className="w-6 h-6" />

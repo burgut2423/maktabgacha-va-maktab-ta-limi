@@ -63,3 +63,164 @@ html.grayscale-mode {
 ::-webkit-scrollbar-thumb:hover {
   background: #64748b;
 }
+
+/* =========================================================
+   W3-Style Smooth UI Animations & Marquee (Compositor-Only)
+   ========================================================= */
+
+@keyframes w3AnimateTop {
+  from {
+    transform: translate3d(0, -24px, 0);
+    opacity: 0;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes w3AnimateBottom {
+  from {
+    transform: translate3d(0, 22px, 0);
+    opacity: 0;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes w3AnimateLeft {
+  from {
+    transform: translate3d(-28px, 0, 0);
+    opacity: 0;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes w3AnimateRight {
+  from {
+    transform: translate3d(28px, 0, 0);
+    opacity: 0;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes w3AnimateOpacity {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes w3AnimateOpacityOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes w3AnimateZoom {
+  from {
+    transform: scale(0.92) translate3d(0, 12px, 0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes w3AnimateZoomOut {
+  from {
+    transform: scale(1) translate3d(0, 0, 0);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.92) translate3d(0, 12px, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes w3MarqueeLeft {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+.w3-animate-top {
+  animation: w3AnimateTop 0.36s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.w3-animate-bottom {
+  animation: w3AnimateBottom 0.36s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.w3-animate-left {
+  animation: w3AnimateLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.w3-animate-right {
+  animation: w3AnimateRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.w3-animate-opacity {
+  animation: w3AnimateOpacity 0.24s ease-out both;
+}
+
+.w3-animate-opacity-out {
+  animation: w3AnimateOpacityOut 0.22s ease-in both;
+}
+
+.w3-animate-zoom {
+  animation: w3AnimateZoom 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.w3-animate-zoom-out {
+  animation: w3AnimateZoomOut 0.22s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+.w3-marquee-track {
+  display: inline-block;
+  white-space: nowrap;
+  padding-left: 100%;
+  animation: w3MarqueeLeft 26s linear infinite;
+  will-change: transform;
+}
+
+.w3-marquee-wrapper:hover .w3-marquee-track,
+.w3-marquee-wrapper:focus-within .w3-marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .w3-animate-top,
+  .w3-animate-bottom,
+  .w3-animate-left,
+  .w3-animate-right,
+  .w3-animate-opacity,
+  .w3-animate-opacity-out,
+  .w3-animate-zoom,
+  .w3-animate-zoom-out {
+    animation: none !important;
+  }
+
+  .w3-marquee-track {
+    animation: none !important;
+    padding-left: 0;
+  }
+}
+

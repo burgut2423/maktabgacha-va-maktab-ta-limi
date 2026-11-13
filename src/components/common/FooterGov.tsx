@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, ExternalLink, Phone, Mail, MapPin } from 'lucide-react';
+import { ShieldCheck, ExternalLink } from 'lucide-react';
 import { usePortal } from '../../context/PortalContext';
 import { stateEmblem } from '../../assets/images';
 
@@ -7,15 +7,15 @@ export const FooterGov: React.FC<{ onOpenAdmin: () => void; onNavigate: (s: stri
   onOpenAdmin,
   onNavigate
 }) => {
-  const { settings } = usePortal();
+  const { settings, t } = usePortal();
 
   const governmentLinks = [
-    { title: "O'zbekiston Respublikasi Prezidenti", url: "https://president.uz" },
-    { title: "Hukumat portali (gov.uz)", url: "https://gov.uz" },
-    { title: "Maktabgacha va maktab ta'limi vazirligi", url: "https://gov.uz/oz/edu" },
-    { title: "Yagona interaktiv davlat xizmatlari (my.gov.uz)", url: "https://my.gov.uz" },
-    { title: "Ta'lim sifatini nazorat qilish inspeksiyasi", url: "https://tdi.uz" },
-    { title: "Xorazm viloyati hokimligi", url: "https://xorazm.uz" },
+    { title: t("O'zbekiston Respublikasi Prezidenti"), url: "https://president.uz" },
+    { title: t("Hukumat portali (gov.uz)"), url: "https://gov.uz" },
+    { title: t("Maktabgacha va maktab ta'limi vazirligi"), url: "https://gov.uz/oz/edu" },
+    { title: t("Yagona interaktiv davlat xizmatlari (my.gov.uz)"), url: "https://my.gov.uz" },
+    { title: t("Ta'lim sifatini nazorat qilish inspeksiyasi"), url: "https://tdi.uz" },
+    { title: t("Xorazm viloyati hokimligi"), url: "https://xorazm.uz" },
   ];
 
   return (
@@ -28,70 +28,70 @@ export const FooterGov: React.FC<{ onOpenAdmin: () => void; onNavigate: (s: stri
             <div className="flex items-center gap-3">
               <img
                 src={stateEmblem}
-                alt="Davlat Gerbi"
+                alt={t("Davlat Gerbi")}
                 className="w-10 h-10 object-contain"
                 referrerPolicy="no-referrer"
               />
               <div>
                 <span className="text-xs uppercase text-slate-400 font-semibold block">
-                  Xorazm viloyati
+                  {t("Xorazm viloyati")}
                 </span>
                 <span className="text-sm font-bold text-white block">
-                  Qo'shko'pir Tumani Maktabgacha va Maktab Ta'limi Bo'limi
+                  {t("Qo'shko'pir Tumani Maktabgacha va Maktab Ta'limi Bo'limi")}
                 </span>
               </div>
             </div>
 
             <p className="text-xs text-slate-400 leading-relaxed">
-              Saytdan olingan barcha axborotlardan foydalanilganda Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi rasmiy veb-saytiga havola berilishi shart.
+              {t("Saytdan olingan barcha axborotlardan foydalanilganda Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi rasmiy veb-saytiga havola berilishi shart.")}
             </p>
 
             <div className="pt-2 text-xs text-slate-400 space-y-1">
-              <div>Manzil: {settings.address}</div>
-              <div>Ishonch telefoni: <strong className="text-amber-400">{settings.trustPhone}</strong></div>
-              <div>Elektron pochta: {settings.email}</div>
+              <div>{t("Manzil")}: {t(settings.address)}</div>
+              <div>{t("Ishonch telefoni")}: <strong className="text-amber-400">{settings.trustPhone}</strong></div>
+              <div>{t("Elektron pochta")}: {settings.email}</div>
             </div>
           </div>
 
           {/* Col 2: Navigation Links */}
           <div className="lg:col-span-3">
             <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-4">
-              Portal bo'limlari
+              {t("Portal bo'limlari")}
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
                 <button onClick={() => onNavigate('asosiy')} className="hover:text-white transition-colors">
-                  Asosiy sahifa
+                  {t("Asosiy sahifa")}
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('bolim-haqida')} className="hover:text-white transition-colors">
-                  Bo'lim rahbariyati va tuzilma
+                  {t("Bo'lim rahbariyati va tuzilma")}
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('muassasalar')} className="hover:text-white transition-colors">
-                  Maktablar va MTTlar ro'yxati
+                  {t("Maktablar va MTTlar ro'yxati")}
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('hujjatlar')} className="hover:text-white transition-colors">
-                  Me'yoriy hujjatlar va buyruqlar
+                  {t("Me'yoriy hujjatlar va buyruqlar")}
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('yangiliklar')} className="hover:text-white transition-colors">
-                  So'nggi yangiliklar va e'lonlar
+                  {t("So'nggi yangiliklar va e'lonlar")}
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('murojaat')} className="hover:text-white transition-colors">
-                  Virtual qabulxona (Murojaat holati)
+                  {t("Virtual qabulxona (Murojaat holati)")}
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('aloqa')} className="hover:text-white transition-colors">
-                  Bog'lanish va manzil
+                  {t("Bog'lanish va manzil")}
                 </button>
               </li>
             </ul>
@@ -100,7 +100,7 @@ export const FooterGov: React.FC<{ onOpenAdmin: () => void; onNavigate: (s: stri
           {/* Col 3: Government portals */}
           <div className="lg:col-span-4">
             <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-4">
-              Davlat organlari rasmiy saytlari
+              {t("Davlat organlari rasmiy saytlari")}
             </h4>
             <ul className="space-y-2 text-xs">
               {governmentLinks.map((item, idx) => (
@@ -123,7 +123,7 @@ export const FooterGov: React.FC<{ onOpenAdmin: () => void; onNavigate: (s: stri
         {/* Bottom copyright and admin login trigger */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>
-            © {new Date().getFullYear()} Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi. Barcha huquqlar himoyalangan.
+            © {new Date().getFullYear()} {t("Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi. Barcha huquqlar himoyalangan.")}
           </p>
 
           <div className="flex items-center gap-4">
@@ -132,7 +132,7 @@ export const FooterGov: React.FC<{ onOpenAdmin: () => void; onNavigate: (s: stri
               className="flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors font-medium"
             >
               <ShieldCheck className="w-4 h-4 text-sky-400" />
-              <span>Admin tizimiga kirish</span>
+              <span>{t("Admin tizimiga kirish")}</span>
             </button>
           </div>
         </div>

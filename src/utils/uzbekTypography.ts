@@ -32,7 +32,16 @@ export const fixUzbekText = (text: string): string => {
 export const toNewUzbekAlphabet = (text: string): string => {
   if (!text) return '';
 
-  let res = text;
+  // Protect URLs, email addresses, and known brand/technical tokens
+  const preserved: string[] = [];
+  let res = text.replace(
+    /(https?:\/\/\S+|[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}|Google Sheets|Google Drive|YouTube|Facebook|Instagram|Telegram|STEM|eMaktab|AdminLTE|SHA-512|PBKDF2|gov\.uz|my\.gov\.uz|adm\.edu\.uz|pedkadr\.uzedu\.uz|emaktab\.uz|president\.uz|tdi\.uz|xorazm\.uz|PDF|DOCX|XLSX)/g,
+    (match) => {
+      const idx = preserved.length;
+      preserved.push(match);
+      return `__PRESERVED_${idx}__`;
+    }
+  );
 
   // Replace compound characters first (order matters)
   // Sh / sh
@@ -45,13 +54,16 @@ export const toNewUzbekAlphabet = (text: string): string => {
   res = res.replace(/Ch/g, 'Ç');
   res = res.replace(/ch/g, 'ç');
 
-  // O‘ / o‘ (and various apostrophes)
-  res = res.replace(/O[‘'ʻ`]/g, 'Ö');
-  res = res.replace(/o[‘'ʻ`]/g, 'ö');
+  // O‘ / o‘ (all apostrophe / modifier variants)
+  res = res.replace(/O['‘’ʻʼ`´]/g, 'Ö');
+  res = res.replace(/o['‘’ʻʼ`´]/g, 'ö');
 
-  // G‘ / g‘
-  res = res.replace(/G[‘'ʻ`]/g, 'Ğ');
-  res = res.replace(/g[‘'ʻ`]/g, 'ğ');
+  // G‘ / g‘ (all apostrophe / modifier variants)
+  res = res.replace(/G['‘’ʻʼ`´]/g, 'Ğ');
+  res = res.replace(/g['‘’ʻʼ`´]/g, 'ğ');
+
+  // Restore protected tokens
+  res = res.replace(/__PRESERVED_(\d+)__/g, (_, i) => preserved[Number(i)] || '');
 
   return res;
 };

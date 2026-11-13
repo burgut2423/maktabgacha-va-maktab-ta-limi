@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Calendar,
   Eye,
@@ -24,10 +24,30 @@ interface NewsSectionProps {
 }
 
 export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelectNews }) => {
-  const { news, speakText } = usePortal();
+  const { news, speakText, t } = usePortal();
   const [selectedCategory, setSelectedCategory] = useState<string>('Barchasi');
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState<boolean>(false);
+  const [isClosingArticle, setIsClosingArticle] = useState<boolean>(false);
+  const [isClosingLightbox, setIsClosingLightbox] = useState<boolean>(false);
+
+  const handleCloseArticle = useCallback(() => {
+    if (isClosingArticle) return;
+    setIsClosingArticle(true);
+    setTimeout(() => {
+      onSelectNews(null);
+      setIsClosingArticle(false);
+    }, 210);
+  }, [isClosingArticle, onSelectNews]);
+
+  const handleCloseLightbox = useCallback(() => {
+    if (isClosingLightbox) return;
+    setIsClosingLightbox(true);
+    setTimeout(() => {
+      setIsLightboxOpen(false);
+      setIsClosingLightbox(false);
+    }, 210);
+  }, [isClosingLightbox]);
 
   const categories = ['Barchasi', 'Boshqaruv', 'MTT', 'Pedagogika', 'Olimpiada', 'E\'lon'];
 
@@ -39,6 +59,8 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
   useEffect(() => {
     setActiveImageIndex(0);
     setIsLightboxOpen(false);
+    setIsClosingArticle(false);
+    setIsClosingLightbox(false);
   }, [selectedNews?.id]);
 
   // Keyboard navigation for lightbox
@@ -51,9 +73,9 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         if (isLightboxOpen) {
-          setIsLightboxOpen(false);
+          handleCloseLightbox();
         } else {
-          onSelectNews(null);
+          handleCloseArticle();
         }
       } else if (e.key === 'ArrowRight' && gallery.length > 1) {
         setActiveImageIndex(prev => (prev + 1) % gallery.length);
@@ -64,18 +86,18 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedNews, isLightboxOpen]);
+  }, [selectedNews, isLightboxOpen, handleCloseLightbox, handleCloseArticle]);
 
   const handleShare = (item: NewsItem) => {
     if (navigator.share) {
       navigator.share({
-        title: item.title,
-        text: item.summary,
+        title: t(item.title),
+        text: t(item.summary),
         url: window.location.href
       }).catch(() => {});
     } else {
       navigator.clipboard.writeText(window.location.href);
-      alert("Havola nusxalandi!");
+      alert(t("Havola nusxalandi!"));
     }
   };
 
@@ -92,13 +114,13 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div>
             <span className="text-xs uppercase tracking-wider font-semibold text-sky-800">
-              Axborot xizmati
+              {t("Axborot xizmati")}
             </span>
             <h2 className="text-2xl font-bold text-slate-900 mt-1">
-              Yangiliklar va rasmiy xabarlar
+              {t("Yangiliklar va rasmiy xabarlar")}
             </h2>
             <p className="text-slate-600 text-sm mt-1">
-              Qo'shko'pir tumani maktabgacha va maktab ta'limi tizimidagi muhim voqealar
+              {t("Qo'shko'pir tumani maktabgacha va maktab ta'limi tizimidagi muhim voqealar")}
             </p>
           </div>
 
@@ -114,7 +136,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
                     : 'bg-white text-slate-700 hover:bg-slate-200 border border-slate-200'
                 }`}
               >
-                {cat}
+                {t(cat)}
               </button>
             ))}
           </div>
@@ -122,21 +144,22 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
 
         {/* News Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredNews.map(item => {
+          {filteredNews.map((item, idx) => {
             const hasMultipleImages = (item.images && item.images.length > 1);
             const imageCount = item.images?.length || 1;
             const cardImg = (item.images && item.images[0]) || item.imageUrl;
 
             return (
               <article
-                key={item.id}
+                key={`${item.id}-${selectedCategory}`}
                 onClick={() => onSelectNews(item)}
-                className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col group"
+                style={{ animationDelay: `${Math.min(idx, 5) * 45}ms` }}
+                className="w3-animate-bottom bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer flex flex-col group"
               >
                 <div className="h-48 w-full overflow-hidden relative bg-slate-100">
                   <img
                     src={cardImg}
-                    alt={item.title}
+                    alt={t(item.title)}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     referrerPolicy="no-referrer"
                     onError={(e) => {
@@ -144,14 +167,14 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
                     }}
                   />
                   <div className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-xs text-white text-[11px] font-semibold px-2.5 py-1 rounded">
-                    {item.category}
+                    {t(item.category)}
                   </div>
 
                   {/* Multi-image indicator badge */}
                   {hasMultipleImages && (
                     <div className="absolute bottom-2.5 right-2.5 bg-slate-900/85 backdrop-blur-xs text-white text-[11px] font-semibold px-2.5 py-1 rounded-md flex items-center gap-1 shadow-sm">
                       <Images className="w-3.5 h-3.5 text-sky-400" />
-                      <span>{imageCount} ta rasm</span>
+                      <span>{imageCount} {t("ta rasm")}</span>
                     </div>
                   )}
                 </div>
@@ -171,18 +194,18 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
                     </div>
 
                     <h3 className="text-base font-bold text-slate-900 group-hover:text-sky-700 transition-colors line-clamp-2 mb-2 leading-snug">
-                      {item.title}
+                      {t(item.title)}
                     </h3>
 
                     <p className="text-xs sm:text-sm text-slate-600 line-clamp-3 leading-relaxed">
-                      {item.summary}
+                      {t(item.summary)}
                     </p>
                   </div>
 
                   <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                    <span className="text-slate-500 font-medium">{item.author}</span>
+                    <span className="text-slate-500 font-medium">{t(item.author)}</span>
                     <span className="text-sky-700 font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                      <span>O'qish va galereya</span>
+                      <span>{t("O'qish va galereya")}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </span>
                   </div>
@@ -194,22 +217,32 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
 
         {filteredNews.length === 0 && (
           <div className="text-center py-12 bg-white rounded-xl border border-slate-200">
-            <p className="text-sm text-slate-500">Ushbu toifada hozircha yangiliklar mavjud emas.</p>
+            <p className="text-sm text-slate-500">{t("Ushbu toifada hozircha yangiliklar mavjud emas.")}</p>
           </div>
         )}
       </div>
 
       {/* Full Article Modal Reader with Interactive Image Gallery */}
       {selectedNews && (
-        <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-200 my-6">
+        <div
+          onClick={handleCloseArticle}
+          className={`fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto ${
+            isClosingArticle ? 'w3-animate-opacity-out' : 'w3-animate-opacity'
+          }`}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={`bg-white rounded-2xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-200 my-6 ${
+              isClosingArticle ? 'w3-animate-zoom-out' : 'w3-animate-zoom'
+            }`}
+          >
             
             {/* Gallery Main Viewer */}
             <div className="relative w-full bg-slate-950 select-none group">
               <div className="relative h-64 sm:h-96 md:h-[420px] w-full flex items-center justify-center overflow-hidden bg-slate-900">
                 <img
                   src={currentGallery[activeImageIndex] || selectedNews.imageUrl}
-                  alt={`${selectedNews.title} - Rasm ${activeImageIndex + 1}`}
+                  alt={`${t(selectedNews.title)} - Rasm ${activeImageIndex + 1}`}
                   className="w-full h-full object-contain cursor-zoom-in transition-all duration-200"
                   referrerPolicy="no-referrer"
                   onClick={() => setIsLightboxOpen(true)}
@@ -227,7 +260,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
                       setActiveImageIndex((activeImageIndex - 1 + currentGallery.length) % currentGallery.length);
                     }}
                     className="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-slate-950/70 hover:bg-slate-950 text-white transition-all backdrop-blur-xs shadow-lg hover:scale-105 active:scale-95"
-                    aria-label="Oldingi rasm"
+                    aria-label={t("Oldingi rasm")}
                   >
                     <ChevronLeft className="w-6 h-6" />
                   </button>
@@ -242,7 +275,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
                       setActiveImageIndex((activeImageIndex + 1) % currentGallery.length);
                     }}
                     className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-slate-950/70 hover:bg-slate-950 text-white transition-all backdrop-blur-xs shadow-lg hover:scale-105 active:scale-95"
-                    aria-label="Keyingi rasm"
+                    aria-label={t("Keyingi rasm")}
                   >
                     <ChevronRight className="w-6 h-6" />
                   </button>
@@ -254,15 +287,15 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
                     type="button"
                     onClick={() => setIsLightboxOpen(true)}
                     className="p-2 rounded-full bg-slate-950/70 hover:bg-slate-900 text-white transition-colors backdrop-blur-xs"
-                    title="Kattalashtirish (Fullscreen)"
+                    title={t("Kattalashtirish (Fullscreen)")}
                   >
                     <Maximize2 className="w-4 h-4" />
                   </button>
                   <button
                     type="button"
-                    onClick={() => onSelectNews(null)}
+                    onClick={handleCloseArticle}
                     className="p-2 rounded-full bg-slate-950/70 hover:bg-slate-900 text-white transition-colors backdrop-blur-xs"
-                    aria-label="Yopish"
+                    aria-label={t("Yopish")}
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -271,7 +304,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
                 {/* Badges: Category & Gallery Counter */}
                 <div className="absolute top-3 left-3 flex items-center gap-2">
                   <div className="bg-sky-700/90 backdrop-blur-xs text-white text-xs font-semibold px-3 py-1 rounded shadow-sm">
-                    {selectedNews.category}
+                    {t(selectedNews.category)}
                   </div>
                   {currentGallery.length > 1 && (
                     <div className="bg-black/75 backdrop-blur-xs text-white text-xs font-semibold px-2.5 py-1 rounded shadow-sm flex items-center gap-1">
@@ -319,12 +352,12 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
                   <span>·</span>
                   <span className="flex items-center gap-1">
                     <User className="w-4 h-4 text-slate-400" />
-                    <span>{selectedNews.author}</span>
+                    <span>{t(selectedNews.author)}</span>
                   </span>
                   <span>·</span>
                   <span className="flex items-center gap-1">
                     <Eye className="w-4 h-4 text-slate-400" />
-                    <span>{selectedNews.views} marta ko'rildi</span>
+                    <span>{selectedNews.views} {t("marta ko'rildi")}</span>
                   </span>
                 </div>
 
@@ -333,35 +366,35 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
                     type="button"
                     onClick={() => speakText(`${selectedNews.title}. ${selectedNews.content}`)}
                     className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-colors"
-                    title="Ovozli o'qish"
+                    title={t("Ovozli o'qish")}
                   >
                     <Volume2 className="w-4 h-4" />
-                    <span>Ovozli eshitish</span>
+                    <span>{t("Ovozli eshitish")}</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => handleShare(selectedNews)}
                     className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-colors"
-                    title="Ulashish"
+                    title={t("Ulashish")}
                   >
                     <Share2 className="w-4 h-4" />
-                    <span>Ulashish</span>
+                    <span>{t("Ulashish")}</span>
                   </button>
                 </div>
               </div>
 
               <h1 className="text-xl sm:text-2xl font-bold text-slate-900 leading-snug mb-4">
-                {selectedNews.title}
+                {t(selectedNews.title)}
               </h1>
 
               {selectedNews.summary && (
                 <div className="text-sm sm:text-base font-medium text-slate-700 bg-sky-50/70 p-4 rounded-xl border border-sky-100 mb-6 leading-relaxed">
-                  {selectedNews.summary}
+                  {t(selectedNews.summary)}
                 </div>
               )}
 
               <div className="prose prose-slate max-w-none text-sm sm:text-base text-slate-700 leading-relaxed whitespace-pre-line">
-                {selectedNews.content}
+                {t(selectedNews.content)}
               </div>
 
               {/* Gallery Grid Preview inside Article Body */}
@@ -369,7 +402,7 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
                 <div className="mt-8 pt-6 border-t border-slate-200">
                   <h4 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
                     <Images className="w-4 h-4 text-sky-700" />
-                    <span>Fotolavhalar to'plami ({currentGallery.length} ta rasm):</span>
+                    <span>{t("Fotolavhalar to'plami")} ({currentGallery.length} {t("ta rasm")}):</span>
                   </h4>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                     {currentGallery.map((imgUrl, i) => (
@@ -405,10 +438,10 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
 
                 <button
                   type="button"
-                  onClick={() => onSelectNews(null)}
+                  onClick={handleCloseArticle}
                   className="px-6 py-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-lg transition-colors"
                 >
-                  Yopish
+                  {t("Yopish")}
                 </button>
               </div>
             </div>
@@ -419,14 +452,16 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
       {/* Fullscreen Lightbox Modal */}
       {selectedNews && isLightboxOpen && (
         <div
-          className="fixed inset-0 z-60 bg-black/95 flex flex-col justify-between p-4"
-          onClick={() => setIsLightboxOpen(false)}
+          className={`fixed inset-0 z-60 bg-black/95 flex flex-col justify-between p-4 ${
+            isClosingLightbox ? 'w3-animate-opacity-out' : 'w3-animate-opacity'
+          }`}
+          onClick={handleCloseLightbox}
         >
           {/* Lightbox Header */}
           <div className="flex items-center justify-between text-white py-2" onClick={e => e.stopPropagation()}>
             <div className="flex items-center gap-3">
               <span className="text-sm font-semibold text-slate-200">
-                {selectedNews.title}
+                {t(selectedNews.title)}
               </span>
               <span className="text-xs px-2.5 py-1 rounded-full bg-white/10 text-sky-300">
                 {activeImageIndex + 1} / {currentGallery.length}
@@ -435,9 +470,9 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
 
             <button
               type="button"
-              onClick={() => setIsLightboxOpen(false)}
+              onClick={handleCloseLightbox}
               className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-              title="Yopish (Esc)"
+              title={t("Yopish (Esc)")}
             >
               <X className="w-6 h-6" />
             </button>

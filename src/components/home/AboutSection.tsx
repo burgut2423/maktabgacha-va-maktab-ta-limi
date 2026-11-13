@@ -8,13 +8,12 @@ import {
   Phone,
   Mail,
   CheckCircle2,
-  BookOpen,
-  ChevronRight
+  BookOpen
 } from 'lucide-react';
 import { usePortal } from '../../context/PortalContext';
 
 export const AboutSection: React.FC = () => {
-  const { settings, leaders } = usePortal();
+  const { settings, leaders, t } = usePortal();
   const [activeTab, setActiveTab] = useState<'rahbariyat' | 'tuzilma' | 'vazifalar' | 'tarix'>('rahbariyat');
 
   return (
@@ -23,23 +22,23 @@ export const AboutSection: React.FC = () => {
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-8">
           <span className="text-xs uppercase tracking-wider font-semibold text-sky-800">
-            Bo'lim faoliyati
+            {t("Bo'lim faoliyati")}
           </span>
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
-            Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi haqida
+            {t("Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi haqida")}
           </h2>
           <p className="text-slate-600 text-sm mt-2 leading-relaxed">
-            {settings.departmentMission || "Tumanda ta'lim sifatini oshirish, barkamol va ma'rifatli yoshlarni tarbiyalash bo'yicha tashkiliy tizim"}
+            {t(settings.departmentMission || "Tumanda ta'lim sifatini oshirish, barkamol va ma'rifatli yoshlarni tarbiyalash bo'yicha tashkiliy tizim")}
           </p>
         </div>
 
         {/* Navigation Tabs */}
         <div className="flex items-center justify-center gap-2 mb-8 border-b border-slate-200 pb-3 overflow-x-auto">
           {[
-            { id: 'rahbariyat', label: `Bo'lim rahbariyati (${leaders.length})`, icon: Users },
-            { id: 'tuzilma', label: `Tashkiliy tuzilma va sho'balar (${settings.branches?.length || 0})`, icon: Building2 },
-            { id: 'vazifalar', label: "Asosiy vazifa va funksiyalar", icon: FileCheck2 },
-            { id: 'tarix', label: "Bo'lim tarixi va me'yoriy asos", icon: BookOpen },
+            { id: 'rahbariyat', label: t(`Bo'lim rahbariyati (${leaders.length})`), icon: Users },
+            { id: 'tuzilma', label: t(`Tashkiliy tuzilma va sho'balar (${settings.branches?.length || 0})`), icon: Building2 },
+            { id: 'vazifalar', label: t("Asosiy vazifa va funksiyalar"), icon: FileCheck2 },
+            { id: 'tarix', label: t("Bo'lim tarixi va me'yoriy asos"), icon: BookOpen },
           ].map(tab => {
             const Icon = tab.icon;
             return (
@@ -61,7 +60,7 @@ export const AboutSection: React.FC = () => {
 
         {/* TAB 1: RAHBARIYAT */}
         {activeTab === 'rahbariyat' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="w3-animate-bottom grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {leaders.map(lead => (
               <div
                 key={lead.id}
@@ -72,39 +71,39 @@ export const AboutSection: React.FC = () => {
                     <div className="w-16 h-16 rounded-full overflow-hidden bg-slate-200 border-2 border-sky-700 shrink-0">
                       <img
                         src={lead.photoUrl}
-                        alt={lead.name}
+                        alt={t(lead.name)}
                         className="w-full h-full object-cover"
                         referrerPolicy="no-referrer"
                       />
                     </div>
                     <div>
                       <span className="text-[11px] font-semibold text-sky-800 uppercase tracking-wider block">
-                        {lead.department}
+                        {t(lead.department)}
                       </span>
                       <h3 className="text-base font-bold text-slate-900 leading-snug">
-                        {lead.name}
+                        {t(lead.name)}
                       </h3>
                       <p className="text-xs text-slate-500 font-medium">
-                        {lead.position}
+                        {t(lead.position)}
                       </p>
                     </div>
                   </div>
 
                   <p className="text-xs text-slate-600 line-clamp-3 mb-4 leading-relaxed italic">
-                    "{lead.bio}"
+                    "{t(lead.bio)}"
                   </p>
 
                   <div className="space-y-2 text-xs text-slate-700 bg-white p-3.5 rounded-xl border border-slate-200 mb-4">
                     <div className="flex items-start gap-2">
                       <Calendar className="w-3.5 h-3.5 text-sky-700 shrink-0 mt-0.5" />
                       <div>
-                        <strong className="text-slate-900">Qabul kunlari:</strong> {lead.receptionDays}
+                        <strong className="text-slate-900">{t("Qabul kunlari")}:</strong> {t(lead.receptionDays)}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <Clock className="w-3.5 h-3.5 text-sky-700 shrink-0" />
                       <div>
-                        <strong className="text-slate-900">Qabul vaqti:</strong> {lead.receptionHours}
+                        <strong className="text-slate-900">{t("Qabul vaqti")}:</strong> {t(lead.receptionHours)}
                       </div>
                     </div>
                   </div>
@@ -124,7 +123,7 @@ export const AboutSection: React.FC = () => {
                     title={lead.email}
                   >
                     <Mail className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">Pochta</span>
+                    <span className="hidden sm:inline">{t("Pochta")}</span>
                   </a>
                 </div>
               </div>
@@ -134,9 +133,9 @@ export const AboutSection: React.FC = () => {
 
         {/* TAB 2: TASHKILIY TUZILMA VA SHO'BALAR */}
         {activeTab === 'tuzilma' && (
-          <div className="space-y-4 max-w-4xl mx-auto">
+          <div className="w3-animate-bottom space-y-4 max-w-4xl mx-auto">
             <div className="bg-sky-50 border border-sky-200 rounded-xl p-4 text-xs text-sky-900 mb-4">
-              <strong>Eslatma:</strong> Bo'lim tuzilmasi O'zbekiston Respublikasi Maktabgacha va maktab ta'limi vazirligi namunaviy shtat jadvaliga asosan tasdiqlangan. Barcha sho'balar va ularning mas'ullari admin panel orqali to'ldirib boriladi.
+              <strong>{t("Eslatma")}:</strong> {t("Bo'lim tuzilmasi O'zbekiston Respublikasi Maktabgacha va maktab ta'limi vazirligi namunaviy shtat jadvaliga asosan tasdiqlangan. Barcha sho'balar va ularning mas'ullari admin panel orqali to'ldirib boriladi.")}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -147,21 +146,21 @@ export const AboutSection: React.FC = () => {
                 >
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <h3 className="text-sm font-bold text-slate-900 leading-snug">
-                      {branch.name}
+                      {t(branch.name)}
                     </h3>
                     <span className="text-[11px] font-semibold bg-sky-100 text-sky-800 px-2 py-0.5 rounded shrink-0">
-                      {branch.staffCount} nafar xodim
+                      {branch.staffCount} {t("nafar xodim")}
                     </span>
                   </div>
 
                   <p className="text-xs text-slate-600 mb-3 leading-relaxed">
-                    {branch.description}
+                    {t(branch.description)}
                   </p>
 
                   <div className="pt-2 border-t border-slate-200 text-xs flex flex-wrap items-center justify-between gap-2 text-slate-700">
                     <div>
-                      <span className="text-slate-500">Sho'ba mudiri: </span>
-                      <strong className="text-slate-900">{branch.head}</strong>
+                      <span className="text-slate-500">{t("Sho'ba mudiri")}: </span>
+                      <strong className="text-slate-900">{t(branch.head)}</strong>
                     </div>
                     <a
                       href={`tel:${branch.phone.replace(/\D/g, '')}`}
@@ -179,10 +178,10 @@ export const AboutSection: React.FC = () => {
 
         {/* TAB 3: ASOSIY VAZIFALAR */}
         {activeTab === 'vazifalar' && (
-          <div className="max-w-4xl mx-auto bg-slate-50 rounded-2xl border border-slate-200 p-6 sm:p-8">
+          <div className="w3-animate-bottom max-w-4xl mx-auto bg-slate-50 rounded-2xl border border-slate-200 p-6 sm:p-8">
             <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-sky-700" />
-              <span>Bo'limning qonunchilik bilan belgilangan asosiy vazifalari</span>
+              <span>{t("Bo'limning qonunchilik bilan belgilangan asosiy vazifalari")}</span>
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -194,7 +193,7 @@ export const AboutSection: React.FC = () => {
                   <span className="w-5 h-5 rounded-full bg-sky-100 text-sky-800 font-bold flex items-center justify-center shrink-0 text-[11px]">
                     {idx + 1}
                   </span>
-                  <span className="leading-relaxed">{task}</span>
+                  <span className="leading-relaxed">{t(task)}</span>
                 </div>
               ))}
             </div>
@@ -203,19 +202,19 @@ export const AboutSection: React.FC = () => {
 
         {/* TAB 4: BO'LIM TARIXI */}
         {activeTab === 'tarix' && (
-          <div className="max-w-4xl mx-auto bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-5">
+          <div className="w3-animate-bottom max-w-4xl mx-auto bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-5">
             <div>
               <h3 className="text-lg font-bold text-slate-900 mb-2">
-                Tarixiy ma'lumot va rivojlanish bosqichlari
+                {t("Tarixiy ma'lumot va rivojlanish bosqichlari")}
               </h3>
               <p className="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line">
-                {settings.departmentHistory}
+                {t(settings.departmentHistory)}
               </p>
             </div>
 
             <div className="p-4 bg-sky-50 rounded-xl border border-sky-100 text-xs text-sky-950">
-              <strong className="block mb-1">Me'yoriy huquqiy asos:</strong>
-              <p>{settings.departmentCharter}</p>
+              <strong className="block mb-1">{t("Me'yoriy huquqiy asos")}:</strong>
+              <p>{t(settings.departmentCharter)}</p>
             </div>
           </div>
         )}

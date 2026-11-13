@@ -4,13 +4,12 @@ import {
   Volume2,
   VolumeX,
   Eye,
-  Search,
   Menu,
   X,
   ShieldCheck,
-  ExternalLink,
   ChevronRight,
-  Database
+  Database,
+  Sparkles
 } from 'lucide-react';
 import { usePortal } from '../../context/PortalContext';
 import { stateEmblem } from '../../assets/images';
@@ -33,20 +32,22 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
     isSpeaking,
     user,
     googleSyncStatus,
-    loginWithGoogle
+    useNewAlphabet,
+    setUseNewAlphabet,
+    t
   } = usePortal();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [accessibilityOpen, setAccessibilityOpen] = useState(false);
 
   const navItems = [
-    { id: 'asosiy', label: 'Asosiy' },
-    { id: 'bolim-haqida', label: "Bo'lim haqida" },
-    { id: 'muassasalar', label: 'Maktab va MTTlar' },
-    { id: 'hujjatlar', label: 'Hujjatlar' },
-    { id: 'yangiliklar', label: 'Yangiliklar' },
-    { id: 'murojaat', label: 'Virtual qabulxona' },
-    { id: 'aloqa', label: 'Aloqa' },
+    { id: 'asosiy', label: t('Asosiy') },
+    { id: 'bolim-haqida', label: t("Bo'lim haqida") },
+    { id: 'muassasalar', label: t('Maktab va MTTlar') },
+    { id: 'hujjatlar', label: t('Hujjatlar') },
+    { id: 'yangiliklar', label: t('Yangiliklar') },
+    { id: 'murojaat', label: t('Virtual qabulxona') },
+    { id: 'aloqa', label: t('Aloqa') },
   ];
 
   const handleNavClick = (id: string) => {
@@ -58,7 +59,7 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
     if (isSpeaking) {
       stopSpeaking();
     } else {
-      speakText(`${settings.districtName}. Rasmiy davlat portali. Ishonch telefoni: ${settings.trustPhone}`);
+      speakText(t(`${settings.districtName}. Rasmiy davlat portali. Ishonch telefoni: ${settings.trustPhone}`));
     }
   };
 
@@ -69,56 +70,71 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           {/* Left: State Portal Indicator */}
           <div className="flex items-center gap-2 truncate">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" title="Rasmiy portal faol" />
+            <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" title={t("Rasmiy portal faol")} />
             <span className="truncate font-medium text-slate-300">
-              O'zbekiston Respublikasi Maktabgacha va maktab ta'limi vazirligi
+              {t("O'zbekiston Respublikasi Maktabgacha va maktab ta'limi vazirligi")}
             </span>
             <span className="hidden md:inline text-slate-500">|</span>
             <span className="hidden md:inline text-slate-400 truncate">
-              Xorazm viloyati Qo'shko'pir tumani bo'limi
+              {t("Xorazm viloyati Qo'shko'pir tumani bo'limi")}
             </span>
           </div>
 
           {/* Right: Accessibility & Hotline Tools */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2.5 shrink-0">
             {/* Ishonch telefoni */}
             <a
               href={`tel:${settings.trustPhone.replace(/\D/g, '')}`}
               className="hidden sm:flex items-center gap-1.5 text-amber-300 hover:text-amber-200 font-medium"
-              title="Ishonch telefoni"
+              title={t("Ishonch telefoni")}
             >
               <Phone className="w-3.5 h-3.5" />
-              <span>Ishonch telefoni: {settings.trustPhone}</span>
+              <span>{t("Ishonch telefoni")}: {settings.trustPhone}</span>
             </a>
+
+            {/* Global Updated Alphabet Toggle (ş, ç, ö, ğ) */}
+            <button
+              type="button"
+              onClick={() => setUseNewAlphabet(!useNewAlphabet)}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold transition-colors cursor-pointer ${
+                useNewAlphabet
+                  ? 'bg-sky-700 text-white hover:bg-sky-600'
+                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+              }`}
+              title={t("Yangilangan alifbo (ş, ç, ö, ğ) / Standart alifbo")}
+            >
+              <Sparkles className="w-3 h-3 text-amber-300" />
+              <span>{useNewAlphabet ? 'Ş · Ç · Ö · Ğ' : "Sh · Ch · O' · G'"}</span>
+            </button>
 
             {/* Accessibility dropdown trigger */}
             <div className="relative">
               <button
                 onClick={() => setAccessibilityOpen(!accessibilityOpen)}
                 className="flex items-center gap-1 px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
-                title="Maxsus imkoniyatlar"
-                aria-label="Maxsus imkoniyatlar paneli"
+                title={t("Maxsus imkoniyatlar")}
+                aria-label={t("Maxsus imkoniyatlar paneli")}
               >
                 <Eye className="w-3.5 h-3.5" />
-                <span className="hidden xs:inline">Maxsus imkoniyatlar</span>
+                <span className="hidden xs:inline">{t("Maxsus imkoniyatlar")}</span>
               </button>
 
               {/* Accessibility popover */}
               {accessibilityOpen && (
                 <div className="absolute right-0 top-full mt-1.5 w-64 bg-white text-slate-900 rounded-lg shadow-xl border border-slate-200 p-3 z-50 text-xs">
                   <div className="font-semibold text-slate-800 mb-2 border-b border-slate-100 pb-1">
-                    Ko'rish imkoniyati cheklanganlar uchun
+                    {t("Ko'rish imkoniyati cheklanganlar uchun")}
                   </div>
 
                   {/* Font Size */}
                   <div className="mb-3">
-                    <span className="text-slate-500 block mb-1">Shrift o'lchami:</span>
+                    <span className="text-slate-500 block mb-1">{t("Shrift o'lchami:")}</span>
                     <div className="grid grid-cols-3 gap-1">
                       <button
                         onClick={() => setFontSize('normal')}
                         className={`px-2 py-1 rounded border text-center font-medium ${fontSize === 'normal' ? 'bg-sky-50 border-sky-600 text-sky-700' : 'border-slate-200 hover:bg-slate-50'}`}
                       >
-                        A (Standart)
+                        A ({t("Standart")})
                       </button>
                       <button
                         onClick={() => setFontSize('large')}
@@ -137,38 +153,38 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
 
                   {/* Contrast */}
                   <div className="mb-3">
-                    <span className="text-slate-500 block mb-1">Ranglar kontrasti:</span>
+                    <span className="text-slate-500 block mb-1">{t("Ranglar kontrasti:")}</span>
                     <div className="grid grid-cols-3 gap-1">
                       <button
                         onClick={() => setContrastMode('normal')}
                         className={`px-2 py-1 rounded border text-center ${contrastMode === 'normal' ? 'bg-sky-50 border-sky-600 text-sky-700 font-medium' : 'border-slate-200 hover:bg-slate-50'}`}
                       >
-                        Oddiy
+                        {t("Oddiy")}
                       </button>
                       <button
                         onClick={() => setContrastMode('high')}
                         className={`px-2 py-1 rounded border text-center ${contrastMode === 'high' ? 'bg-black text-yellow-300 border-yellow-400 font-bold' : 'border-slate-200 hover:bg-slate-50'}`}
                       >
-                        Kontrast
+                        {t("Kontrast")}
                       </button>
                       <button
                         onClick={() => setContrastMode('grayscale')}
                         className={`px-2 py-1 rounded border text-center ${contrastMode === 'grayscale' ? 'bg-slate-300 font-medium' : 'border-slate-200 hover:bg-slate-50'}`}
                       >
-                        Oq-qora
+                        {t("Oq-qora")}
                       </button>
                     </div>
                   </div>
 
                   {/* Voice assistant */}
                   <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-slate-600">Ovozli o'qish:</span>
+                    <span className="text-slate-600">{t("Ovozli o'qish:")}</span>
                     <button
                       onClick={handleSpeechToggle}
                       className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium transition-colors ${isSpeaking ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
                     >
                       {isSpeaking ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
-                      <span>{isSpeaking ? 'To\'xtatish' : 'O\'qish'}</span>
+                      <span>{isSpeaking ? t("To'xtatish") : t("O'qish")}</span>
                     </button>
                   </div>
                 </div>
@@ -183,11 +199,11 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
                   ? 'bg-emerald-800 text-emerald-200 hover:bg-emerald-700'
                   : 'bg-sky-900 text-sky-200 hover:bg-sky-800'
               }`}
-              title={googleSyncStatus.isConnected ? "Google Sheets bog'langan" : "Admin boshqaruv tizimi"}
+              title={googleSyncStatus.isConnected ? t("Google Sheets bog'langan") : t("Admin boshqaruv tizimi")}
             >
               <Database className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">
-                {googleSyncStatus.isConnected ? 'Baza ulangan' : 'Admin'}
+                {googleSyncStatus.isConnected ? t('Baza ulangan') : 'Admin'}
               </span>
             </button>
           </div>
@@ -203,19 +219,19 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
         >
           <img
             src={stateEmblem}
-            alt="O'zbekiston Davlat Gerbi"
+            alt={t("O'zbekiston Davlat Gerbi")}
             className="w-12 h-12 object-contain drop-shadow-xs group-hover:scale-105 transition-transform"
             referrerPolicy="no-referrer"
           />
           <div className="flex flex-col">
             <span className="text-xs uppercase tracking-wider font-semibold text-sky-800">
-              Xorazm viloyati
+              {t("Xorazm viloyati")}
             </span>
             <span className="text-base sm:text-lg font-bold text-slate-900 tracking-tight leading-snug">
-              Qo'shko'pir Tumani Maktabgacha va Maktab Ta'limi Bo'limi
+              {t("Qo'shko'pir Tumani Maktabgacha va Maktab Ta'limi Bo'limi")}
             </span>
             <span className="text-xs text-slate-500 hidden sm:block">
-              Rasmiy axborot va xizmatlar portali
+              {t("Rasmiy axborot va xizmatlar portali")}
             </span>
           </div>
         </div>
@@ -223,7 +239,7 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
         {/* Desktop Quick Contacts & Admin Button */}
         <div className="hidden lg:flex items-center gap-4 shrink-0">
           <div className="text-right">
-            <span className="text-xs text-slate-500 block">Qabulxona:</span>
+            <span className="text-xs text-slate-500 block">{t("Qabulxona:")}</span>
             <a
               href={`tel:${settings.departmentPhone.replace(/\D/g, '')}`}
               className="text-sm font-semibold text-slate-800 hover:text-sky-700"
@@ -236,7 +252,7 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
             onClick={() => onNavigate('murojaat')}
             className="px-4 py-2 text-xs font-semibold text-white bg-sky-700 hover:bg-sky-800 rounded-md transition-colors shadow-xs"
           >
-            Virtual qabulxona
+            {t("Virtual qabulxona")}
           </button>
 
           <button
@@ -248,7 +264,7 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
             ) : (
               <ShieldCheck className="w-4 h-4 text-sky-700" />
             )}
-            <span>Admin panel</span>
+            <span>{t("Admin panel")}</span>
           </button>
         </div>
 
@@ -257,15 +273,15 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
           <button
             onClick={onOpenAdmin}
             className="p-2 text-slate-700 hover:bg-slate-100 rounded-md"
-            aria-label="Admin panel"
-            title="Admin panel"
+            aria-label={t("Admin panel")}
+            title={t("Admin panel")}
           >
             <ShieldCheck className="w-5 h-5 text-sky-700" />
           </button>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2 text-slate-700 hover:bg-slate-100 rounded-md"
-            aria-label="Menyu"
+            aria-label={t("Menyu")}
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -293,7 +309,7 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
           </ul>
 
           <div className="flex items-center gap-3 text-xs text-sky-200">
-            <span className="hidden xl:inline">Ish vaqti: Dush-Juma 09:00 - 18:00</span>
+            <span className="hidden xl:inline">{t("Ish vaqti: Dush-Juma 09:00 - 18:00")}</span>
           </div>
         </div>
       </nav>
@@ -325,7 +341,7 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
               }}
               className="w-full py-2.5 text-center text-sm font-semibold text-white bg-sky-800 rounded-md"
             >
-              Virtual qabulxona (Murojaat yuborish)
+              {t("Virtual qabulxona (Murojaat yuborish)")}
             </button>
             <button
               onClick={() => {
@@ -334,7 +350,7 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
               }}
               className="w-full py-2.5 text-center text-sm font-medium text-slate-700 bg-slate-100 border border-slate-300 rounded-md"
             >
-              Admin panel (Boshqaruv)
+              {t("Admin panel (Boshqaruv)")}
             </button>
           </div>
         </div>

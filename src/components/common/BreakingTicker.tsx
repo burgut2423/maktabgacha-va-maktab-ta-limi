@@ -3,7 +3,7 @@ import { BellRing, ChevronRight } from 'lucide-react';
 import { usePortal } from '../../context/PortalContext';
 
 export const BreakingTicker: React.FC<{ onOpenNews?: () => void }> = ({ onOpenNews }) => {
-  const { settings } = usePortal();
+  const { settings, t } = usePortal();
 
   if (!settings.marqueeText) return null;
 
@@ -12,12 +12,12 @@ export const BreakingTicker: React.FC<{ onOpenNews?: () => void }> = ({ onOpenNe
       <div className="max-w-7xl mx-auto flex items-center gap-3">
         <div className="flex items-center gap-1.5 bg-slate-950 text-amber-400 font-bold px-2 py-0.5 rounded text-[11px] shrink-0 uppercase tracking-wider">
           <BellRing className="w-3.5 h-3.5" />
-          <span>Muhim e'lon</span>
+          <span>{t("Muhim e'lon")}</span>
         </div>
 
-        <div className="overflow-hidden whitespace-nowrap flex-1">
-          <p className="animate-marquee inline-block font-semibold">
-            {settings.marqueeText}
+        <div className="w3-marquee-wrapper overflow-hidden whitespace-nowrap flex-1 relative [mask-image:linear-gradient(to_right,transparent,black_16px,black_calc(100%-16px),transparent)]">
+          <p className="w3-marquee-track font-semibold cursor-default">
+            {t(settings.marqueeText)}
           </p>
         </div>
 
@@ -26,7 +26,7 @@ export const BreakingTicker: React.FC<{ onOpenNews?: () => void }> = ({ onOpenNe
             onClick={onOpenNews}
             className="hidden sm:flex items-center gap-1 text-[11px] font-bold text-slate-900 hover:text-white shrink-0 uppercase tracking-wider"
           >
-            <span>Barcha e'lonlar</span>
+            <span>{t("Barcha e'lonlar")}</span>
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
         )}

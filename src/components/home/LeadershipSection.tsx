@@ -1,22 +1,22 @@
 import React from 'react';
-import { Phone, Mail, Clock, Calendar, UserCheck } from 'lucide-react';
+import { Phone, Mail, Clock, Calendar } from 'lucide-react';
 import { usePortal } from '../../context/PortalContext';
 
 export const LeadershipSection: React.FC = () => {
-  const { leaders } = usePortal();
+  const { leaders, t } = usePortal();
 
   return (
     <section id="bolim-haqida" className="py-12 bg-white border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-xs uppercase tracking-wider font-semibold text-sky-800">
-            Bo'lim tuzilmasi
+            {t("Bo'lim tuzilmasi")}
           </span>
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
-            Bo'lim rahbariyati va fuqarolarni qabul qilish jadvali
+            {t("Bo'lim rahbariyati va fuqarolarni qabul qilish jadvali")}
           </h2>
           <p className="text-slate-600 text-sm mt-2">
-            Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi mas'ul rahbarlari
+            {t("Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi mas'ul rahbarlari")}
           </p>
         </div>
 
@@ -31,39 +31,39 @@ export const LeadershipSection: React.FC = () => {
                   <div className="w-16 h-16 rounded-full overflow-hidden bg-slate-200 border-2 border-sky-700 shrink-0">
                     <img
                       src={lead.photoUrl}
-                      alt={lead.name}
+                      alt={t(lead.name)}
                       className="w-full h-full object-cover"
                       referrerPolicy="no-referrer"
                     />
                   </div>
                   <div>
                     <span className="text-[11px] font-semibold text-sky-800 uppercase tracking-wider block">
-                      {lead.department}
+                      {t(lead.department)}
                     </span>
                     <h3 className="text-base font-bold text-slate-900 leading-snug">
-                      {lead.name}
+                      {t(lead.name)}
                     </h3>
                     <p className="text-xs text-slate-500 font-medium">
-                      {lead.position}
+                      {t(lead.position)}
                     </p>
                   </div>
                 </div>
 
                 <p className="text-xs text-slate-600 line-clamp-3 mb-4 leading-relaxed italic">
-                  "{lead.bio}"
+                  "{t(lead.bio)}"
                 </p>
 
                 <div className="space-y-2 text-xs text-slate-700 bg-white p-3.5 rounded-xl border border-slate-200 mb-4">
                   <div className="flex items-start gap-2">
                     <Calendar className="w-3.5 h-3.5 text-sky-700 shrink-0 mt-0.5" />
                     <div>
-                      <strong className="text-slate-900">Qabul kunlari:</strong> {lead.receptionDays}
+                      <strong className="text-slate-900">{t("Qabul kunlari")}:</strong> {t(lead.receptionDays)}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="w-3.5 h-3.5 text-sky-700 shrink-0" />
                     <div>
-                      <strong className="text-slate-900">Qabul vaqti:</strong> {lead.receptionHours}
+                      <strong className="text-slate-900">{t("Qabul vaqti")}:</strong> {t(lead.receptionHours)}
                     </div>
                   </div>
                 </div>
@@ -83,7 +83,7 @@ export const LeadershipSection: React.FC = () => {
                   title={lead.email}
                 >
                   <Mail className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Pochta</span>
+                  <span className="hidden sm:inline">{t("Pochta")}</span>
                 </a>
               </div>
             </div>
