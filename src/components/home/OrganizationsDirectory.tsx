@@ -223,7 +223,12 @@ export const OrganizationsDirectory: React.FC = () => {
               </div>
               <div>
                 <span className="text-xs text-slate-500 block">Manzil:</span>
-                <span>{selectedOrg.address}, {selectedOrg.mahalla}</span>
+                <span>{selectedOrg.address}{selectedOrg.mahalla && !selectedOrg.address.includes(selectedOrg.mahalla) ? `, ${selectedOrg.mahalla}` : ''}</span>
+                {selectedOrg.mapUrl && (
+                  <a href={selectedOrg.mapUrl} target="_blank" rel="noopener noreferrer" className="ml-2 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:underline">
+                    <MapPin className="w-3 h-3" /> Xaritada körish
+                  </a>
+                )}
               </div>
               <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-200 text-center">
                 <div>
