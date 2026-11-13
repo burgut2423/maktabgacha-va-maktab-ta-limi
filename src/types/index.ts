@@ -36,6 +36,7 @@ export interface NewsItem {
   sentToInstagram?: boolean;
   telegramMessageId?: string;
   instagramMediaId?: string;
+  sourceUrl?: string; // qoshkopir-mmtb.uz dagi asl manzil
 }
 
 export interface Organization {
@@ -56,6 +57,7 @@ export interface Organization {
   photoUrl?: string;
   inn?: string;
   capacity?: number;
+  mapUrl?: string; // Google Maps havolasi
 }
 
 export interface Leader {
