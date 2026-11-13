@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { User } from 'firebase/auth';
 import { NewsItem, Organization, Leader, DocumentItem, CitizenAppeal, PortalSettings, GoogleSyncStatus } from '../types';
 import {
@@ -20,6 +20,7 @@ import {
 } from '../services/googleSheets';
 import { getOrCreatePortalFolder } from '../services/googleDrive';
 import { PORTAL_CONFIG } from '../config/portalConfig';
+import { MmtbSyncData, loadMmtbSync, getHiddenMmtbIds, hideMmtbId, isMmtbId, mergeNews, mergeOrganizations, mergeLeaders } from '../services/mmtbSync';
 
 interface PortalContextType {
   // State
@@ -29,6 +30,9 @@ interface PortalContextType {
   documents: DocumentItem[];
   appeals: CitizenAppeal[];
   settings: PortalSettings;
+
+  // qoshkopir-mmtb.uz sinxronlaşi
+  mmtbSyncedAt: string | null;
 
   // Google Integration
   user: User | null;
@@ -150,6 +154,26 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [fontSize, setFontSizeState] = useState<'normal' | 'large' | 'xlarge'>('normal');
   const [contrastMode, setContrastModeState] = useState<'normal' | 'high' | 'grayscale'>('normal');
   const [isSpeaking, setIsSpeaking] = useState(false);
+
+  // qoshkopir-mmtb.uz dan avtomatik sinxronlangan ma'lumotlar
+  const [mmtbData, setMmtbData] = useState<MmtbSyncData | null>(null);
+  const [hiddenMmtbIds, setHiddenMmtbIds] = useState<Set<string>>(() => getHiddenMmtbIds());
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = () => loadMmtbSync().then(data => { if (!cancelled && data) setMmtbData(data); });
+    load();
+    const timer = window.setInterval(load, 10 * 60 * 1000);
+    return () => { cancelled = true; window.clearInterval(timer); };
+  }, []);
+
+  const mergedNews = useMemo(() => mergeNews(news, mmtbData, hiddenMmtbIds), [news, mmtbData, hiddenMmtbIds]);
+  const mergedOrganizations = useMemo(() => mergeOrganizations(organizations, mmtbData, hiddenMmtbIds), [organizations, mmtbData, hiddenMmtbIds]);
+  const mergedLeaders = useMemo(() => mergeLeaders(leaders, mmtbData, hiddenMmtbIds), [leaders, mmtbData, hiddenMmtbIds]);
+
+  const hideSynced = (id: string) => {
+    if (isMmtbId(id)) setHiddenMmtbIds(new Set(hideMmtbId(id)));
+  };
 
   // Sync to local storage
   useEffect(() => {
@@ -554,7 +578,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const updateNews = async (item: NewsItem) => {
-    const updated = news.map(n => n.id === item.id ? item : n);
+    const updated = news.some(n => n.id === item.id) ? news.map(n => n.id === item.id ? item : n) : [item, ...news];
     setNews(updated);
     if (googleSyncStatus.spreadsheetId) {
       await triggerGoogleSheetsSync(undefined, { news: updated });
@@ -562,6 +586,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const deleteNews = async (id: string) => {
+    hideSynced(id);
     const updated = news.filter(n => n.id !== id);
     setNews(updated);
     if (googleSyncStatus.spreadsheetId) {
@@ -582,7 +607,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const updateOrganization = async (item: Organization) => {
-    const updated = organizations.map(o => o.id === item.id ? item : o);
+    const updated = organizations.some(o => o.id === item.id) ? organizations.map(o => o.id === item.id ? item : o) : [...organizations, item];
     setOrganizations(updated);
     if (googleSyncStatus.spreadsheetId) {
       await triggerGoogleSheetsSync(undefined, { organizations: updated });
@@ -590,6 +615,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const deleteOrganization = async (id: string) => {
+    hideSynced(id);
     const updated = organizations.filter(o => o.id !== id);
     setOrganizations(updated);
     if (googleSyncStatus.spreadsheetId) {
@@ -610,7 +636,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const updateLeader = async (item: Leader) => {
-    const updated = leaders.map(l => l.id === item.id ? item : l).sort((a, b) => a.order - b.order);
+    const updated = (leaders.some(l => l.id === item.id) ? leaders.map(l => l.id === item.id ? item : l) : [...leaders, item]).sort((a, b) => a.order - b.order);
     setLeaders(updated);
     if (googleSyncStatus.spreadsheetId) {
       await triggerGoogleSheetsSync(undefined, { leaders: updated });
@@ -618,6 +644,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const deleteLeader = async (id: string) => {
+    hideSynced(id);
     const updated = leaders.filter(l => l.id !== id);
     setLeaders(updated);
     if (googleSyncStatus.spreadsheetId) {
@@ -741,9 +768,10 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   return (
     <PortalContext.Provider
       value={{
-        news,
-        organizations,
-        leaders,
+        news: mergedNews,
+        organizations: mergedOrganizations,
+        leaders: mergedLeaders,
+        mmtbSyncedAt: mmtbData?.syncedAt || null,
         documents,
         appeals,
         settings,
