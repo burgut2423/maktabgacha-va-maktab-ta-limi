@@ -4,9 +4,12 @@ on:
   push:
     branches: ['main', 'master']
   workflow_dispatch:
+  schedule:
+    # qoshkopir-mmtb.uz dan har 2 soatda yangi ma'lumotlarni olish
+    - cron: '17 */2 * * *'
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -31,6 +34,21 @@ jobs:
 
       - name: Install dependencies
         run: npm install --legacy-peer-deps
+
+      - name: Sync from qoshkopir-mmtb.uz
+        continue-on-error: true
+        run: node scripts/sync-mmtb.mjs
+
+      - name: Save synced snapshot to repository
+        continue-on-error: true
+        run: |
+          if [ -n "$(git status --porcelain public/data/mmtb-sync.json)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add public/data/mmtb-sync.json
+            git commit -m "Sinxron: qoshkopir-mmtb.uz ma'lumotlari yangilandi"
+            git push
+          fi
 
       - name: Build project
         run: npm run build
