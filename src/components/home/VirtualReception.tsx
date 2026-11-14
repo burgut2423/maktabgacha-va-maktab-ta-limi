@@ -4,15 +4,16 @@ import { usePortal } from '../../context/PortalContext';
 import { CitizenAppeal } from '../../types';
 
 export const VirtualReception: React.FC = () => {
-  const { appeals, submitCitizenAppeal, organizations, t } = usePortal();
+  const { settings, appeals, submitCitizenAppeal, organizations, t } = usePortal();
 
+  const defaultTarget = (settings.receptionTargets && settings.receptionTargets[0]) || settings.shortName || settings.districtName;
   const [activeTab, setActiveTab] = useState<'submit' | 'check'>('submit');
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
     email: '',
     address: '',
-    organizationType: 'Qo\'shko\'pir tumani MMTB',
+    organizationType: defaultTarget,
     subject: '',
     message: ''
   });
@@ -41,7 +42,7 @@ export const VirtualReception: React.FC = () => {
         phone: '',
         email: '',
         address: '',
-        organizationType: 'Qo\'shko\'pir tumani MMTB',
+        organizationType: defaultTarget,
         subject: '',
         message: ''
       });
@@ -100,13 +101,13 @@ export const VirtualReception: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-8">
           <span className="text-xs uppercase tracking-wider font-semibold text-sky-800">
-            {t("Fuqarolar bilan muloqot")}
+            {t(settings.receptionKicker || "Fuqarolar bilan muloqot")}
           </span>
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
-            {t("Bo'lim boshlig'i virtual qabulxonasi")}
+            {t(settings.receptionTitle || "Virtual qabulxona")}
           </h2>
           <p className="text-slate-600 text-sm mt-1 max-w-xl mx-auto">
-            {t("Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi rahbariyatiga to'g'ridan-to'g'ri elektron murojaat yo'llang")}
+            {t(settings.receptionSubtitle)}
           </p>
         </div>
 
@@ -146,7 +147,7 @@ export const VirtualReception: React.FC = () => {
                   {t("Murojaatingiz muvaffaqiyatli qabul qilindi!")}
                 </h3>
                 <p className="text-slate-600 text-sm mb-6 max-w-md mx-auto">
-                  {t("Murojaatingiz Qo'shko'pir tumani MMTB ro'yxatiga olindi va Google Sheets ma'lumotlar bazasiga kiritildi.")}
+                  {t(`Murojaatingiz ${settings.shortName || settings.districtName} ro'yxatiga olindi va ma'lumotlar bazasiga kiritildi.`)}
                 </p>
 
                 <div className="bg-sky-50 border border-sky-200 rounded-xl p-4 max-w-sm mx-auto mb-6">
@@ -241,16 +242,16 @@ export const VirtualReception: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      {t("Tegishli muassasa yoki bo'lim")}
+                      {t("Tegishli muassasa yoki bo'linma")}
                     </label>
                     <select
                       value={formData.organizationType}
                       onChange={(e) => setFormData({ ...formData, organizationType: e.target.value })}
                       className="w-full px-3.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-sky-600 focus:bg-white"
                     >
-                      <option value="Qo'shko'pir tumani MMTB">{t("Qo'shko'pir tumani MMTB rahbariyati")}</option>
-                      <option value="Maktabgacha ta'lim (Bog'chalar)">{t("Maktabgacha ta'lim (Bog'chalar bo'yicha)")}</option>
-                      <option value="Umumiy o'rta ta'lim (Maktablar)">{t("Umumiy o'rta ta'lim (Maktablar bo'yicha)")}</option>
+                      {(settings.receptionTargets || []).map((target, idx) => (
+                        <option key={idx} value={target}>{t(target)}</option>
+                      ))}
                       {organizations.map(org => (
                         <option key={org.id} value={org.name}>{t(org.name)}</option>
                       ))}
@@ -314,7 +315,7 @@ export const VirtualReception: React.FC = () => {
               <div className="flex gap-2">
                 <input
                   type="text"
-                  placeholder={t("Masalan: QSP-2026-4412")}
+                  placeholder={t("Masalan: ORG-2026-4412")}
                   value={searchCode}
                   onChange={(e) => setSearchCode(e.target.value)}
                   className="flex-1 px-4 py-2.5 text-sm uppercase font-mono font-bold bg-slate-50 border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-sky-600 focus:bg-white"

@@ -23,7 +23,7 @@ import { normalizePhotoUrl, toNewUzbekAlphabet } from '../../utils/uzbekTypograp
 const ITEMS_PER_PAGE = 6;
 
 export const OrganizationsDirectory: React.FC = () => {
-  const { organizations, googleSyncStatus, refreshDataFromSheets, useNewAlphabet, setUseNewAlphabet, t } = usePortal();
+  const { settings, organizations, googleSyncStatus, refreshDataFromSheets, useNewAlphabet, setUseNewAlphabet, t } = usePortal();
   const [filterType, setFilterType] = useState<'all' | 'maktab' | 'mtt' | 'ixtisos'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null);
@@ -117,7 +117,7 @@ export const OrganizationsDirectory: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs uppercase tracking-wider font-semibold text-sky-800">
-                {t("Ta'lim muassasalari tarmog'i")}
+                {t(settings.orgsKicker || "Ta'lim muassasalari tarmog'i")}
               </span>
               <button
                 type="button"
@@ -134,10 +134,10 @@ export const OrganizationsDirectory: React.FC = () => {
               </button>
             </div>
             <h2 className="text-2xl font-bold text-slate-900 mt-1">
-              {t("Maktablar va Maktabgacha ta'lim tashkilotlari (MTT)")}
+              {t(settings.orgsTitle || "Tarkibiy muassasalar va ta'lim bo'linmalari")}
             </h2>
             <p className="text-slate-600 text-sm mt-1">
-              {t("Qo'shko'pir tumanidagi barcha ta'lim maskanlari ma'lumotlari, manzillari va rahbarlari")}
+              {t(settings.orgsSubtitle)}
             </p>
           </div>
 
@@ -149,7 +149,7 @@ export const OrganizationsDirectory: React.FC = () => {
                 filterType === 'all' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              {t("Barchasi")} ({organizations.length})
+              {t(settings.orgsFilterAllLabel || "Barchasi")} ({organizations.length})
             </button>
             <button
               onClick={() => handleFilterChange('maktab')}
@@ -157,7 +157,7 @@ export const OrganizationsDirectory: React.FC = () => {
                 filterType === 'maktab' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              {t("Maktablar")} ({organizations.filter(o => o.type === 'maktab').length})
+              {t(settings.orgsFilterSchoolLabel || "Maktablar")} ({organizations.filter(o => o.type === 'maktab').length})
             </button>
             <button
               onClick={() => handleFilterChange('mtt')}
@@ -165,7 +165,7 @@ export const OrganizationsDirectory: React.FC = () => {
                 filterType === 'mtt' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              {t("Bog'chalar - MTT")} ({organizations.filter(o => o.type === 'mtt').length})
+              {t(settings.orgsFilterKindergartenLabel || "Bog'chalar - MTT")} ({organizations.filter(o => o.type === 'mtt').length})
             </button>
             <button
               onClick={() => handleFilterChange('ixtisos')}
@@ -173,7 +173,7 @@ export const OrganizationsDirectory: React.FC = () => {
                 filterType === 'ixtisos' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              {t("Ixtisoslashgan")} ({organizations.filter(o => o.type === 'ixtisos').length})
+              {t(settings.orgsFilterSpecializedLabel || "Ixtisoslashgan")} ({organizations.filter(o => o.type === 'ixtisos').length})
             </button>
           </div>
         </div>
@@ -486,7 +486,7 @@ export const OrganizationsDirectory: React.FC = () => {
                 <div>
                   <span className="text-xs text-slate-500 block mb-0.5">{t("Elektron pochta")}:</span>
                   <span className="text-slate-800 font-medium break-all">
-                    {selectedOrg.email || `${selectedOrg.type}${selectedOrg.number}.qoshkopir@edu.uz`}
+                    {selectedOrg.email || `${selectedOrg.type}${selectedOrg.number}@talim-tashkiloti.uz`}
                   </span>
                 </div>
               </div>
@@ -497,6 +497,15 @@ export const OrganizationsDirectory: React.FC = () => {
                   {t(selectedOrg.address)}, {t(selectedOrg.mahalla)}
                 </span>
               </div>
+
+              {selectedOrg.description && (
+                <div className="bg-white p-3 rounded-lg border border-slate-200">
+                  <span className="text-xs text-slate-500 block mb-0.5">{t("Qo'shimcha ma'lumot")}:</span>
+                  <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-line">
+                    {t(selectedOrg.description)}
+                  </p>
+                </div>
+              )}
 
               {/* Numerical Statistics */}
               <div className="grid grid-cols-3 gap-2 pt-3 border-t border-slate-200 text-center">

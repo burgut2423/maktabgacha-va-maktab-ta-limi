@@ -9,14 +9,7 @@ export const FooterGov: React.FC<{ onOpenAdmin: () => void; onNavigate: (s: stri
 }) => {
   const { settings, t } = usePortal();
 
-  const governmentLinks = [
-    { title: t("O'zbekiston Respublikasi Prezidenti"), url: "https://president.uz" },
-    { title: t("Hukumat portali (gov.uz)"), url: "https://gov.uz" },
-    { title: t("Maktabgacha va maktab ta'limi vazirligi"), url: "https://gov.uz/oz/edu" },
-    { title: t("Yagona interaktiv davlat xizmatlari (my.gov.uz)"), url: "https://my.gov.uz" },
-    { title: t("Ta'lim sifatini nazorat qilish inspeksiyasi"), url: "https://tdi.uz" },
-    { title: t("Xorazm viloyati hokimligi"), url: "https://xorazm.uz" },
-  ];
+  const governmentLinks = settings.governmentLinks || [];
 
   return (
     <footer className="bg-slate-900 text-slate-300 pt-12 pb-8 border-t border-slate-800">
@@ -33,17 +26,19 @@ export const FooterGov: React.FC<{ onOpenAdmin: () => void; onNavigate: (s: stri
                 referrerPolicy="no-referrer"
               />
               <div>
-                <span className="text-xs uppercase text-slate-400 font-semibold block">
-                  {t("Xorazm viloyati")}
-                </span>
+                {settings.regionLabel && (
+                  <span className="text-xs uppercase text-slate-400 font-semibold block">
+                    {t(settings.regionLabel)}
+                  </span>
+                )}
                 <span className="text-sm font-bold text-white block">
-                  {t("Qo'shko'pir Tumani Maktabgacha va Maktab Ta'limi Bo'limi")}
+                  {t(settings.districtName)}
                 </span>
               </div>
             </div>
 
             <p className="text-xs text-slate-400 leading-relaxed">
-              {t("Saytdan olingan barcha axborotlardan foydalanilganda Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi rasmiy veb-saytiga havola berilishi shart.")}
+              {t(settings.footerDisclaimer)}
             </p>
 
             <div className="pt-2 text-xs text-slate-400 space-y-1">
@@ -61,37 +56,37 @@ export const FooterGov: React.FC<{ onOpenAdmin: () => void; onNavigate: (s: stri
             <ul className="space-y-2 text-xs">
               <li>
                 <button onClick={() => onNavigate('asosiy')} className="hover:text-white transition-colors">
-                  {t("Asosiy sahifa")}
+                  {t(settings.navLabels?.home || "Asosiy sahifa")}
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('bolim-haqida')} className="hover:text-white transition-colors">
-                  {t("Bo'lim rahbariyati va tuzilma")}
+                  {t(settings.navLabels?.about || "Tashkilot haqida")}
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('muassasalar')} className="hover:text-white transition-colors">
-                  {t("Maktablar va MTTlar ro'yxati")}
+                  {t(settings.navLabels?.orgs || "Muassasalar ro'yxati")}
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('hujjatlar')} className="hover:text-white transition-colors">
-                  {t("Me'yoriy hujjatlar va buyruqlar")}
+                  {t(settings.navLabels?.docs || "Hujjatlar")}
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('yangiliklar')} className="hover:text-white transition-colors">
-                  {t("So'nggi yangiliklar va e'lonlar")}
+                  {t(settings.navLabels?.news || "Yangiliklar")}
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('murojaat')} className="hover:text-white transition-colors">
-                  {t("Virtual qabulxona (Murojaat holati)")}
+                  {t(settings.navLabels?.reception || "Virtual qabulxona")}
                 </button>
               </li>
               <li>
                 <button onClick={() => onNavigate('aloqa')} className="hover:text-white transition-colors">
-                  {t("Bog'lanish va manzil")}
+                  {t(settings.navLabels?.contact || "Aloqa")}
                 </button>
               </li>
             </ul>
@@ -100,18 +95,18 @@ export const FooterGov: React.FC<{ onOpenAdmin: () => void; onNavigate: (s: stri
           {/* Col 3: Government portals */}
           <div className="lg:col-span-4">
             <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-4">
-              {t("Davlat organlari rasmiy saytlari")}
+              {t("Foydali davlat resurslari")}
             </h4>
             <ul className="space-y-2 text-xs">
               {governmentLinks.map((item, idx) => (
-                <li key={idx}>
+                <li key={item.id || idx}>
                   <a
                     href={item.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-1.5 hover:text-white transition-colors group"
                   >
-                    <span>{item.title}</span>
+                    <span>{t(item.title)}</span>
                     <ExternalLink className="w-3 h-3 text-slate-500 group-hover:text-slate-300 shrink-0" />
                   </a>
                 </li>
@@ -123,7 +118,7 @@ export const FooterGov: React.FC<{ onOpenAdmin: () => void; onNavigate: (s: stri
         {/* Bottom copyright and admin login trigger */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>
-            © {new Date().getFullYear()} {t("Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi. Barcha huquqlar himoyalangan.")}
+            © {new Date().getFullYear()} {t(settings.footerCopyright)}
           </p>
 
           <div className="flex items-center gap-4">

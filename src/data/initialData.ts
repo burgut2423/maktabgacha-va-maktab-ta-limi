@@ -2,15 +2,20 @@ import { NewsItem, Organization, Leader, DocumentItem, CitizenAppeal, PortalSett
 import { heroImage, headPortrait, preschoolBuilding, conferenceImage } from '../assets/images';
 
 export const INITIAL_SETTINGS: PortalSettings = {
-  districtName: "Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi",
+  districtName: "Qo'shko'pir Ta'lim Tashkiloti",
+  shortName: "Ta'lim Tashkiloti",
+  supervisingOrg: "O'zbekiston Respublikasi Ta'lim tizimi",
+  regionLabel: "Xorazm viloyati · Qo'shko'pir",
+  portalSubtitle: "Rasmiy axborot va elektron xizmatlar portali",
   departmentPhone: "+998 (62) 352-14-25",
   trustPhone: "+998 (62) 352-11-02",
-  email: "qoshkopir.mmtb@edu.uz",
-  address: "Xorazm viloyati, Qo'shko'pir tumani, Mustaqillik ko'chasi, 24-uy",
+  email: "info@talim-tashkiloti.uz",
+  address: "Xorazm viloyati, Qo'shko'pir, Mustaqillik ko'chasi, 24-uy",
   workingHours: "Dushanba - Juma: 09:00 - 18:00 (Tushlik: 13:00 - 14:00)",
-  telegramChannel: "https://t.me/qoshkopir_mmtb",
-  facebookPage: "https://facebook.com/qoshkopir.mmtb",
-  youtubeChannel: "https://youtube.com/@qoshkopir_talim",
+  workingHoursShort: "Ish vaqti: Dush-Juma 09:00 - 18:00",
+  telegramChannel: "https://t.me/talim_tashkiloti",
+  facebookPage: "https://facebook.com/talim.tashkiloti",
+  youtubeChannel: "https://youtube.com/@talim_tashkiloti",
   schoolsCount: 54,
   mttsCount: 42,
   studentsTotal: 34850,
@@ -18,25 +23,41 @@ export const INITIAL_SETTINGS: PortalSettings = {
   specializedSchoolsCount: 4,
   higherCategoryTeachersCount: 685,
   marqueeText: "E'lon: 2026-yilgi umumta'lim maktablarining 1-sinfiga qabul jarayonlari boshlandi! Barcha savollar bo'yicha Ishonch telefoniga murojaat qilishingiz mumkin: +998 (62) 352-11-02.",
+  navLabels: {
+    home: "Asosiy",
+    about: "Tashkilot haqida",
+    orgs: "Muassasalar",
+    docs: "Hujjatlar",
+    news: "Yangiliklar",
+    reception: "Virtual qabulxona",
+    contact: "Aloqa"
+  },
 
   // Asosiy sahifa sozlamalari
   heroTitle: "Ta'lim va tarbiya — kelajak poydevori, ma'rifatli avlod kafolati",
-  heroSubtitle: "Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi tizimidagi 54 ta umumta'lim maktabi hamda 42 ta davlat va xususiy MTTlar faoliyatini yagona raqamli platforma orqali kuzatib boring.",
-  heroBadgeText: "Xorazm viloyati · Qo'shko'pir tumani",
-  heroImageUrl: heroImage,
+  heroSubtitle: "Ta'lim tashkiloti tizimidagi ta'lim muassasalari, pedagogik jamoa va zamonaviy raqamli xizmatlar faoliyatini yagona ochiq platforma orqali kuzatib boring.",
+  heroBadgeText: "Xorazm viloyati · Ta'lim tashkiloti",
+  heroImageUrl: "./assets/aistudio/IMG_20261114_101244_271_9b96aa41.jpg",
+  heroPrimaryBtnText: "Murojaat yo'llash",
+  heroSecondaryBtnText: "Muassasalar katalogi",
+  heroShowcaseBadge: "Zamonaviy ta'lim maskani",
+  heroShowcaseTitle: "Innovatsion o'quv majmuasi va raqamli sinfxonalar",
+  heroShowcaseDesc: "STEM laboratoriyalari, zamonaviy kutubxona va sport inshootlariga ega qulay ta'lim muhiti",
+  heroServicesTitle: "Elektron ta'lim xizmatlari va havolalar",
+  heroServicesSubtitle: "Yagona raqamli axborot tizimlari",
   quickServices: [
     {
       id: "srv-1",
-      title: "1-sinfga qabul",
-      desc: "Umumta'lim maktablariga elektron ariza topshirish",
+      title: "Qabul jarayoni",
+      desc: "Ta'lim tashkilotiga elektron ariza topshirish",
       link: "https://adm.edu.uz",
       isExternal: true,
       color: "bg-blue-600 text-white"
     },
     {
       id: "srv-2",
-      title: "Bog'chaga navbat",
-      desc: "Davlat MTTlariga navbatga qo'yish va tekshirish",
+      title: "Davlat xizmatlari",
+      desc: "Elektron navbat va hujjatlarni tekshirish",
       link: "https://my.gov.uz",
       isExternal: true,
       color: "bg-emerald-600 text-white"
@@ -52,7 +73,7 @@ export const INITIAL_SETTINGS: PortalSettings = {
     {
       id: "srv-4",
       title: "Fan olimpiadalari",
-      desc: "Tuman va viloyat bosqichlari natijalari",
+      desc: "Bellashuv va tanlovlar natijalari",
       link: "#yangiliklar",
       isExternal: false,
       color: "bg-indigo-600 text-white"
@@ -68,76 +89,221 @@ export const INITIAL_SETTINGS: PortalSettings = {
     {
       id: "srv-6",
       title: "Virtual qabulxona",
-      desc: "Bo'lim rahbariyatiga to'g'ridan-to'g'ri murojaat",
+      desc: "Tashkilot rahbariyatiga to'g'ridan-to'g'ri murojaat",
       link: "#murojaat",
       isExternal: false,
       color: "bg-sky-700 text-white"
     }
   ],
 
-  // Bo'lim haqida (About Department) ma'lumotlari
-  departmentHistory: "Qo'shko'pir tumani xalq ta'limi bo'limi 1935-yilda tashkil topgan bo'lib, o'tgan yillar davomida tumanda minglab yetuk mutaxassislar, olimlar va davlat arboblarini tarbiyalab voyaga yetkazdi. Bugungi kunda O'zbekiston Respublikasi Prezidentining 2023-yilgi qaroriga muvofiq, maktabgacha ta'lim va maktab ta'limi tizimlari birlashtirilib, zamonaviy Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi sifatida faoliyat yuritmoqda.",
-  departmentMission: "Tumanda yashovchi har bir bolaga teng, sifatli va zamonaviy ta'lim-tarbiya olish imkoniyatini yaratish, pedagoglarning kasbiy mahoratini oshirish, zamonaviy axborot texnologiyalari va ilg'or xorijiy tajribalarni ta'lim jarayoniga keng tatbiq etish.",
-  departmentCharter: "Bo'lim O'zbekiston Respublikasi Konstitutsiyasi, 'Ta'lim to'g'risida'gi Qonun, Maktabgacha va maktab ta'limi vazirligi Nizomi hamda Qo'shko'pir tumani hokimligi qarorlari asosida ish yuritadi.",
+  // Statistika bo'limi
+  statsKicker: "Raqamlarda ta'lim tashkiloti",
+  statsTitle: "Ta'lim tashkiloti faoliyatining asosiy ko'rsatkichlari",
+  statsItems: [
+    {
+      id: "st-1",
+      label: "Umumta'lim maktablari",
+      value: "54",
+      suffix: " ta",
+      sub: "Hududdagi muassasalar",
+      icon: "school",
+      color: "text-blue-600 bg-blue-50"
+    },
+    {
+      id: "st-2",
+      label: "Maktabgacha tashkilotlar",
+      value: "42",
+      suffix: " ta",
+      sub: "Davlat va nodavlat maskanlar",
+      icon: "baby",
+      color: "text-emerald-600 bg-emerald-50"
+    },
+    {
+      id: "st-3",
+      label: "O'quvchi yoshlar",
+      value: "34 850",
+      suffix: "+",
+      sub: "Barcha bosqich ta'lim oluvchilari",
+      icon: "graduation",
+      color: "text-purple-600 bg-purple-50"
+    },
+    {
+      id: "st-4",
+      label: "Pedagog xodimlar",
+      value: "2 840",
+      suffix: "+",
+      sub: "Tajribali ustozlar jamoasi",
+      icon: "users",
+      color: "text-amber-600 bg-amber-50"
+    },
+    {
+      id: "st-5",
+      label: "Oliy toifali ustozlar",
+      value: "685",
+      suffix: "+",
+      sub: "Malaka toifasiga ega pedagoglar",
+      icon: "book",
+      color: "text-teal-600 bg-teal-50"
+    },
+    {
+      id: "st-6",
+      label: "Olimpiada g'oliblari",
+      value: "142",
+      suffix: "+",
+      sub: "2026-yilgi fan bellashuvlari",
+      icon: "award",
+      color: "text-rose-600 bg-rose-50"
+    }
+  ],
+
+  // Tashkilot haqida (#bolim-haqida - Admin orqali to'liq boshqariladi)
+  aboutKicker: "Tashkilot faoliyati",
+  aboutTitle: "Ta'lim tashkiloti haqida ma'lumot",
+  aboutTabLeadersLabel: "Tashkilot rahbariyati",
+  aboutTabStructureLabel: "Tashkiliy tuzilma va bo'limlar",
+  aboutTabTasksLabel: "Asosiy vazifa va funksiyalar",
+  aboutTabHistoryLabel: "Tashkilot tarixi va me'yoriy asos",
+  aboutStructureNote: "Tashkilotning ichki tuzilmasi, bo'linmalari va ularning rahbarlari to'liq Admin panel va Google Sheets bazasi orqali boshqariladi hamda tahrirlanadi.",
+  aboutHeadRoleLabel: "Bo'linma rahbari",
+  aboutTasksTitle: "Tashkilotning nizom bilan belgilangan asosiy vazifalari",
+  aboutHistoryTitle: "Tarixiy ma'lumot va rivojlanish bosqichlari",
+  aboutCharterLabel: "Me'yoriy huquqiy asos",
+  departmentHistory: "Ta'lim tashkiloti o'z faoliyatini ilg'or milliy va xalqaro ta'lim standartlari asosida yo'lga qo'ygan bo'lib, ko'p yillar davomida bilimli, raqobatbardosh va ma'rifatli yosh avlodni tarbiyalab kelmoqda. Bugungi kunda zamonaviy raqamli boshqaruv va ochiqlik tamoyillari asosida barcha ta'lim yo'nalishlari yagona tizim sifatida faoliyat yuritmoqda.",
+  departmentMission: "Har bir ta'lim oluvchiga teng, sifatli va zamonaviy ta'lim-tarbiya olish imkoniyatini yaratish, pedagoglarning kasbiy salohiyatini rivojlantirish hamda zamonaviy axborot texnologiyalarini ta'lim jarayoniga keng tatbiq etish.",
+  departmentCharter: "Tashkilot O'zbekiston Respublikasi Konstitutsiyasi, 'Ta'lim to'g'risida'gi Qonun, amaldagi davlat ta'lim standartlari hamda tashkilot Nizomi asosida ish yuritadi.",
   tasksList: [
-    "Maktabgacha ta'lim tashkilotlarida bolalarni sifatli parvarishlash va maktabga har tomonlama tayyorlash",
-    "Umumiy o'rta ta'lim muassasalarida davlat ta'lim standartlarini to'liq ta'minlash",
-    "Iqtidorli va iste'dodli o'quvchilarni aniqlash, ularni fan olimpiadalariga maqsadli tayyorlash",
-    "Pedagog kadrlar salohiyatini oshirish, attestatsiya va malaka toifalarini adolatli o'tkazish",
-    "Ta'lim muassasalari moddiy-texnik bazasini mustahkamlash, zamonaviy jihozlar va darsliklar bilan ta'minlash",
-    "Fuqarolar murojaatlari bilan ishlash, ota-onalar va jamoatchilik nazoratini rivojlantirish"
+    "Ta'lim jarayonida davlat ta'lim standartlari va ilg'or o'quv dasturlarini to'liq ta'minlash",
+    "Maktabgacha va umumiy ta'lim bosqichlarida sifatli parvarish hamda uzviy ta'lim-tarbiyani yo'lga qo'yish",
+    "Iqtidorli o'quvchilarni aniqlash, ularni fan olimpiadalari va ijodiy tanlovlarga tayyorlash",
+    "Pedagog kadrlar malakasini muntazam oshirish va zamonaviy o'qitish metodikalarini joriy etish",
+    "Ta'lim muassasalari moddiy-texnik bazasi va raqamli infratuzilmasini mustahkamlash",
+    "Ota-onalar, fuqarolar va jamoatchilik bilan ochiq muloqot hamda hamkorlikni rivojlantirish"
   ],
   branches: [
     {
       id: "br-1",
-      name: "Umumiy o'rta ta'lim tashkilotlari faoliyatini muvofiqlashtirish sho'basi",
+      name: "O'quv-metodik ta'minot va sifat nazorati bo'limi",
       head: "Matyoqubov Shuxratbek Qadamovich",
       phone: "+998 (62) 352-16-40",
       staffCount: 6,
-      description: "Tumandagi 54 ta umumta'lim maktablarida o'quv-tarbiya jarayoni, darsliklar ta'minoti va monitoringni amalga oshiradi."
+      description: "Ta'lim jarayonini metodik muvofiqlashtirish, o'quv dasturlari ijrosi va bilim sifatini monitoring qilish."
     },
     {
       id: "br-2",
-      name: "Maktabgacha ta'lim tashkilotlari faoliyatini muvofiqlashtirish sho'basi",
-      head: "Sobirova Gulchehra Karimova",
+      name: "Maktabgacha va boshlang'ich tayyorlov yo'nalishi",
+      head: "Sobirova Gulchehra Karimovna",
       phone: "+998 (62) 352-18-12",
       staffCount: 5,
-      description: "Davlat va oilaviy nodavlat MTTlar faoliyatini muvofiqlashtirish, qabul va metodik yordam ko'rsatish."
+      description: "Ilk rivojlanish dasturlari, bolalarni maktabga sifatli tayyorlash va pedagogik ko'mak ko'rsatish."
     },
     {
       id: "br-3",
-      name: "Pedagogik mahorat va xalqaro baholash bo'yicha metodika sho'basi",
+      name: "Innovatsiyalar, PISA va xalqaro baholash markazi",
       head: "Qutlimuratov Anvar Omonovich",
       phone: "+998 (62) 352-15-77",
       staffCount: 8,
-      description: "Fan o'qituvchilari uchun seminar-treninglar, yangi pedagogik texnologiyalar va PISA/TIMSS tayyorgarligi."
+      description: "O'qituvchilar uchun seminar-treninglar, raqamli texnologiyalar va xalqaro baholash dasturlariga tayyorgarlik."
     },
     {
       id: "br-4",
-      name: "Moliya-iqtisodiyot va davlat xaridlari bo'limi",
+      name: "Moliya-iqtisodiyot va moddiy-texnik ta'minot bo'limi",
       head: "Bekchanov Mansurbek Shokirovich",
       phone: "+998 (62) 352-12-30",
       staffCount: 4,
-      description: "Ta'lim muassasalarini moliyalashtirish, o'qituvchilar oylik maoshlari va moddiy ta'minot masalalari."
+      description: "Tashkilotni moliyalashtirish, moddiy-texnik ta'minot va infratuzilmani rivojlantirish masalalari."
     },
     {
       id: "br-5",
-      name: "Inson resurslari va kadrlar boshqaruvi sho'basi",
+      name: "Inson resurslari va kadrlar bilan ishlash bo'limi",
       head: "Ro'zimov Ilhom Qodirovich",
       phone: "+998 (62) 352-19-15",
       staffCount: 3,
-      description: "Pedagog va rahbar xodimlar hisobi, attestatsiya va bo'sh ish o'rinlari monitoringi."
+      description: "Pedagog va mutaxassis kadrlar hisobi, attestatsiya jarayonlari va bo'sh ish o'rinlari."
     }
+  ],
+
+  // Muassasalar / Bo'linmalar bo'limi
+  orgsKicker: "Ta'lim muassasalari tarmog'i",
+  orgsTitle: "Ta'lim muassasalari va bo'linmalar katalogi",
+  orgsSubtitle: "Tashkilot tizimidagi barcha muassasalar ma'lumotlari, manzillari va mas'ul rahbarlari",
+  orgsFilterAllLabel: "Barchasi",
+  orgsFilterSchoolLabel: "Maktablar",
+  orgsFilterKindergartenLabel: "Bog'chalar - MTT",
+  orgsFilterSpecializedLabel: "Ixtisoslashgan",
+
+  // Hujjatlar bo'limi
+  docsKicker: "Me'yoriy baza",
+  docsTitle: "Me'yoriy-huquqiy hujjatlar va buyruqlar",
+  docsSubtitle: "Tashkilot nizomlari, ichki buyruqlar, o'quv dasturlari va rasmiy qarorlar",
+  docCategories: [
+    "Tashkilot buyruqlari",
+    "Vazirlik buyruqlari",
+    "Hokim qarorlari",
+    "Nizom va qoidalar",
+    "O'quv dasturlari"
+  ],
+
+  // Yangiliklar bo'limi
+  newsKicker: "Axborot xizmati",
+  newsTitle: "Yangiliklar va rasmiy xabarlar",
+  newsSubtitle: "Ta'lim tashkiloti hayotidagi muhim voqealar, tadbirlar va rasmiy e'lonlar",
+  newsCategories: [
+    "Boshqaruv",
+    "MTT",
+    "Pedagogika",
+    "Olimpiada",
+    "Tadbirlar",
+    "E'lon"
+  ],
+
+  // Virtual qabulxona
+  receptionKicker: "Fuqarolar bilan muloqot",
+  receptionTitle: "Rahbariyat virtual qabulxonasi",
+  receptionSubtitle: "Ta'lim tashkiloti rahbariyatiga to'g'ridan-to'g'ri elektron murojaat yo'llang va ijro holatini kuzating",
+  receptionTargets: [
+    "Ta'lim tashkiloti rahbariyati",
+    "O'quv-metodik bo'lim",
+    "Maktabgacha va boshlang'ich yo'nalish",
+    "Kadrlar va qabul bo'limi"
+  ],
+
+  // Aloqa va xarita
+  contactKicker: "Bog'lanish",
+  contactTitle: "Ta'lim tashkiloti bilan aloqa",
+  contactSubtitle: "Manzilimiz, qabulxona telefonlari va ijtimoiy tarmoqlardagi rasmiy sahifalarimiz",
+  contactAddressLabel: "Tashkilot manzili:",
+  landmarkText: "Mo'ljal: Markaziy maydon va axborot-resurs markazi yaqinida",
+  mapAreaTitle: "Tashkilot joylashuvi",
+  mapAreaDesc: "Tashkilot bosh binosi Mustaqillik ko'chasida, markaziy istirohat bog'i ro'parasida joylashgan.",
+  mapTransportLabel: "Jamoat transporti:",
+  mapTransportText: "Shahar va tuman markaziy yo'nalishli avtobuslari (\"Markaz\" bekati)",
+  mapExternalUrl: "https://yandex.uz/maps",
+
+  // Footer
+  footerDisclaimer: "Saytdan olingan barcha axborotlardan foydalanilganda Ta'lim tashkiloti rasmiy veb-saytiga havola berilishi shart.",
+  footerCopyright: "Ta'lim tashkiloti. Barcha huquqlar himoyalangan.",
+  governmentLinks: [
+    { id: "gl-1", title: "O'zbekiston Respublikasi Prezidenti", url: "https://president.uz" },
+    { id: "gl-2", title: "Hukumat portali (gov.uz)", url: "https://gov.uz" },
+    { id: "gl-3", title: "Ta'lim tizimi rasmiy portali", url: "https://gov.uz/oz/edu" },
+    { id: "gl-4", title: "Yagona interaktiv davlat xizmatlari (my.gov.uz)", url: "https://my.gov.uz" },
+    { id: "gl-5", title: "Ta'lim sifatini nazorat qilish inspeksiyasi", url: "https://tdi.uz" },
+    { id: "gl-6", title: "Xorazm viloyati hokimligi", url: "https://xorazm.uz" }
+  ],
+
+  // Gmail bilan admin panelga kirish ruxsati berilgan hisoblar
+  allowedAdminEmails: [
+    "burgutsony@gmail.com"
   ],
 
   // Telegram, Facebook va Instagram ijtimoiy tarmoqlariga avtomatik yuborish sozlamalari
   telegramBotToken: "",
-  telegramChannelUsername: "@qoshkopir_mmtb",
+  telegramChannelUsername: "@talim_tashkiloti",
   telegramAutoPublish: true,
   facebookPageId: "",
   facebookPageToken: "",
   facebookAutoPublish: false,
-  instagramPage: "https://instagram.com/qoshkopir_mmtb",
+  instagramPage: "https://instagram.com/talim_tashkiloti",
   instagramAccountId: "",
   instagramAccessToken: "",
   instagramAutoPublish: false
@@ -147,39 +313,39 @@ export const INITIAL_LEADERS: Leader[] = [
   {
     id: "lead-1",
     name: "Raximov Mansur Davlatovich",
-    position: "Bo'lim boshlig'i",
-    department: "Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi",
+    position: "Tashkilot direktori",
+    department: "Qo'shko'pir Ta'lim Tashkiloti",
     phone: "+998 (62) 352-14-25",
-    email: "m.raximov@qoshkopir-edu.uz",
+    email: "m.raximov@talim-tashkiloti.uz",
     receptionDays: "Har haftaning chorshanba va juma kunlari",
     receptionHours: "10:00 - 12:00",
-    bio: "Pedagogika fanlari bo'yicha falsafa doktori (PhD). Ta'lim sohasida 22 yildan ortiq tajribaga ega. Tuman umumta'lim tizimini raqamlashtirish va maktabgacha ta'lim qamrovini 85% ga oshirish tashabbuskori.",
+    bio: "Pedagogika fanlari bo'yicha falsafa doktori (PhD). Ta'lim sohasida 22 yildan ortiq tajribaga ega. Ta'lim jarayonini raqamlashtirish va innovatsion metodikalarni joriy etish tashabbuskori.",
     photoUrl: headPortrait,
     order: 1
   },
   {
     id: "lead-2",
     name: "Matyoqubov Shuxratbek Qadamovich",
-    position: "Bo'lim boshlig'i o'rinbosari - Maktablar faoliyatini muvofiqlashtirish sho'basi mudiri",
-    department: "Umumiy o'rta ta'lim sho'basi",
+    position: "Direktor o'rinbosari — O'quv-metodik bo'lim boshlig'i",
+    department: "O'quv-metodik yo'nalish",
     phone: "+998 (62) 352-16-40",
-    email: "sh.matyoqubov@qoshkopir-edu.uz",
+    email: "sh.matyoqubov@talim-tashkiloti.uz",
     receptionDays: "Har haftaning seshanba va payshanba kunlari",
     receptionHours: "14:00 - 17:00",
-    bio: "Oliy toifali matematika fani o'qituvchisi. Tuman maktablarida aniq fanlar chuqurlashtirilgan sinflari va olimpiada markazlarini tashkil etish bo'yicha mas'ul rahbar.",
+    bio: "Oliy toifali matematika fani o'qituvchisi. Aniq fanlarni chuqurlashtirib o'qitish va olimpiada markazlarini rivojlantirish bo'yicha mas'ul rahbar.",
     photoUrl: headPortrait,
     order: 2
   },
   {
     id: "lead-3",
-    name: "Sobirova Gulchehra Karimova",
-    position: "Maktabgacha ta'lim tashkilotlari faoliyatini muvofiqlashtirish sho'basi mudiri",
-    department: "Maktabgacha ta'lim sho'basi",
+    name: "Sobirova Gulchehra Karimovna",
+    position: "Maktabgacha va boshlang'ich tayyorlov bo'limi rahbari",
+    department: "Tayyorlov yo'nalishi",
     phone: "+998 (62) 352-18-12",
-    email: "g.sobirova@qoshkopir-edu.uz",
+    email: "g.sobirova@talim-tashkiloti.uz",
     receptionDays: "Har haftaning dushanba va chorshanba kunlari",
     receptionHours: "09:00 - 12:00",
-    bio: "Maktabgacha ta'lim a'lochisi. Davlat va nodavlat MTTlar tarmog'ini rivojlantirish hamda 'Aqlvoy' dasturi joriy etilishi bo'yicha yetakchi mutaxassis.",
+    bio: "Ta'lim sohasi a'lochisi. Zamonaviy ilk rivojlanish dasturlari va 'Ilk qadam' metodikasini joriy etish bo'yicha yetakchi mutaxassis.",
     photoUrl: headPortrait,
     order: 3
   }
@@ -188,11 +354,11 @@ export const INITIAL_LEADERS: Leader[] = [
 export const INITIAL_NEWS: NewsItem[] = [
   {
     id: "news-1",
-    title: "Qo'shko'pir tumanida yangi innovatsion maktab binosi foydalanishga topshirildi",
+    title: "Yangi innovatsion o'quv majmuasi foydalanishga topshirildi",
     category: "Boshqaruv",
     date: "2026-11-08",
-    summary: "Tumanning Shixmashhad mahallasida 660 o'ringa mo'ljallangan zamonaviy 14-sonli umumiy o'rta ta'lim maktabining yangi binosi tantanali ravishda ochildi.",
-    content: "O'zbekiston Respublikasi Prezidentining ta'lim sifatini oshirish va maktab infratuzilmasini yaxshilashga doir qarorlari ijrosi doirasida Qo'shko'pir tumanida navbatdagi zamonaviy ta'lim muassasasi qad rostladi. Yangi maktab binosida eng so'nggi rusumdagi STEM laboratoriyalari, interaktiv multimedia sinfxonalari, keng sport zali va zamonaviy kutubxona mavjud. Ochilish marosimida tuman hokimligi, viloyat va tuman maktabgacha va maktab ta'limi bo'limi rahbariyati, nuroniylar hamda ota-onalar ishtirok etishdi.",
+    summary: "660 o'ringa mo'ljallangan zamonaviy 14-sonli ta'lim muassasasining yangi o'quv korpusi tantanali ravishda ochildi.",
+    content: "Ta'lim sifatini oshirish va zamonaviy infratuzilmani yaxshilash dasturi doirasida navbatdagi zamonaviy o'quv korpusi qad rostladi. Yangi binoda eng so'nggi rusumdagi STEM laboratoriyalari, interaktiv multimedia sinfxonalari, keng sport zali va zamonaviy kutubxona mavjud. Ochilish marosimida tashkilot rahbariyati, pedagoglar jamoasi, nuroniylar hamda ota-onalar ishtirok etishdi.",
     imageUrl: heroImage,
     author: "Matbuot xizmati",
     views: 1240,
@@ -200,13 +366,13 @@ export const INITIAL_NEWS: NewsItem[] = [
   },
   {
     id: "news-2",
-    title: "Tumandagi 42 ta davlat va xususiy MTTlarda zamonaviy 'Ilk qadam' dasturi takomillashtirilmoqda",
+    title: "Maktabgacha ta'lim maskanlarida zamonaviy 'Ilk qadam' dasturi takomillashtirilmoqda",
     category: "MTT",
     date: "2026-11-05",
-    summary: "Maktabgacha yoshdagi bolalarni sifatli ta'lim bilan qamrab olish ko'rsatkichi Qo'shko'pirda 85 foizga yetkazildi.",
-    content: "Bo'limning maktabgacha ta'lim sho'basi tashabbusi bilan tuman markazidagi 5-sonli 'Mitti Qadamlar' davlat maktabgacha ta'lim tashkilotida seminar-trening tashkil etildi. Treningda tarbiyachilar yangi interaktiv didaktik o'yinlar, bolalarni maktabga tayyorlashning zamonaviy metodikalari hamda sensor rivojlanish vositalarini amaliyotda qo'llash ko'nikmalarini mustahkamladilar.",
+    summary: "Maktabgacha yoshdagi bolalarni sifatli ta'lim bilan qamrab olish va maktabga tayyorlash bo'yicha seminar-trening o'tkazildi.",
+    content: "Tashkilotning metodika bo'limi tashabbusi bilan 5-sonli 'Mitti Qadamlar' ta'lim maskanida seminar-trening tashkil etildi. Treningda tarbiyachilar yangi interaktiv didaktik o'yinlar, bolalarni maktabga tayyorlashning zamonaviy metodikalari hamda sensor rivojlanish vositalarini amaliyotda qo'llash ko'nikmalarini mustahkamladilar.",
     imageUrl: preschoolBuilding,
-    author: "Maktabgacha ta'lim sho'basi",
+    author: "Metodika bo'limi",
     views: 890,
     isPinned: true
   },
@@ -215,22 +381,22 @@ export const INITIAL_NEWS: NewsItem[] = [
     title: "Pedagoglar forumi: Xalqaro baholash PISA va TIMSS mezonlariga tayyorgarlik masalalari muhokama qilindi",
     category: "Pedagogika",
     date: "2026-10-29",
-    summary: "Qo'shko'pir tumanidagi 500 dan ortiq yetakchi fan o'qituvchilari ishtirokida ilmiy-amaliy anjuman bo'lib o'tdi.",
-    content: "O'quvchilarning mantiqiy, tanqidiy fikrlashini o'stirish, fanlararo integratsiyani ta'minlash va yangi darsliklar bilan ishlash bo'yicha mahorat darslari o'tkazildi. Forum yakunida yuqori natijalarga erishgan 25 nafar fidoiy o'qituvchi bo'limning faxriy yorliqlari va esdalik sovg'alari bilan taqdirlandi.",
+    summary: "500 dan ortiq yetakchi fan o'qituvchilari ishtirokida ilmiy-amaliy anjuman bo'lib o'tdi.",
+    content: "O'quvchilarning mantiqiy, tanqidiy fikrlashini o'stirish, fanlararo integratsiyani ta'minlash va yangi darsliklar bilan ishlash bo'yicha mahorat darslari o'tkazildi. Forum yakunida yuqori natijalarga erishgan 25 nafar fidoiy o'qituvchi tashkilotning faxriy yorliqlari va esdalik sovg'alari bilan taqdirlandi.",
     imageUrl: conferenceImage,
-    author: "Metodika sho'basi",
+    author: "O'quv-metodik markaz",
     views: 645,
     isPinned: false
   },
   {
     id: "news-4",
-    title: "Asosiy fan olimpiadasining tuman bosqichida 142 nafar iqtidorli o'quvchi g'oliblikni qo'lga kiritdi",
+    title: "Asosiy fan olimpiadasining saralash bosqichida 142 nafar iqtidorli o'quvchi g'oliblikni qo'lga kiritdi",
     category: "Olimpiada",
     date: "2026-10-21",
-    summary: "Matematika, fizika, kimyo va xorijiy tillar yo'nalishlarida Qo'shko'pir yoshlari yuqori bilim saviyasini namoyon qildilar.",
-    content: "G'olib o'quvchilar endi viloyat bosqichida tuman sharafini himoya qiladilar. Eng yuqori natijani 1-sonli ixtisoslashtirilgan maktab-internati hamda 14-sonli umumiy o'rta ta'lim maktabi o'quvchilari qayd etishdi.",
+    summary: "Matematika, fizika, kimyo va xorijiy tillar yo'nalishlarida yoshlar yuqori bilim saviyasini namoyon qildilar.",
+    content: "G'olib o'quvchilar endi keyingi bosqichda tashkilot sharafini himoya qiladilar. Eng yuqori natijani 1-sonli ixtisoslashtirilgan maktab-internati hamda 14-sonli umumiy o'rta ta'lim maktabi o'quvchilari qayd etishdi.",
     imageUrl: heroImage,
-    author: "Iqtidorli yoshlar sho'basi",
+    author: "Iqtidorli yoshlar bo'limi",
     views: 780,
     isPinned: false
   }
@@ -242,136 +408,143 @@ export const INITIAL_ORGANIZATIONS: Organization[] = [
     type: "mtt",
     number: 12,
     name: "12-sonli 'Kamalak' davlat maktabgacha ta'lim tashkiloti",
-    address: "Qo'shko'pir tumani, G'azovot qishlog'i",
+    address: "G'azovot qishlog'i",
     mahalla: "G'azovot mahallasi",
     director: "Ibragimova Nodira Qodirovna",
     phone: "+998 (62) 352-18-12",
-    email: "mtt12.qoshkopir@edu.uz",
+    email: "mtt12@talim-tashkiloti.uz",
     studentsCount: 190,
     teachersCount: 22,
     shifts: 1,
     establishedYear: 2020,
     rating: 4.7,
-    photoUrl: preschoolBuilding
+    photoUrl: preschoolBuilding,
+    description: "Bolalarni har tomonlama rivojlantirish va maktabga sifatli tayyorlash maskani"
   },
   {
     id: "org-1",
     type: "maktab",
     number: 1,
-    name: "1-son maktab",
-    address: "Shaxarda",
+    name: "1-son umumta'lim maktabi",
+    address: "Markaziy ko'cha, 10-uy",
     mahalla: "Markaz",
     director: "Avezov Furqatbek",
     phone: "+998 (62) 352-19-02",
-    email: "maktab1.qoshkopir@edu.uz",
+    email: "maktab1@talim-tashkiloti.uz",
     studentsCount: 350,
     teachersCount: 45,
     shifts: 1,
     establishedYear: 1990,
     rating: 4.5,
-    photoUrl: heroImage
+    photoUrl: heroImage,
+    description: "Zamonaviy o'quv jihozlari va chet tillariga ixtisoslashgan sinflar"
   },
   {
     id: "sch-1",
     type: "ixtisos",
     number: 1,
     name: "1-sonli aniq va tabiiy fanlarga ixtisoslashtirilgan maktab-internati",
-    address: "Qo'shko'pir shaharchasi, Al-Xorazmiy ko'chasi, 12-uy",
+    address: "Al-Xorazmiy ko'chasi, 12-uy",
     mahalla: "Navro'z mahallasi",
     director: "Otaxonov Bobur Karimovich",
     phone: "+998 (62) 352-21-14",
-    email: "maktab1.qoshkopir@edu.uz",
+    email: "ixtisos1@talim-tashkiloti.uz",
     studentsCount: 780,
     teachersCount: 74,
     shifts: 1,
     establishedYear: 1998,
     rating: 4.9,
-    photoUrl: heroImage
+    photoUrl: heroImage,
+    description: "Matematika, fizika va biologiya fanlariga chuqurlashtirilgan tayanch maskan"
   },
   {
     id: "sch-14",
     type: "maktab",
     number: 14,
     name: "14-sonli umumiy o'rta ta'lim maktabi",
-    address: "Qo'shko'pir tumani, Shixmashhad qishlog'i",
+    address: "Shixmashhad qishlog'i",
     mahalla: "Shixmashhad mahallasi",
     director: "Yusupova Dilnoza Anvarovna",
     phone: "+998 (62) 352-33-88",
-    email: "maktab14.qoshkopir@edu.uz",
+    email: "maktab14@talim-tashkiloti.uz",
     studentsCount: 940,
     teachersCount: 68,
     shifts: 2,
     establishedYear: 1982,
     rating: 4.8,
-    photoUrl: heroImage
+    photoUrl: heroImage,
+    description: "STEM laboratoriyalari va sport majmuasiga ega namunaviy maktab"
   },
   {
     id: "sch-2",
     type: "maktab",
     number: 2,
     name: "2-sonli umumiy o'rta ta'lim maktabi",
-    address: "Qo'shko'pir shaharchasi, Mustaqillik shoh ko'chasi, 45-uy",
+    address: "Mustaqillik shoh ko'chasi, 45-uy",
     mahalla: "Markaz mahallasi",
     director: "Qalandarov Umidjon Sultonovich",
     phone: "+998 (62) 352-19-02",
-    email: "maktab2.qoshkopir@edu.uz",
+    email: "maktab2@talim-tashkiloti.uz",
     studentsCount: 1120,
     teachersCount: 85,
     shifts: 2,
     establishedYear: 1975,
     rating: 4.7,
-    photoUrl: heroImage
+    photoUrl: heroImage,
+    description: "Axborot texnologiyalari va robototexnika to'garaklari faoliyat yuritadi"
   },
   {
     id: "sch-23",
     type: "maktab",
     number: 23,
     name: "23-sonli umumiy o'rta ta'lim maktabi",
-    address: "Qo'shko'pir tumani, Xonobod qishlog'i",
+    address: "Xonobod qishlog'i",
     mahalla: "Xonobod mahallasi",
     director: "Matrasulov Otabek Baxtiyorovich",
     phone: "+998 (62) 352-44-12",
-    email: "maktab23.qoshkopir@edu.uz",
+    email: "maktab23@talim-tashkiloti.uz",
     studentsCount: 620,
     teachersCount: 48,
     shifts: 2,
     establishedYear: 1990,
     rating: 4.6,
-    photoUrl: heroImage
+    photoUrl: heroImage,
+    description: "Zamonaviy kutubxona va xorijiy tillar xonasiga ega ta'lim muassasasi"
   },
   {
     id: "mtt-5",
     type: "mtt",
     number: 5,
     name: "5-sonli 'Mitti Qadamlar' davlat maktabgacha ta'lim tashkiloti",
-    address: "Qo'shko'pir shaharchasi, Yoshlik ko'chasi, 8-uy",
+    address: "Yoshlik ko'chasi, 8-uy",
     mahalla: "Yoshlik mahallasi",
     director: "Bobojonova Sayyora Rustamovna",
     phone: "+998 (62) 352-51-09",
-    email: "mtt5.qoshkopir@edu.uz",
+    email: "mtt5@talim-tashkiloti.uz",
     studentsCount: 280,
     teachersCount: 32,
     shifts: 1,
     establishedYear: 2018,
     rating: 4.9,
-    photoUrl: preschoolBuilding
+    photoUrl: preschoolBuilding,
+    description: "'Ilk qadam' dasturi asosida faoliyat yurituvchi tayanch maskan"
   }
 ];
 
 export const INITIAL_DOCUMENTS: DocumentItem[] = [
   {
     id: "doc-1",
-    title: "2026/2027-o'quv yilida umumiy o'rta ta'lim muassasalarida ta'lim-tarbiya jarayonini tashkil etish to'g'risida",
-    docNumber: "142-sonli bo'lim buyrug'i",
+    title: "2026/2027-o'quv yilida ta'lim-tarbiya jarayonini samarali tashkil etish to'g'risida",
+    docNumber: "142-sonli tashkilot buyrug'i",
     date: "2026-08-25",
-    category: "Bo'lim buyruqlari",
+    category: "Tashkilot buyruqlari",
     fileUrl: "https://drive.google.com",
     fileSize: "1.4 MB",
     fileType: "PDF"
   },
   {
     id: "doc-2",
-    title: "Maktabgacha ta'lim tashkilotlarida bolalarning sog'lom ovqatlanishini ta'minlash standartlari",
+    title: "Ta'lim maskanlarida bolalarning sog'lom ovqatlanishi va xavfsizligini ta'minlash standartlari",
     docNumber: "88-sonli nizom",
     date: "2026-09-10",
     category: "Nizom va qoidalar",
@@ -391,8 +564,8 @@ export const INITIAL_DOCUMENTS: DocumentItem[] = [
   },
   {
     id: "doc-4",
-    title: "Qo'shko'pir tumani maktablarida yangi isitish mavsumiga tayyorgarlik ko'rish chora-tadbirlari",
-    docNumber: "Tuman hokimi 319-K qarori",
+    title: "Ta'lim muassasalarida kuz-qish mavsumiga tayyorgarlik ko'rish chora-tadbirlari",
+    docNumber: "319-K qarori",
     date: "2026-10-02",
     category: "Hokim qarorlari",
     fileUrl: "https://drive.google.com",
@@ -404,31 +577,31 @@ export const INITIAL_DOCUMENTS: DocumentItem[] = [
 export const INITIAL_APPEALS: CitizenAppeal[] = [
   {
     id: "app-101",
-    trackingCode: "QSP-2026-4412",
+    trackingCode: "ORG-2026-4412",
     fullName: "Davlatov Anvar Ilhomovich",
     phone: "+998 91 422 10 20",
     email: "anvar.d@mail.uz",
-    address: "Qo'shko'pir tumani, Shixmashhad mahallasi",
+    address: "Shixmashhad mahallasi",
     organizationType: "14-sonli maktab",
     subject: "1-sinfga qabul bo'yicha hujjatlar qabuli muddati",
-    message: "Assalomu alaykum. Farzandimni 14-sonli maktabga 1-sinfga elektron tizim orqali ariza berish jarayonida mikrohudud bo'yicha qanday qo'shimcha ma'lumotnoma talab etiladi?",
+    message: "Assalomu alaykum. Farzandimni 14-sonli maktabga 1-sinfga elektron tizim orqali ariza berish jarayonida qanday qo'shimcha ma'lumotnoma talab etiladi?",
     date: "2026-11-04",
     status: "ijro_etildi",
-    replyMessage: "Hurmatli fuqaro! Vazirlik nizomiga muvofiq, mikrohudud bo'yicha qabulda faqat bolaning tug'ilganlik haqidagi guvohnomasi va ota-onaning pasport ma'lumotlari elektron tizim orqali avtomatik tekshiriladi. Ortiqcha qog'oz ma'lumotnomalar talab etilmaydi.",
+    replyMessage: "Hurmatli fuqaro! Nizomga muvofiq, qabulda faqat bolaning tug'ilganlik haqidagi guvohnomasi va ota-onaning pasport ma'lumotlari elektron tizim orqali avtomatik tekshiriladi.",
     replyDate: "2026-11-06",
-    officer: "Bo'lim boshlig'i o'rinbosari Sh.Matyoqubov"
+    officer: "Direktor o'rinbosari Sh.Matyoqubov"
   },
   {
     id: "app-102",
-    trackingCode: "QSP-2026-5893",
+    trackingCode: "ORG-2026-5893",
     fullName: "Karimova Ziyoda Bahromovna",
     phone: "+998 93 711 34 55",
-    address: "Qo'shko'pir shaharchasi, Yoshlik mahallasi",
+    address: "Yoshlik mahallasi",
     organizationType: "5-sonli MTT",
-    subject: "Bog'chaga navbat holatini tasdiqlash",
-    message: "Salom, 5-sonli 'Mitti qadamlar' bog'chasiga my.gov.uz orqali ariza qoldirgan edim. Qabul vaqti va guruhlar shakllantirilishi haqida ma'lumot bersangiz.",
+    subject: "Qabul navbati holatini tasdiqlash",
+    message: "Salom, 5-sonli 'Mitti qadamlar' maskaniga my.gov.uz orqali ariza qoldirgan edim. Qabul vaqti va guruhlar shakllantirilishi haqida ma'lumot bersangiz.",
     date: "2026-11-08",
     status: "jarayonda",
-    officer: "Maktabgacha ta'lim sho'basi mudiri G.Sobirova"
+    officer: "Tayyorlov yo'nalishi rahbari G.Sobirova"
   }
 ];

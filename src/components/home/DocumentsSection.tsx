@@ -3,16 +3,15 @@ import { FileText, Download, Search, Calendar } from 'lucide-react';
 import { usePortal } from '../../context/PortalContext';
 
 export const DocumentsSection: React.FC = () => {
-  const { documents, t } = usePortal();
+  const { settings, documents, t } = usePortal();
   const [selectedCategory, setSelectedCategory] = useState<string>('Barchasi');
   const [searchQuery, setSearchQuery] = useState('');
 
   const categories = [
     'Barchasi',
-    'Bo\'lim buyruqlari',
-    'Vazirlik buyruqlari',
-    'Hokim qarorlari',
-    'Nizom va qoidalar'
+    ...(settings.docCategories && settings.docCategories.length > 0
+      ? settings.docCategories
+      : ['Tashkilot buyruqlari', 'Vazirlik buyruqlari', 'Nizom va qoidalar'])
   ];
 
   const filteredDocs = documents.filter(doc => {
@@ -29,13 +28,13 @@ export const DocumentsSection: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div>
             <span className="text-xs uppercase tracking-wider font-semibold text-sky-800">
-              {t("Qonunchilik bazasi")}
+              {t(settings.docsKicker || "Qonunchilik bazasi")}
             </span>
             <h2 className="text-2xl font-bold text-slate-900 mt-1">
-              {t("Me'yoriy-huquqiy hujjatlar va buyruqlar")}
+              {t(settings.docsTitle || "Me'yoriy-huquqiy hujjatlar va buyruqlar")}
             </h2>
             <p className="text-slate-600 text-sm mt-1">
-              {t("Vazirlik qarorlari, tuman hokimi qarorlari hamda bo'limning rasmiy buyruqlari")}
+              {t(settings.docsSubtitle)}
             </p>
           </div>
 

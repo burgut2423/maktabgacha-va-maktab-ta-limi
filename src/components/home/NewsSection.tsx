@@ -24,7 +24,7 @@ interface NewsSectionProps {
 }
 
 export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelectNews }) => {
-  const { news, speakText, t } = usePortal();
+  const { settings, news, speakText, t } = usePortal();
   const [selectedCategory, setSelectedCategory] = useState<string>('Barchasi');
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState<boolean>(false);
@@ -49,7 +49,12 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
     }, 210);
   }, [isClosingLightbox]);
 
-  const categories = ['Barchasi', 'Boshqaruv', 'MTT', 'Pedagogika', 'Olimpiada', 'E\'lon'];
+  const categories = [
+    'Barchasi',
+    ...(settings.newsCategories && settings.newsCategories.length > 0
+      ? settings.newsCategories
+      : ['Boshqaruv', 'MTT', 'Pedagogika', 'Olimpiada', 'E\'lon'])
+  ];
 
   const filteredNews = selectedCategory === 'Barchasi'
     ? news
@@ -114,13 +119,13 @@ export const NewsSection: React.FC<NewsSectionProps> = ({ selectedNews, onSelect
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div>
             <span className="text-xs uppercase tracking-wider font-semibold text-sky-800">
-              {t("Axborot xizmati")}
+              {t(settings.newsKicker || "Axborot xizmati")}
             </span>
             <h2 className="text-2xl font-bold text-slate-900 mt-1">
-              {t("Yangiliklar va rasmiy xabarlar")}
+              {t(settings.newsTitle || "Yangiliklar va rasmiy xabarlar")}
             </h2>
             <p className="text-slate-600 text-sm mt-1">
-              {t("Qo'shko'pir tumani maktabgacha va maktab ta'limi tizimidagi muhim voqealar")}
+              {t(settings.newsSubtitle)}
             </p>
           </div>
 

@@ -41,13 +41,13 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
   const [accessibilityOpen, setAccessibilityOpen] = useState(false);
 
   const navItems = [
-    { id: 'asosiy', label: t('Asosiy') },
-    { id: 'bolim-haqida', label: t("Bo'lim haqida") },
-    { id: 'muassasalar', label: t('Maktab va MTTlar') },
-    { id: 'hujjatlar', label: t('Hujjatlar') },
-    { id: 'yangiliklar', label: t('Yangiliklar') },
-    { id: 'murojaat', label: t('Virtual qabulxona') },
-    { id: 'aloqa', label: t('Aloqa') },
+    { id: 'asosiy', label: t(settings.navLabels?.home || 'Asosiy') },
+    { id: 'bolim-haqida', label: t(settings.navLabels?.about || 'Tashkilot haqida') },
+    { id: 'muassasalar', label: t(settings.navLabels?.orgs || 'Muassasalar') },
+    { id: 'hujjatlar', label: t(settings.navLabels?.docs || 'Hujjatlar') },
+    { id: 'yangiliklar', label: t(settings.navLabels?.news || 'Yangiliklar') },
+    { id: 'murojaat', label: t(settings.navLabels?.reception || 'Virtual qabulxona') },
+    { id: 'aloqa', label: t(settings.navLabels?.contact || 'Aloqa') },
   ];
 
   const handleNavClick = (id: string) => {
@@ -59,25 +59,29 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
     if (isSpeaking) {
       stopSpeaking();
     } else {
-      speakText(t(`${settings.districtName}. Rasmiy davlat portali. Ishonch telefoni: ${settings.trustPhone}`));
+      speakText(t(`${settings.districtName}. ${settings.portalSubtitle}. Ishonch telefoni: ${settings.trustPhone}`));
     }
   };
 
   return (
     <header className="w-full bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
-      {/* 1. Top Accessibility and State Ribbon (Gov.uz standard) */}
+      {/* 1. Top Accessibility and State Ribbon */}
       <div className="bg-slate-900 text-slate-200 text-xs py-1.5 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          {/* Left: State Portal Indicator */}
+          {/* Left: Portal Identity Indicator */}
           <div className="flex items-center gap-2 truncate">
             <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" title={t("Rasmiy portal faol")} />
             <span className="truncate font-medium text-slate-300">
-              {t("O'zbekiston Respublikasi Maktabgacha va maktab ta'limi vazirligi")}
+              {t(settings.supervisingOrg)}
             </span>
-            <span className="hidden md:inline text-slate-500">|</span>
-            <span className="hidden md:inline text-slate-400 truncate">
-              {t("Xorazm viloyati Qo'shko'pir tumani bo'limi")}
-            </span>
+            {settings.regionLabel && (
+              <>
+                <span className="hidden md:inline text-slate-500">|</span>
+                <span className="hidden md:inline text-slate-400 truncate">
+                  {t(settings.regionLabel)}
+                </span>
+              </>
+            )}
           </div>
 
           {/* Right: Accessibility & Hotline Tools */}
@@ -224,15 +228,19 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
             referrerPolicy="no-referrer"
           />
           <div className="flex flex-col">
-            <span className="text-xs uppercase tracking-wider font-semibold text-sky-800">
-              {t("Xorazm viloyati")}
-            </span>
+            {settings.regionLabel && (
+              <span className="text-xs uppercase tracking-wider font-semibold text-sky-800">
+                {t(settings.regionLabel)}
+              </span>
+            )}
             <span className="text-base sm:text-lg font-bold text-slate-900 tracking-tight leading-snug">
-              {t("Qo'shko'pir Tumani Maktabgacha va Maktab Ta'limi Bo'limi")}
+              {t(settings.districtName)}
             </span>
-            <span className="text-xs text-slate-500 hidden sm:block">
-              {t("Rasmiy axborot va xizmatlar portali")}
-            </span>
+            {settings.portalSubtitle && (
+              <span className="text-xs text-slate-500 hidden sm:block">
+                {t(settings.portalSubtitle)}
+              </span>
+            )}
           </div>
         </div>
 
@@ -252,7 +260,7 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
             onClick={() => onNavigate('murojaat')}
             className="px-4 py-2 text-xs font-semibold text-white bg-sky-700 hover:bg-sky-800 rounded-md transition-colors shadow-xs"
           >
-            {t("Virtual qabulxona")}
+            {t(settings.navLabels?.reception || "Virtual qabulxona")}
           </button>
 
           <button
@@ -309,7 +317,7 @@ export const HeaderGov: React.FC<HeaderGovProps> = ({ onOpenAdmin, onNavigate, a
           </ul>
 
           <div className="flex items-center gap-3 text-xs text-sky-200">
-            <span className="hidden xl:inline">{t("Ish vaqti: Dush-Juma 09:00 - 18:00")}</span>
+            <span className="hidden xl:inline">{t(settings.workingHoursShort || settings.workingHours)}</span>
           </div>
         </div>
       </nav>

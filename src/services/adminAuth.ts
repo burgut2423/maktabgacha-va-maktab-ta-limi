@@ -178,18 +178,19 @@ export function resetFailedAttempts(): void {
 }
 
 /**
- * Xavfsiz sessiya yaratish
+ * Xavfsiz sessiya yaratish (Login & Parol)
  */
 export function createAdminSession(rememberMe: boolean = false): void {
   const sessionData = {
     authenticated: true,
-    user: 'MMTB Administrator',
+    authType: 'password' as const,
+    user: 'Tashkilot Administratori',
     loginTime: Date.now(),
     expiresAt: rememberMe ? Date.now() + 24 * 3600 * 1000 : Date.now() + 4 * 3600 * 1000,
     signature: window.crypto.randomUUID ? window.crypto.randomUUID() : Math.random().toString(36).substring(2)
   };
 
-  const payload = btoa(JSON.stringify(sessionData));
+  const payload = btoa(unescape(encodeURIComponent(JSON.stringify(sessionData))));
   if (rememberMe) {
     localStorage.setItem(SESSION_KEY, payload);
   }
@@ -197,23 +198,86 @@ export function createAdminSession(rememberMe: boolean = false): void {
 }
 
 /**
+ * Gmail orqali tasdiqlangan Admin sessiyasini yaratish
+ */
+export function createGoogleAdminSession(
+  email: string,
+  displayName?: string,
+  rememberMe: boolean = true
+): void {
+  const sessionData = {
+    authenticated: true,
+    authType: 'google' as const,
+    email: email.trim().toLowerCase(),
+    user: displayName || email,
+    loginTime: Date.now(),
+    expiresAt: rememberMe ? Date.now() + 24 * 3600 * 1000 : Date.now() + 4 * 3600 * 1000,
+    signature: window.crypto.randomUUID ? window.crypto.randomUUID() : Math.random().toString(36).substring(2)
+  };
+
+  const payload = btoa(unescape(encodeURIComponent(JSON.stringify(sessionData))));
+  if (rememberMe) {
+    localStorage.setItem(SESSION_KEY, payload);
+  }
+  sessionStorage.setItem(SESSION_KEY, payload);
+}
+
+/**
+ * Foydalanuvchi Gmail manzili adminlar ro'yxatida borligini tekshirish
+ */
+export function isEmailAllowedAdmin(
+  email: string | null | undefined,
+  allowedEmails?: string[]
+): boolean {
+  if (!email) return false;
+  const normalized = email.trim().toLowerCase();
+  const effectiveList = (allowedEmails && allowedEmails.length > 0)
+    ? allowedEmails
+    : ['burgutsony@gmail.com'];
+  return effectiveList.some(item => String(item || '').trim().toLowerCase() === normalized);
+}
+
+/**
+ * Joriy admin sessiyasi haqida ma'lumot olish
+ */
+export function getAdminSessionInfo(): {
+  authenticated: boolean;
+  authType?: 'password' | 'google';
+  email?: string;
+  user?: string;
+} | null {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY) || localStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+
+    let decoded = '';
+    try {
+      decoded = decodeURIComponent(escape(atob(raw)));
+    } catch {
+      decoded = atob(raw);
+    }
+
+    const data = JSON.parse(decoded);
+    if (data.authenticated && data.expiresAt && Date.now() < data.expiresAt) {
+      return {
+        authenticated: true,
+        authType: data.authType || 'password',
+        email: data.email,
+        user: data.user
+      };
+    }
+    destroyAdminSession();
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Sessiya faolligini tekshirish
  */
 export function checkAdminSession(): boolean {
-  try {
-    const raw = sessionStorage.getItem(SESSION_KEY) || localStorage.getItem(SESSION_KEY);
-    if (!raw) return false;
-
-    const data = JSON.parse(atob(raw));
-    if (data.authenticated && data.expiresAt && Date.now() < data.expiresAt) {
-      return true;
-    }
-    // Muddati o'tgan bo'lsa
-    destroyAdminSession();
-    return false;
-  } catch {
-    return false;
-  }
+  return Boolean(getAdminSessionInfo()?.authenticated);
 }
 
 /**

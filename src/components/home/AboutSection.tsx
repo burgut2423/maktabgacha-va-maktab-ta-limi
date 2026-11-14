@@ -8,37 +8,57 @@ import {
   Phone,
   Mail,
   CheckCircle2,
-  BookOpen
+  BookOpen,
+  Edit3
 } from 'lucide-react';
 import { usePortal } from '../../context/PortalContext';
+import { checkAdminSession } from '../../services/adminAuth';
 
-export const AboutSection: React.FC = () => {
+interface AboutSectionProps {
+  onEditAbout?: () => void;
+}
+
+export const AboutSection: React.FC<AboutSectionProps> = ({ onEditAbout }) => {
   const { settings, leaders, t } = usePortal();
   const [activeTab, setActiveTab] = useState<'rahbariyat' | 'tuzilma' | 'vazifalar' | 'tarix'>('rahbariyat');
+  const isAdminLoggedIn = checkAdminSession();
 
   return (
     <section id="bolim-haqida" className="py-12 bg-white border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-8">
-          <span className="text-xs uppercase tracking-wider font-semibold text-sky-800">
-            {t("Bo'lim faoliyati")}
-          </span>
+        <div className="text-center max-w-3xl mx-auto mb-8 relative">
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-xs uppercase tracking-wider font-semibold text-sky-800">
+              {t(settings.aboutKicker || "Tashkilot faoliyati")}
+            </span>
+            {isAdminLoggedIn && onEditAbout && (
+              <button
+                type="button"
+                onClick={onEditAbout}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 text-[11px] font-semibold transition-colors cursor-pointer"
+                title={t("Admin panel orqali ushbu bo'limni tahrirlash")}
+              >
+                <Edit3 className="w-3 h-3" />
+                <span>{t("Tahrirlash")}</span>
+              </button>
+            )}
+          </div>
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
-            {t("Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi haqida")}
+            {t(settings.aboutTitle || settings.districtName)}
           </h2>
           <p className="text-slate-600 text-sm mt-2 leading-relaxed">
-            {t(settings.departmentMission || "Tumanda ta'lim sifatini oshirish, barkamol va ma'rifatli yoshlarni tarbiyalash bo'yicha tashkiliy tizim")}
+            {t(settings.departmentMission)}
           </p>
         </div>
 
         {/* Navigation Tabs */}
         <div className="flex items-center justify-center gap-2 mb-8 border-b border-slate-200 pb-3 overflow-x-auto">
           {[
-            { id: 'rahbariyat', label: t(`Bo'lim rahbariyati (${leaders.length})`), icon: Users },
-            { id: 'tuzilma', label: t(`Tashkiliy tuzilma va sho'balar (${settings.branches?.length || 0})`), icon: Building2 },
-            { id: 'vazifalar', label: t("Asosiy vazifa va funksiyalar"), icon: FileCheck2 },
-            { id: 'tarix', label: t("Bo'lim tarixi va me'yoriy asos"), icon: BookOpen },
+            { id: 'rahbariyat', label: `${t(settings.aboutTabLeadersLabel || "Tashkilot rahbariyati")} (${leaders.length})`, icon: Users },
+            { id: 'tuzilma', label: `${t(settings.aboutTabStructureLabel || "Tashkiliy tuzilma va bo'linmalar")} (${settings.branches?.length || 0})`, icon: Building2 },
+            { id: 'vazifalar', label: t(settings.aboutTabTasksLabel || "Asosiy vazifa va funksiyalar"), icon: FileCheck2 },
+            { id: 'tarix', label: t(settings.aboutTabHistoryLabel || "Tashkilot tarixi va me'yoriy asos"), icon: BookOpen },
           ].map(tab => {
             const Icon = tab.icon;
             return (
@@ -131,12 +151,14 @@ export const AboutSection: React.FC = () => {
           </div>
         )}
 
-        {/* TAB 2: TASHKILIY TUZILMA VA SHO'BALAR */}
+        {/* TAB 2: TASHKILIY TUZILMA VA BO'LINMALAR */}
         {activeTab === 'tuzilma' && (
           <div className="w3-animate-bottom space-y-4 max-w-4xl mx-auto">
-            <div className="bg-sky-50 border border-sky-200 rounded-xl p-4 text-xs text-sky-900 mb-4">
-              <strong>{t("Eslatma")}:</strong> {t("Bo'lim tuzilmasi O'zbekiston Respublikasi Maktabgacha va maktab ta'limi vazirligi namunaviy shtat jadvaliga asosan tasdiqlangan. Barcha sho'balar va ularning mas'ullari admin panel orqali to'ldirib boriladi.")}
-            </div>
+            {settings.aboutStructureNote && (
+              <div className="bg-sky-50 border border-sky-200 rounded-xl p-4 text-xs text-sky-900 mb-4">
+                <strong>{t("Eslatma")}:</strong> {t(settings.aboutStructureNote)}
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {(settings.branches || []).map(branch => (
@@ -159,7 +181,7 @@ export const AboutSection: React.FC = () => {
 
                   <div className="pt-2 border-t border-slate-200 text-xs flex flex-wrap items-center justify-between gap-2 text-slate-700">
                     <div>
-                      <span className="text-slate-500">{t("Sho'ba mudiri")}: </span>
+                      <span className="text-slate-500">{t(settings.aboutHeadRoleLabel || "Bo'linma rahbari")}: </span>
                       <strong className="text-slate-900">{t(branch.head)}</strong>
                     </div>
                     <a
@@ -181,7 +203,7 @@ export const AboutSection: React.FC = () => {
           <div className="w3-animate-bottom max-w-4xl mx-auto bg-slate-50 rounded-2xl border border-slate-200 p-6 sm:p-8">
             <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-sky-700" />
-              <span>{t("Bo'limning qonunchilik bilan belgilangan asosiy vazifalari")}</span>
+              <span>{t(settings.aboutTasksTitle || "Tashkilotning asosiy vazifa va faoliyat yo'nalishlari")}</span>
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -200,12 +222,12 @@ export const AboutSection: React.FC = () => {
           </div>
         )}
 
-        {/* TAB 4: BO'LIM TARIXI */}
+        {/* TAB 4: TASHKILOT TARIXI VA NIZOMI */}
         {activeTab === 'tarix' && (
           <div className="w3-animate-bottom max-w-4xl mx-auto bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-5">
             <div>
               <h3 className="text-lg font-bold text-slate-900 mb-2">
-                {t("Tarixiy ma'lumot va rivojlanish bosqichlari")}
+                {t(settings.aboutHistoryTitle || "Tarixiy ma'lumot va rivojlanish bosqichlari")}
               </h3>
               <p className="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line">
                 {t(settings.departmentHistory)}
@@ -213,7 +235,7 @@ export const AboutSection: React.FC = () => {
             </div>
 
             <div className="p-4 bg-sky-50 rounded-xl border border-sky-100 text-xs text-sky-950">
-              <strong className="block mb-1">{t("Me'yoriy huquqiy asos")}:</strong>
+              <strong className="block mb-1">{t(settings.aboutCharterLabel || "Nizom va huquqiy asos")}:</strong>
               <p>{t(settings.departmentCharter)}</p>
             </div>
           </div>

@@ -3,20 +3,20 @@ import { Phone, Mail, Clock, Calendar } from 'lucide-react';
 import { usePortal } from '../../context/PortalContext';
 
 export const LeadershipSection: React.FC = () => {
-  const { leaders, t } = usePortal();
+  const { settings, leaders, t } = usePortal();
 
   return (
     <section id="bolim-haqida" className="py-12 bg-white border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-xs uppercase tracking-wider font-semibold text-sky-800">
-            {t("Bo'lim tuzilmasi")}
+            {t(settings.aboutKicker || "Tashkilot tuzilmasi")}
           </span>
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
-            {t("Bo'lim rahbariyati va fuqarolarni qabul qilish jadvali")}
+            {t(settings.aboutTabLeadersLabel || "Tashkilot rahbariyati va qabul jadvali")}
           </h2>
           <p className="text-slate-600 text-sm mt-2">
-            {t("Qo'shko'pir tumani maktabgacha va maktab ta'limi bo'limi mas'ul rahbarlari")}
+            {t(settings.departmentMission)}
           </p>
         </div>
 

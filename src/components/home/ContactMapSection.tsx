@@ -10,13 +10,13 @@ export const ContactMapSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-xs uppercase tracking-wider font-semibold text-sky-800">
-            {t("Bog'lanish")}
+            {t(settings.contactKicker || "Bog'lanish")}
           </span>
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
-            {t("Qo'shko'pir tumani MMTB bilan aloqa")}
+            {t(settings.contactTitle || settings.districtName)}
           </h2>
           <p className="text-slate-600 text-sm mt-1">
-            {t("Manzilimiz, qabulxona telefonlari va ijtimoiy tarmoqlardagi rasmiy sahifalarimiz")}
+            {t(settings.contactSubtitle)}
           </p>
         </div>
 
@@ -29,11 +29,15 @@ export const ContactMapSection: React.FC = () => {
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-semibold text-slate-500 uppercase">{t("Bo'lim manzili:")}</h4>
+                  <h4 className="text-xs font-semibold text-slate-500 uppercase">
+                    {t(settings.contactAddressLabel || "Tashkilot manzili:")}
+                  </h4>
                   <p className="text-sm font-semibold text-slate-900 mt-0.5 leading-snug">
                     {t(settings.address)}
                   </p>
-                  <p className="text-xs text-slate-500 mt-1">{t("Mo'ljal: Tuman hokimligi yaqinida")}</p>
+                  {settings.landmarkText && (
+                    <p className="text-xs text-slate-500 mt-1">{t(settings.landmarkText)}</p>
+                  )}
                 </div>
               </div>
 
@@ -91,24 +95,28 @@ export const ContactMapSection: React.FC = () => {
                 {t("Rasmiy ijtimoiy tarmoqlar:")}
               </span>
               <div className="flex flex-wrap gap-2">
-                <a
-                  href={settings.telegramChannel}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3.5 py-2 bg-sky-50 text-sky-800 hover:bg-sky-100 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors border border-sky-200"
-                >
-                  <Send className="w-3.5 h-3.5 text-sky-600" />
-                  <span>{t("Telegram kanal")}</span>
-                </a>
-                <a
-                  href={settings.facebookPage}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3.5 py-2 bg-blue-50 text-blue-800 hover:bg-blue-100 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors border border-blue-200"
-                >
-                  <Globe className="w-3.5 h-3.5 text-blue-600" />
-                  <span>{t("Facebook sahifa")}</span>
-                </a>
+                {settings.telegramChannel && (
+                  <a
+                    href={settings.telegramChannel}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3.5 py-2 bg-sky-50 text-sky-800 hover:bg-sky-100 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors border border-sky-200"
+                  >
+                    <Send className="w-3.5 h-3.5 text-sky-600" />
+                    <span>{t("Telegram kanal")}</span>
+                  </a>
+                )}
+                {settings.facebookPage && (
+                  <a
+                    href={settings.facebookPage}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3.5 py-2 bg-blue-50 text-blue-800 hover:bg-blue-100 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors border border-blue-200"
+                  >
+                    <Globe className="w-3.5 h-3.5 text-blue-600" />
+                    <span>{t("Facebook sahifa")}</span>
+                  </a>
+                )}
               </div>
             </div>
           </div>
@@ -117,26 +125,32 @@ export const ContactMapSection: React.FC = () => {
           <div className="lg:col-span-7 bg-slate-100 rounded-2xl border border-slate-200 overflow-hidden relative min-h-[360px] flex flex-col justify-between p-6">
             <div className="bg-white/95 backdrop-blur-xs p-4 rounded-xl shadow-xs max-w-sm border border-slate-200">
               <span className="text-[11px] font-bold uppercase tracking-wider text-sky-800 block mb-1">
-                {t("Qo'shko'pir tumani markazi")}
+                {t(settings.mapAreaTitle || settings.regionLabel || settings.shortName)}
               </span>
               <p className="text-xs text-slate-700 font-medium">
-                {t("Bo'lim binosi Mustaqillik ko'chasida, markaziy istirohat bog'i va tuman tibbiyot birlashmasi ro'parasida joylashgan.")}
+                {t(settings.mapAreaDesc)}
               </p>
             </div>
 
             <div className="bg-white/95 backdrop-blur-xs p-4 rounded-xl shadow-xs border border-slate-200 flex items-center justify-between">
               <div>
-                <span className="text-xs font-bold text-slate-900 block">{t("Jamoat transporti:")}</span>
-                <span className="text-xs text-slate-600">{t("Urganch — Qo'shko'pir yo'nalishli mikroavtobuslari (\"Markaz\" bekati)")}</span>
+                <span className="text-xs font-bold text-slate-900 block">
+                  {t(settings.mapTransportLabel || "Jamoat transporti:")}
+                </span>
+                <span className="text-xs text-slate-600">
+                  {t(settings.mapTransportText)}
+                </span>
               </div>
-              <a
-                href="https://yandex.uz/maps"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-3 py-1.5 bg-sky-800 text-white rounded text-xs font-semibold hover:bg-sky-900 shrink-0 ml-3"
-              >
-                {t("Xaritada ko'rish")}
-              </a>
+              {settings.mapExternalUrl && (
+                <a
+                  href={settings.mapExternalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 bg-sky-800 text-white rounded text-xs font-semibold hover:bg-sky-900 shrink-0 ml-3"
+                >
+                  {t("Xaritada ko'rish")}
+                </a>
+              )}
             </div>
           </div>
         </div>

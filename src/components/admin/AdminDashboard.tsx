@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   ShieldCheck,
   LogOut,
@@ -49,7 +49,9 @@ import {
   Images,
   Star,
   FolderOpen,
-  Loader2
+  Loader2,
+  Globe,
+  ListChecks
 } from 'lucide-react';
 import { usePortal } from '../../context/PortalContext';
 import {
@@ -60,6 +62,8 @@ import {
   CitizenAppeal,
   DepartmentBranch,
   QuickServiceItem,
+  StatCardItem,
+  GovernmentLinkItem,
   PortalSettings
 } from '../../types';
 import {
@@ -83,9 +87,9 @@ import {
 } from '../../services/socialBroadcast';
 import { fixUzbekText } from '../../utils/uzbekTypography';
 import { UzbekLetterHelper } from './UzbekLetterHelper';
-import { destroyAdminSession } from '../../services/adminAuth';
+import { destroyAdminSession, getAdminSessionInfo } from '../../services/adminAuth';
 
-type AdminTab =
+export type AdminTab =
   | 'overview'
   | 'hero'
   | 'about'
@@ -96,9 +100,13 @@ type AdminTab =
   | 'appeals'
   | 'social'
   | 'contacts'
-  | 'sheets';
+  | 'sheets'
+  | 'access';
 
-export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+export const AdminDashboard: React.FC<{ onClose: () => void; initialTab?: AdminTab }> = ({
+  onClose,
+  initialTab = 'overview'
+}) => {
   const {
     news,
     organizations,
@@ -131,7 +139,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
   } = usePortal();
 
   // Navigation tab
-  const [activeTab, setActiveTab] = useState<AdminTab>('overview');
+  const [activeTab, setActiveTab] = useState<AdminTab>(initialTab);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [menuSearch, setMenuSearch] = useState('');
 
@@ -148,8 +156,21 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
     onConfirm: async () => {}
   });
 
-  // Local settings state
+  // Local settings state (synced when Sheets updates)
   const [localSettings, setLocalSettings] = useState<PortalSettings>(settings);
+
+  useEffect(() => {
+    setLocalSettings(settings);
+  }, [settings]);
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
+
+  const adminSession = getAdminSessionInfo();
+  const orgShortTitle = localSettings.shortName || localSettings.districtName || "Ta'lim Tashkiloti";
 
   // News Modal State (with Telegram, Facebook & Instagram broadcast options)
   const [newsModal, setNewsModal] = useState<{
@@ -248,6 +269,24 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
     item: {},
     isEdit: false
   });
+
+  // Stat Card Modal
+  const [statModal, setStatModal] = useState<{
+    isOpen: boolean;
+    item: Partial<StatCardItem>;
+    isEdit: boolean;
+    index?: number;
+  }>({
+    isOpen: false,
+    item: {},
+    isEdit: false
+  });
+
+  // Inline states for Tasks, GovLinks, and Gmail Access
+  const [newTaskText, setNewTaskText] = useState('');
+  const [govLinkInput, setGovLinkInput] = useState<{ title: string; url: string }>({ title: '', url: '' });
+  const [newAdminEmail, setNewAdminEmail] = useState('');
+  const [adminEmailMsg, setAdminEmailMsg] = useState<{ isError: boolean; text: string } | null>(null);
 
   // Uploading state for Drive
   const [isUploading, setIsUploading] = useState(false);
@@ -515,14 +554,14 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
     },
     {
       id: 'about',
-      label: '2. Bo‘lim haqida (Sho‘balar)',
+      label: '2. Tashkilot haqida & Tuzilma',
       icon: Building2,
       badge: `${localSettings.branches?.length || 0}`,
       badgeClass: 'bg-secondary text-white'
     },
     {
       id: 'orgs',
-      label: '3. Maktab va MTTlar',
+      label: '3. Muassasalar & Bo‘linmalar',
       icon: School,
       badge: `${organizations.length}`,
       badgeClass: 'bg-success text-white'
@@ -564,7 +603,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
     },
     {
       id: 'contacts',
-      label: '9. Aloqa & Ish tartibi',
+      label: '9. Aloqa, Xarita & Footer',
       icon: PhoneCall,
       badge: 'Manzil',
       badgeClass: 'bg-secondary text-white'
@@ -575,6 +614,13 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
       icon: Database,
       badge: googleSyncStatus.isConnected ? 'Ulangan' : 'Lokal',
       badgeClass: googleSyncStatus.isConnected ? 'bg-success text-white' : 'bg-warning text-dark'
+    },
+    {
+      id: 'access',
+      label: '11. Gmail Admin Ruxsatlari',
+      icon: ShieldCheck,
+      badge: `${localSettings.allowedAdminEmails?.length || 1}`,
+      badgeClass: 'bg-emerald-600 text-white'
     }
   ];
 
@@ -604,7 +650,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
               <span className="bg-sky-700 text-white px-2 py-0.5 rounded font-black text-xs tracking-wider">
                 AdminLTE
               </span>
-              <span className="hidden sm:inline font-bold text-slate-700">Qo‘shko‘pir MMTB</span>
+              <span className="hidden sm:inline font-bold text-slate-700">{orgShortTitle}</span>
             </span>
           </div>
 
@@ -752,11 +798,13 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
               </div>
               <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#343a40]" title="Tizimda faol" />
             </div>
-            <div className="leading-tight">
-              <div className="font-semibold text-sm text-white">Administrator</div>
-              <div className="text-[11px] text-emerald-400 flex items-center gap-1 mt-0.5">
-                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping" />
-                <span>Onlayn rejim</span>
+            <div className="leading-tight min-w-0">
+              <div className="font-semibold text-sm text-white truncate">
+                {adminSession?.user || user?.displayName || 'Administrator'}
+              </div>
+              <div className="text-[11px] text-emerald-400 flex items-center gap-1 mt-0.5 truncate">
+                <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping shrink-0" />
+                <span className="truncate">{adminSession?.email || user?.email || 'Onlayn rejim'}</span>
               </div>
             </div>
           </div>
@@ -813,7 +861,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
 
           {/* Sidebar Footer info */}
           <div className="p-3 border-t border-[#4f5962] text-[11px] text-slate-400 text-center">
-            <div>Qo‘shko‘pir tumani MMTB</div>
+            <div className="truncate">{orgShortTitle}</div>
             <div className="text-[10px] text-slate-500 mt-0.5">AdminLTE v3.2.0 &bull; 2026</div>
           </div>
         </aside>
@@ -848,8 +896,8 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       isOpen: true,
                       item: {
                         date: new Date().toISOString().split('T')[0],
-                        category: "Boshlang'ich ta'lim",
-                        author: "Qo‘shko‘pir MMTB Matbuot xizmati",
+                        category: localSettings.newsCategories?.[0] || "Boshlang'ich ta'lim",
+                        author: `${orgShortTitle} Matbuot xizmati`,
                         views: 120
                       },
                       isEdit: false,
@@ -877,7 +925,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs shadow-xs transition-colors"
                 >
                   <Plus className="w-4 h-4" />
-                  <span>Yangi maktab/MTT qo‘shish</span>
+                  <span>Yangi muassasa qo‘shish</span>
                 </button>
               )}
 
@@ -888,7 +936,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       isOpen: true,
                       item: {
                         date: new Date().toISOString().split('T')[0],
-                        category: 'Bo\'lim buyruqlari',
+                        category: localSettings.docCategories?.[0] || "Tashkilot buyruqlari",
                         fileType: 'PDF'
                       },
                       isEdit: false
@@ -1056,7 +1104,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                     </div>
                     <div>
                       <span className="text-[11px] font-bold text-slate-500 uppercase block">Telegram Kanali</span>
-                      <span className="text-sm font-bold text-slate-900">@{localSettings.telegramChannelUsername || 'qoshkopir_mmtb'}</span>
+                      <span className="text-sm font-bold text-slate-900">@{localSettings.telegramChannelUsername || 'talim_tashkiloti'}</span>
                       <span className="text-[10px] text-emerald-600 block font-semibold">Avto-yuborish faol</span>
                     </div>
                   </div>
@@ -1081,12 +1129,12 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       <span>Google Sheets Ma’lumotlar Bazasi va Google Drive Ombori Holati</span>
                     </h3>
                     <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">
-                      Qo‘shko‘pir MMTB
+                      {orgShortTitle}
                     </span>
                   </div>
                   <div className="p-4 sm:p-6 space-y-4 text-xs">
                     <p className="text-slate-600 leading-relaxed">
-                      Saytning barcha bo‘limlari (maktablar, MTTlar, me’yoriy hujjatlar, yangiliklar, murojaatlar va sozlamalar) Google Sheets jadvali bilan integratsiya qilingan. Barcha fayllar avtomatik tarzda Google Drive xizmatiga yuklanadi.
+                      Saytning barcha bo‘limlari (tashkilot haqida, muassasalar, me’yoriy hujjatlar, yangiliklar, murojaatlar, admin Gmail ruxsatlari va sozlamalar) Google Sheets jadvali bilan integratsiya qilingan. Barcha fayllar avtomatik tarzda Google Drive xizmatiga yuklanadi.
                     </p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1095,7 +1143,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                           <Database className="w-4 h-4 text-emerald-600" />
                           <span>Google Sheets Jadvali:</span>
                         </strong>
-                        <div>Nomi: <code className="bg-white px-1.5 py-0.5 rounded border border-slate-300 font-mono text-slate-800">Qo'shko'pir_MMTB_Rasmiy_Baza</code></div>
+                        <div>Nomi: <code className="bg-white px-1.5 py-0.5 rounded border border-slate-300 font-mono text-slate-800">Talim_Tashkiloti_Rasmiy_Baza</code></div>
                         <div>
                           Jadval ID: <span className="font-mono text-slate-700">{googleSyncStatus.spreadsheetId || "Avtomatik bog‘langan"}</span>
                         </div>
@@ -1117,7 +1165,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                           <HardDrive className="w-4 h-4 text-amber-600" />
                           <span>Google Drive Ombori:</span>
                         </strong>
-                        <div>Jild nomi: <code className="bg-white px-1.5 py-0.5 rounded border border-slate-300 font-mono text-slate-800">Qo'shko'pir_MMTB_Fayllar</code></div>
+                        <div>Jild nomi: <code className="bg-white px-1.5 py-0.5 rounded border border-slate-300 font-mono text-slate-800">Talim_Tashkiloti_Fayllar</code></div>
                         <div>
                           Jild ID: <span className="font-mono text-slate-700">{googleSyncStatus.folderId || "Avtomatik bog‘langan"}</span>
                         </div>
@@ -1140,14 +1188,141 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
             )}
 
             {/* ======================================================== */}
-            {/* TAB 2: HERO BANNER & QUICK SERVICES                      */}
+            {/* TAB 2: HERO BANNER, IDENTITY, NAV, STATS & SERVICES      */}
             {/* ======================================================== */}
             {activeTab === 'hero' && (
               <div className="space-y-6">
+                {/* 1A: Organization Identity & Header/Navigation */}
+                <div className="bg-white rounded border border-slate-200 border-t-4 border-t-sky-700 shadow-xs p-6 space-y-4">
+                  <div className="flex items-center justify-between border-b pb-3">
+                    <div>
+                      <h3 className="font-bold text-slate-800 text-sm">
+                        1. Tashkilot Identifikatsiyasi va Yuqori Menyu (Statik matnlarsiz)
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        Sayt sarlavhasi, header matnlari va navigatsiya tugmalari nomlari
+                      </p>
+                    </div>
+                    <UzbekLetterHelper
+                      compact
+                      onInsertLetter={(letter) => {
+                        setLocalSettings(prev => ({
+                          ...prev,
+                          shortName: (prev.shortName || '') + letter
+                        }));
+                      }}
+                      onAutoFix={() => {
+                        setLocalSettings(prev => ({
+                          ...prev,
+                          districtName: fixUzbekText(prev.districtName || ''),
+                          shortName: fixUzbekText(prev.shortName || ''),
+                          supervisingOrg: fixUzbekText(prev.supervisingOrg || ''),
+                          regionLabel: fixUzbekText(prev.regionLabel || ''),
+                          portalSubtitle: fixUzbekText(prev.portalSubtitle || '')
+                        }));
+                      }}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Tashkilot To‘liq Nomi</label>
+                      <input
+                        type="text"
+                        value={localSettings.districtName || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, districtName: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300 focus:border-sky-500 font-semibold"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Qisqa Nomi (Header & Tab)</label>
+                      <input
+                        type="text"
+                        value={localSettings.shortName || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, shortName: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300 focus:border-sky-500 font-semibold"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Hudud / Maqom Matni</label>
+                      <input
+                        type="text"
+                        value={localSettings.regionLabel || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, regionLabel: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300 focus:border-sky-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Yuqori Chiziqdagi Tashkilot</label>
+                      <input
+                        type="text"
+                        value={localSettings.supervisingOrg || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, supervisingOrg: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300 focus:border-sky-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Logo Ostidagi Izoh</label>
+                      <input
+                        type="text"
+                        value={localSettings.portalSubtitle || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, portalSubtitle: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300 focus:border-sky-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Qisqa Ish Tartibi (Header)</label>
+                      <input
+                        type="text"
+                        value={localSettings.workingHoursShort || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, workingHoursShort: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300 focus:border-sky-500"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Nav labels */}
+                  <div className="pt-2 border-t border-slate-100">
+                    <span className="font-bold text-slate-700 text-xs block mb-2">Menyu Tugmalari Nomlari:</span>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 text-xs">
+                      {(['home', 'about', 'orgs', 'docs', 'news', 'reception', 'contact'] as const).map(navKey => (
+                        <div key={navKey}>
+                          <label className="text-[10px] font-semibold text-slate-500 uppercase block mb-0.5">{navKey}</label>
+                          <input
+                            type="text"
+                            value={localSettings.navLabels?.[navKey] || ''}
+                            onChange={e =>
+                              setLocalSettings({
+                                ...localSettings,
+                                navLabels: { ...localSettings.navLabels, [navKey]: e.target.value }
+                              })
+                            }
+                            className="w-full px-2.5 py-1.5 rounded border border-slate-300 focus:border-sky-500"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-3 border-t">
+                    <button
+                      onClick={async () => {
+                        await updateSettings(localSettings);
+                        alert("Tashkilot identifikatsiyasi va menyu sozlamalari saqlandi!");
+                      }}
+                      className="px-4 py-2 rounded bg-sky-700 hover:bg-sky-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>Saqlash</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* 1B: Hero Banner & Showcase Card */}
                 <div className="bg-white rounded border border-slate-200 border-t-4 border-t-sky-600 shadow-xs p-6 space-y-4">
                   <div className="flex items-center justify-between border-b pb-3">
                     <h3 className="font-bold text-slate-800 text-sm">
-                      1. Asosiy Sahifa Banneri va Sarlavhalari
+                      Asosiy Sahifa Banneri, Tugmalar va Tezkor Xizmatlar Sarlavhasi
                     </h3>
                     <UzbekLetterHelper
                       compact
@@ -1202,6 +1377,69 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                         className="w-full px-3 py-2 rounded border border-slate-300 focus:border-sky-500 focus:outline-hidden"
                       />
                     </div>
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">1-Tugma Matni (Asosiy)</label>
+                      <input
+                        type="text"
+                        value={localSettings.heroPrimaryBtnText || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, heroPrimaryBtnText: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">2-Tugma Matni (Ikkinchi)</label>
+                      <input
+                        type="text"
+                        value={localSettings.heroSecondaryBtnText || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, heroSecondaryBtnText: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Banner O‘ng Karta Badge</label>
+                      <input
+                        type="text"
+                        value={localSettings.heroShowcaseBadge || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, heroShowcaseBadge: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Banner O‘ng Karta Sarlavhasi</label>
+                      <input
+                        type="text"
+                        value={localSettings.heroShowcaseTitle || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, heroShowcaseTitle: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="font-bold text-slate-700 block mb-1">Banner O‘ng Karta Matni</label>
+                      <input
+                        type="text"
+                        value={localSettings.heroShowcaseDesc || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, heroShowcaseDesc: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Tezkor Xizmatlar Sarlavhasi</label>
+                      <input
+                        type="text"
+                        value={localSettings.heroServicesTitle || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, heroServicesTitle: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Tezkor Xizmatlar Izohi</label>
+                      <input
+                        type="text"
+                        value={localSettings.heroServicesSubtitle || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, heroServicesSubtitle: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
                     <div className="md:col-span-2">
                       <label className="font-bold text-slate-700 block mb-1">
                         Banner Rasmi (URL yoki Drive)
@@ -1231,7 +1469,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                     <button
                       onClick={async () => {
                         await updateSettings(localSettings);
-                        alert("Asosiy sahifa sozlamalari saqlandi!");
+                        alert("Asosiy sahifa banner sozlamalari saqlandi!");
                       }}
                       className="px-4 py-2 rounded bg-sky-700 hover:bg-sky-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs"
                     >
@@ -1241,7 +1479,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   </div>
                 </div>
 
-                {/* Quick Services Management */}
+                {/* 1C: Quick Services Management */}
                 <div className="bg-white rounded border border-slate-200 border-t-4 border-t-emerald-600 shadow-xs p-6 space-y-4">
                   <div className="flex items-center justify-between border-b pb-3">
                     <div>
@@ -1316,19 +1554,133 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                     ))}
                   </div>
                 </div>
+
+                {/* 1D: Statistics Strip Management */}
+                <div className="bg-white rounded border border-slate-200 border-t-4 border-t-amber-500 shadow-xs p-6 space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-3">
+                    <div>
+                      <h3 className="font-bold text-slate-800 text-sm">
+                        Bosh Sahifa Statistika Ko‘rsatkichlari (Raqamlar Lenta)
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        Bosh sahifadagi barcha statistik ko‘rsatkich kartalarini qo‘shish va tahrirlash
+                      </p>
+                    </div>
+                    <button
+                      onClick={() =>
+                        setStatModal({
+                          isOpen: true,
+                          item: { icon: 'school', color: 'bg-sky-700', suffix: '+' },
+                          isEdit: false
+                        })
+                      }
+                      className="px-3 py-1.5 rounded bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs flex items-center gap-1 shadow-xs"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Ko‘rsatkich qo‘shish</span>
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Yuqori Yorliq (Kicker)</label>
+                      <input
+                        type="text"
+                        value={localSettings.statsKicker || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, statsKicker: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Bo‘lim Sarlavhasi</label>
+                      <input
+                        type="text"
+                        value={localSettings.statsTitle || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, statsTitle: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {localSettings.statsItems?.map((st, idx) => (
+                      <div key={st.id || idx} className="p-3 rounded border border-slate-200 bg-slate-50 flex items-start justify-between gap-2 text-xs">
+                        <div className="space-y-0.5">
+                          <div className="font-extrabold text-slate-900 text-base">
+                            {st.value} <span className="text-sky-700 text-xs">{st.suffix}</span>
+                          </div>
+                          <div className="font-bold text-slate-800">{st.label}</div>
+                          <div className="text-[11px] text-slate-500">{st.sub}</div>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            onClick={() =>
+                              setStatModal({
+                                isOpen: true,
+                                item: st,
+                                isEdit: true,
+                                index: idx
+                              })
+                            }
+                            className="p-1 rounded hover:bg-slate-200 text-slate-600"
+                            title="Tahrirlash"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              requestDelete(
+                                "Ko‘rsatkichni o‘chirish",
+                                `Haqiqatan ham "${st.label}" statistikasini o‘chirmoqchimisiz?`,
+                                async () => {
+                                  const updated = (localSettings.statsItems || []).filter((_, i) => i !== idx);
+                                  const newSettings = { ...localSettings, statsItems: updated };
+                                  setLocalSettings(newSettings);
+                                  await updateSettings(newSettings);
+                                }
+                              );
+                            }}
+                            className="p-1 rounded hover:bg-red-50 text-red-600"
+                            title="O‘chirish"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex justify-end pt-2 border-t">
+                    <button
+                      onClick={async () => {
+                        await updateSettings(localSettings);
+                        alert("Statistika sarlavhalari saqlandi!");
+                      }}
+                      className="px-4 py-1.5 rounded bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs"
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      <span>Statistikani Saqlash</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
 
             {/* ======================================================== */}
-            {/* TAB 3: ABOUT DEPARTMENT (BRANCHES & TASKS)                */}
+            {/* TAB 3: ABOUT ORGANIZATION (#bolim-haqida)                */}
             {/* ======================================================== */}
             {activeTab === 'about' && (
               <div className="space-y-6">
                 <div className="bg-white rounded border border-slate-200 border-t-4 border-t-sky-600 shadow-xs p-6 space-y-4">
-                  <div className="flex items-center justify-between border-b pb-3">
-                    <h3 className="font-bold text-slate-800 text-sm">
-                      2. Bo‘lim Haqida Asosiy Ma’lumotlar
-                    </h3>
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-3">
+                    <div>
+                      <h3 className="font-bold text-slate-800 text-sm">
+                        2. Tashkilot Haqida (#bolim-haqida) — Barcha Sarlavha va Matnlar
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        Saytdagi &laquo;Tashkilot haqida&raquo; bo‘limidagi barcha ichki tablar, sarlavhalar va matnlarni shu yerdan to‘liq tahrirlang
+                      </p>
+                    </div>
                     <UzbekLetterHelper
                       compact
                       onInsertLetter={(letter) => {
@@ -1340,6 +1692,8 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       onAutoFix={() => {
                         setLocalSettings(prev => ({
                           ...prev,
+                          aboutKicker: fixUzbekText(prev.aboutKicker || ''),
+                          aboutTitle: fixUzbekText(prev.aboutTitle || ''),
                           departmentMission: fixUzbekText(prev.departmentMission),
                           departmentHistory: fixUzbekText(prev.departmentHistory),
                           departmentCharter: fixUzbekText(prev.departmentCharter)
@@ -1348,10 +1702,115 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                     />
                   </div>
 
-                  <div className="space-y-4 text-xs">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Bo‘lim Yuqori Yorlig‘i (Kicker)</label>
+                      <input
+                        type="text"
+                        value={localSettings.aboutKicker || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, aboutKicker: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Asosiy Sarlavha</label>
+                      <input
+                        type="text"
+                        value={localSettings.aboutTitle || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, aboutTitle: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300 font-semibold"
+                      />
+                    </div>
+
+                    {/* 4 sub-tabs labels */}
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">1-Tab Nomi (Rahbariyat)</label>
+                      <input
+                        type="text"
+                        value={localSettings.aboutTabLeadersLabel || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, aboutTabLeadersLabel: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">2-Tab Nomi (Tuzilma)</label>
+                      <input
+                        type="text"
+                        value={localSettings.aboutTabStructureLabel || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, aboutTabStructureLabel: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">3-Tab Nomi (Vazifalar)</label>
+                      <input
+                        type="text"
+                        value={localSettings.aboutTabTasksLabel || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, aboutTabTasksLabel: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">4-Tab Nomi (Tarix va Nizom)</label>
+                      <input
+                        type="text"
+                        value={localSettings.aboutTabHistoryLabel || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, aboutTabHistoryLabel: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Tuzilma Tabi Izohi</label>
+                      <input
+                        type="text"
+                        value={localSettings.aboutStructureNote || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, aboutStructureNote: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Bo‘linma Mas’ul Lavozim Yorlig‘i</label>
+                      <input
+                        type="text"
+                        value={localSettings.aboutHeadRoleLabel || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, aboutHeadRoleLabel: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Vazifalar Bloki Sarlavhasi</label>
+                      <input
+                        type="text"
+                        value={localSettings.aboutTasksTitle || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, aboutTasksTitle: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Tarix Bloki Sarlavhasi</label>
+                      <input
+                        type="text"
+                        value={localSettings.aboutHistoryTitle || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, aboutHistoryTitle: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="font-bold text-slate-700 block mb-1">Nizom Bloki Sarlavhasi</label>
+                      <input
+                        type="text"
+                        value={localSettings.aboutCharterLabel || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, aboutCharterLabel: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 text-xs pt-2 border-t border-slate-100">
                     <div>
                       <label className="font-bold text-slate-700 block mb-1">
-                        Bo‘limning Maqsadi va Missiyasi
+                        Tashkilotning Maqsadi va Missiyasi
                       </label>
                       <textarea
                         rows={3}
@@ -1363,7 +1822,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
 
                     <div>
                       <label className="font-bold text-slate-700 block mb-1">
-                        Bo‘lim Tarixi va Tashkil Topishi
+                        Tashkilot Tarixi va Tashkil Topishi
                       </label>
                       <textarea
                         rows={3}
@@ -1375,7 +1834,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
 
                     <div>
                       <label className="font-bold text-slate-700 block mb-1">
-                        Nizom va Qoidalar
+                        Nizom va Huquqiy Asoslar
                       </label>
                       <textarea
                         rows={3}
@@ -1390,7 +1849,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                     <button
                       onClick={async () => {
                         await updateSettings(localSettings);
-                        alert("Bo‘lim ma’lumotlari muvaffaqiyatli saqlandi!");
+                        alert("Tashkilot haqidagi ma’lumotlar muvaffaqiyatli saqlandi!");
                       }}
                       className="px-4 py-2 rounded bg-sky-700 hover:bg-sky-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs"
                     >
@@ -1400,15 +1859,97 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   </div>
                 </div>
 
-                {/* Branches (Sho'balar) Management */}
+                {/* Tasks List CRUD */}
+                <div className="bg-white rounded border border-slate-200 border-t-4 border-t-indigo-600 shadow-xs p-6 space-y-4 text-xs">
+                  <div className="flex items-center justify-between border-b pb-3">
+                    <div>
+                      <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
+                        <ListChecks className="w-4 h-4 text-indigo-600" />
+                        <span>Asosiy Vazifa va Funksiyalar Ro‘yxati</span>
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        #bolim-haqida ichidagi «Vazifalar» tabida ko‘rsatiladigan bandlar
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    {(localSettings.tasksList || []).map((task, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <span className="w-6 h-6 rounded bg-indigo-50 text-indigo-800 font-bold flex items-center justify-center shrink-0">
+                          {idx + 1}
+                        </span>
+                        <input
+                          type="text"
+                          value={task}
+                          onChange={e => {
+                            const next = [...(localSettings.tasksList || [])];
+                            next[idx] = e.target.value;
+                            setLocalSettings({ ...localSettings, tasksList: next });
+                          }}
+                          className="flex-1 px-3 py-2 rounded border border-slate-300 focus:border-indigo-500"
+                        />
+                        <button
+                          onClick={() => {
+                            const next = (localSettings.tasksList || []).filter((_, i) => i !== idx);
+                            setLocalSettings({ ...localSettings, tasksList: next });
+                          }}
+                          className="p-2 rounded bg-red-50 hover:bg-red-100 text-red-600"
+                          title="O‘chirish"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex gap-2 pt-2 border-t border-slate-100">
+                    <input
+                      type="text"
+                      placeholder="Yangi vazifa yoki funksiya matnini kiriting..."
+                      value={newTaskText}
+                      onChange={e => setNewTaskText(e.target.value)}
+                      className="flex-1 px-3 py-2 rounded border border-slate-300"
+                    />
+                    <button
+                      onClick={() => {
+                        if (!newTaskText.trim()) return;
+                        setLocalSettings({
+                          ...localSettings,
+                          tasksList: [...(localSettings.tasksList || []), fixUzbekText(newTaskText.trim())]
+                        });
+                        setNewTaskText('');
+                      }}
+                      className="px-3.5 py-2 rounded bg-indigo-700 hover:bg-indigo-800 text-white font-semibold flex items-center gap-1"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Qo‘shish</span>
+                    </button>
+                  </div>
+
+                  <div className="flex justify-end pt-2">
+                    <button
+                      onClick={async () => {
+                        await updateSettings(localSettings);
+                        alert("Vazifalar ro‘yxati saqlandi!");
+                      }}
+                      className="px-4 py-2 rounded bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>Vazifalarni Saqlash</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Branches (Bo'linmalar) Management */}
                 <div className="bg-white rounded border border-slate-200 border-t-4 border-t-emerald-600 shadow-xs p-6 space-y-4">
                   <div className="flex items-center justify-between border-b pb-3">
                     <div>
                       <h3 className="font-bold text-slate-800 text-sm">
-                        Bo‘lim Sho‘balari va Tarkibiy Tuzilmasi
+                        Tashkilot Bo‘linmalari va Tarkibiy Tuzilmasi
                       </h3>
                       <p className="text-xs text-slate-500">
-                        Metodika, kadrlash, moliya va axborot texnologiyalari sho‘balari
+                        Metodika, o‘quv-tarbiya, moliya va axborot texnologiyalari bo‘linmalari
                       </p>
                     </div>
                     <button
@@ -1422,7 +1963,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       className="px-3 py-1.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs flex items-center gap-1 shadow-xs"
                     >
                       <Plus className="w-3.5 h-3.5" />
-                      <span>Sho‘ba qo‘shish</span>
+                      <span>Bo‘linma qo‘shish</span>
                     </button>
                   </div>
 
@@ -1449,8 +1990,8 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                             <button
                               onClick={() => {
                                 requestDelete(
-                                  "Sho‘bani o‘chirish",
-                                  `"${branch.name}" sho‘basini o‘chirmoqchimisiz?`,
+                                  "Bo‘linmani o‘chirish",
+                                  `"${branch.name}" bo‘linmasini o‘chirmoqchimisiz?`,
                                   async () => {
                                     const updated = localSettings.branches.filter((_, i) => i !== idx);
                                     const newSettings = { ...localSettings, branches: updated };
@@ -1466,7 +2007,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                             </button>
                           </div>
                         </div>
-                        <div className="text-slate-600">Rahbar: <strong className="text-slate-800">{branch.head}</strong></div>
+                        <div className="text-slate-600">Mas’ul: <strong className="text-slate-800">{branch.head}</strong></div>
                         <div className="text-slate-500">Telefon: {branch.phone} &bull; Xodimlar: {branch.staffCount} nafar</div>
                         <p className="text-[11px] text-slate-600 leading-tight">{branch.description}</p>
                       </div>
@@ -1477,58 +2018,111 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
             )}
 
             {/* ======================================================== */}
-            {/* TAB 4: SCHOOLS & MTTS (MAKTAB VA BOG'CHALAR)              */}
+            {/* TAB 4: ORGANIZATIONS & BRANCH UNITS                      */}
             {/* ======================================================== */}
             {activeTab === 'orgs' && (
-              <div className="bg-white rounded border border-slate-200 border-t-4 border-t-emerald-600 shadow-xs p-6 space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4">
-                  <div>
-                    <h3 className="font-bold text-slate-800 text-sm">
-                      3. Ta’lim Muassasalari (Maktab va Bog‘chalar Boshqaruvi)
-                    </h3>
-                    <p className="text-xs text-slate-500">
-                      Qo‘shko‘pir tumanidagi barcha 54 ta umumta’lim maktabi va 38 ta MTT ro‘yxati
-                    </p>
+              <div className="space-y-4">
+                <div className="bg-white rounded border border-slate-200 p-4 space-y-3 text-xs">
+                  <div className="flex items-center justify-between border-b pb-2">
+                    <span className="font-bold text-slate-800">Muassasalar Bo‘limi Sarlavhalari va Filtr Yorliqlari</span>
+                    <button
+                      onClick={async () => {
+                        await updateSettings(localSettings);
+                        alert("Muassasalar bo‘limi sarlavhalari saqlandi!");
+                      }}
+                      className="px-3 py-1 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-bold flex items-center gap-1"
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      <span>Sarlavhalarni saqlash</span>
+                    </button>
                   </div>
-                  <button
-                    onClick={() =>
-                      setOrgModal({
-                        isOpen: true,
-                        item: { type: 'maktab' },
-                        isEdit: false
-                      })
-                    }
-                    className="px-3 py-1.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs flex items-center gap-1 shadow-xs"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>Yangi Muassasa Qo‘shish</span>
-                  </button>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="font-semibold text-slate-600 block mb-1">Kicker</label>
+                      <input type="text" value={localSettings.orgsKicker || ''} onChange={e => setLocalSettings({ ...localSettings, orgsKicker: e.target.value })} className="w-full px-2.5 py-1.5 rounded border border-slate-300" />
+                    </div>
+                    <div>
+                      <label className="font-semibold text-slate-600 block mb-1">Asosiy Sarlavha</label>
+                      <input type="text" value={localSettings.orgsTitle || ''} onChange={e => setLocalSettings({ ...localSettings, orgsTitle: e.target.value })} className="w-full px-2.5 py-1.5 rounded border border-slate-300" />
+                    </div>
+                    <div>
+                      <label className="font-semibold text-slate-600 block mb-1">Qisqa Izoh</label>
+                      <input type="text" value={localSettings.orgsSubtitle || ''} onChange={e => setLocalSettings({ ...localSettings, orgsSubtitle: e.target.value })} className="w-full px-2.5 py-1.5 rounded border border-slate-300" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <div>
+                      <label className="text-[10px] font-semibold text-slate-500 block mb-0.5">Filtr: Barchasi</label>
+                      <input type="text" value={localSettings.orgsFilterAllLabel || ''} onChange={e => setLocalSettings({ ...localSettings, orgsFilterAllLabel: e.target.value })} className="w-full px-2.5 py-1.5 rounded border border-slate-300" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-semibold text-slate-500 block mb-0.5">Filtr: Maktab</label>
+                      <input type="text" value={localSettings.orgsFilterSchoolLabel || ''} onChange={e => setLocalSettings({ ...localSettings, orgsFilterSchoolLabel: e.target.value })} className="w-full px-2.5 py-1.5 rounded border border-slate-300" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-semibold text-slate-500 block mb-0.5">Filtr: MTT</label>
+                      <input type="text" value={localSettings.orgsFilterKindergartenLabel || ''} onChange={e => setLocalSettings({ ...localSettings, orgsFilterKindergartenLabel: e.target.value })} className="w-full px-2.5 py-1.5 rounded border border-slate-300" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-semibold text-slate-500 block mb-0.5">Filtr: Ixtisos</label>
+                      <input type="text" value={localSettings.orgsFilterSpecializedLabel || ''} onChange={e => setLocalSettings({ ...localSettings, orgsFilterSpecializedLabel: e.target.value })} className="w-full px-2.5 py-1.5 rounded border border-slate-300" />
+                    </div>
+                  </div>
                 </div>
 
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs border border-slate-200">
-                    <thead className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 uppercase text-[11px]">
-                      <tr>
-                        <th className="p-2.5">Nomi</th>
-                        <th className="p-2.5">Turi</th>
-                        <th className="p-2.5">Direktor</th>
-                        <th className="p-2.5">Manzil</th>
-                        <th className="p-2.5">Telefon</th>
-                        <th className="p-2.5">O‘quvchi/Tarbiyalanuvchi</th>
-                        <th className="p-2.5 text-right">Amallar</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200">
-                      {organizations.map(org => (
-                        <tr key={org.id} className="hover:bg-slate-50 transition-colors">
-                          <td className="p-2.5 font-bold text-slate-900">{org.name}</td>
-                          <td className="p-2.5">
-                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                              org.type === 'maktab' ? 'bg-sky-100 text-sky-800' : 'bg-pink-100 text-pink-800'
-                            }`}>
-                              {org.type === 'maktab' ? 'Maktab' : 'MTT'}
-                            </span>
-                          </td>
+                <div className="bg-white rounded border border-slate-200 border-t-4 border-t-emerald-600 shadow-xs p-6 space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4">
+                    <div>
+                      <h3 className="font-bold text-slate-800 text-sm">
+                        3. Ta’lim Muassasalari va Bo‘linmalar Boshqaruvi
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        Barcha muassasalar, direktor rasmlari (Google Sheets O ustuni) va batafsil tavsiflar (P ustuni)
+                      </p>
+                    </div>
+                    <button
+                      onClick={() =>
+                        setOrgModal({
+                          isOpen: true,
+                          item: { type: 'maktab' },
+                          isEdit: false
+                        })
+                      }
+                      className="px-3 py-1.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs flex items-center gap-1 shadow-xs"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Yangi Muassasa Qo‘shish</span>
+                    </button>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs border border-slate-200">
+                      <thead className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 uppercase text-[11px]">
+                        <tr>
+                          <th className="p-2.5">Nomi</th>
+                          <th className="p-2.5">Turi</th>
+                          <th className="p-2.5">Direktor</th>
+                          <th className="p-2.5">Manzil</th>
+                          <th className="p-2.5">Telefon</th>
+                          <th className="p-2.5">O‘quvchi/Tarbiyalanuvchi</th>
+                          <th className="p-2.5 text-right">Amallar</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200">
+                        {organizations.map(org => (
+                          <tr key={org.id} className="hover:bg-slate-50 transition-colors">
+                            <td className="p-2.5 font-bold text-slate-900">{org.name}</td>
+                            <td className="p-2.5">
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                org.type === 'maktab'
+                                  ? 'bg-sky-100 text-sky-800'
+                                  : org.type === 'ixtisos'
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : 'bg-pink-100 text-pink-800'
+                              }`}>
+                                {org.type === 'maktab' ? 'Maktab' : org.type === 'ixtisos' ? 'Ixtisos' : 'MTT'}
+                              </span>
+                            </td>
                           <td className="p-2.5 text-slate-700">{org.director}</td>
                           <td className="p-2.5 text-slate-600 truncate max-w-[150px]">{org.address}</td>
                           <td className="p-2.5 font-mono text-slate-600">{org.phone}</td>
@@ -1563,6 +2157,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   </table>
                 </div>
               </div>
+            </div>
             )}
 
             {/* ======================================================== */}
@@ -1573,10 +2168,10 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4">
                   <div>
                     <h3 className="font-bold text-slate-800 text-sm">
-                      4. Bo‘lim Rahbariyati Tarkibi
+                      4. Tashkilot Rahbariyati Tarkibi
                     </h3>
                     <p className="text-xs text-slate-500">
-                      Bo‘lim mudiri, o‘rinbosarlari va fuqarolarni qabul qilish kunlari
+                      Rahbarlar, o‘rinbosarlar, qabul kunlari va Admin Gmail ruxsati (Google Sheets L ustuni)
                     </p>
                   </div>
                   <button
@@ -1641,34 +2236,79 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
             {/* TAB 6: DOCUMENTS (ME'YORIY HUJJATLAR)                     */}
             {/* ======================================================== */}
             {activeTab === 'docs' && (
-              <div className="bg-white rounded border border-slate-200 border-t-4 border-t-amber-500 shadow-xs p-6 space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4">
-                  <div>
-                    <h3 className="font-bold text-slate-800 text-sm">
-                      5. Me’yoriy-Huquqiy Hujjatlar Ombori
-                    </h3>
-                    <p className="text-xs text-slate-500">
-                      Qarorlar, buyruqlar, nizomlar va Google Drive’ga yuklangan PDF fayllar
-                    </p>
+              <div className="space-y-4">
+                <div className="bg-white rounded border border-slate-200 p-4 space-y-3 text-xs">
+                  <div className="flex items-center justify-between border-b pb-2">
+                    <span className="font-bold text-slate-800">Hujjatlar Bo‘limi Sarlavhalari va Toifalari</span>
+                    <button
+                      onClick={async () => {
+                        await updateSettings(localSettings);
+                        alert("Hujjatlar bo‘limi sozlamalari saqlandi!");
+                      }}
+                      className="px-3 py-1 rounded bg-amber-600 hover:bg-amber-700 text-white font-bold flex items-center gap-1"
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      <span>Saqlash</span>
+                    </button>
                   </div>
-                  <button
-                    onClick={() =>
-                      setDocModal({
-                        isOpen: true,
-                        item: {
-                          date: new Date().toISOString().split('T')[0],
-                          category: 'Bo\'lim buyruqlari',
-                          fileType: 'PDF'
-                        },
-                        isEdit: false
-                      })
-                    }
-                    className="px-3 py-1.5 rounded bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs flex items-center gap-1 shadow-xs"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>Yangi Hujjat Qo‘shish</span>
-                  </button>
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                    <div>
+                      <label className="font-semibold text-slate-600 block mb-1">Kicker</label>
+                      <input type="text" value={localSettings.docsKicker || ''} onChange={e => setLocalSettings({ ...localSettings, docsKicker: e.target.value })} className="w-full px-2.5 py-1.5 rounded border border-slate-300" />
+                    </div>
+                    <div>
+                      <label className="font-semibold text-slate-600 block mb-1">Asosiy Sarlavha</label>
+                      <input type="text" value={localSettings.docsTitle || ''} onChange={e => setLocalSettings({ ...localSettings, docsTitle: e.target.value })} className="w-full px-2.5 py-1.5 rounded border border-slate-300" />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="font-semibold text-slate-600 block mb-1">Qisqa Izoh</label>
+                      <input type="text" value={localSettings.docsSubtitle || ''} onChange={e => setLocalSettings({ ...localSettings, docsSubtitle: e.target.value })} className="w-full px-2.5 py-1.5 rounded border border-slate-300" />
+                    </div>
+                    <div className="sm:col-span-4">
+                      <label className="font-semibold text-slate-600 block mb-1">Toifalar (vergul bilan ajrating)</label>
+                      <input
+                        type="text"
+                        value={(localSettings.docCategories || []).join(', ')}
+                        onChange={e =>
+                          setLocalSettings({
+                            ...localSettings,
+                            docCategories: e.target.value.split(',').map(s => s.trim()).filter(Boolean)
+                          })
+                        }
+                        className="w-full px-2.5 py-1.5 rounded border border-slate-300"
+                      />
+                    </div>
+                  </div>
                 </div>
+
+                <div className="bg-white rounded border border-slate-200 border-t-4 border-t-amber-500 shadow-xs p-6 space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4">
+                    <div>
+                      <h3 className="font-bold text-slate-800 text-sm">
+                        5. Me’yoriy-Huquqiy Hujjatlar Ombori
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        Qarorlar, buyruqlar, nizomlar va Google Drive’ga yuklangan PDF fayllar
+                      </p>
+                    </div>
+                    <button
+                      onClick={() =>
+                        setDocModal({
+                          isOpen: true,
+                          item: {
+                            date: new Date().toISOString().split('T')[0],
+                            category: localSettings.docCategories?.[0] || "Tashkilot buyruqlari",
+                            fileType: 'PDF'
+                          },
+                          isEdit: false
+                        })
+                      }
+                      className="px-3 py-1.5 rounded bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs flex items-center gap-1 shadow-xs"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Yangi Hujjat Qo‘shish</span>
+                    </button>
+                  </div>
 
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs border border-slate-200">
@@ -1741,45 +2381,91 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   </table>
                 </div>
               </div>
+            </div>
             )}
 
             {/* ======================================================== */}
             {/* TAB 7: NEWS & BROADCAST (TG, IG, FB)                     */}
             {/* ======================================================== */}
             {activeTab === 'news' && (
-              <div className="bg-white rounded border border-slate-200 border-t-4 border-t-sky-600 shadow-xs p-6 space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4">
-                  <div>
-                    <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-sky-600" />
-                      <span>6. Yangiliklar va Ijtimoiy Tarmoqlarga Tarqatish (Telegram, Instagram, Facebook)</span>
-                    </h3>
-                    <p className="text-xs text-slate-500">
-                      Yangilik kiritilganda bir vaqtning o‘zida Telegram kanal, Instagram va Facebook sahifasiga yuboriladi
-                    </p>
+              <div className="space-y-4">
+                <div className="bg-white rounded border border-slate-200 p-4 space-y-3 text-xs">
+                  <div className="flex items-center justify-between border-b pb-2">
+                    <span className="font-bold text-slate-800">Yangiliklar Bo‘limi Sarlavhalari va Kategoriyalari</span>
+                    <button
+                      onClick={async () => {
+                        await updateSettings(localSettings);
+                        alert("Yangiliklar bo‘limi sozlamalari saqlandi!");
+                      }}
+                      className="px-3 py-1 rounded bg-sky-700 hover:bg-sky-800 text-white font-bold flex items-center gap-1"
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      <span>Saqlash</span>
+                    </button>
                   </div>
-                  <button
-                    onClick={() =>
-                      setNewsModal({
-                        isOpen: true,
-                        item: {
-                          date: new Date().toISOString().split('T')[0],
-                          category: "Boshlang'ich ta'lim",
-                          author: "Qo‘shko‘pir MMTB Matbuot xizmati",
-                          views: 100
-                        },
-                        isEdit: false,
-                        broadcastToTelegram: localSettings.telegramAutoPublish ?? true,
-                        broadcastToFacebook: localSettings.facebookAutoPublish ?? false,
-                        broadcastToInstagram: localSettings.instagramAutoPublish ?? false
-                      })
-                    }
-                    className="px-3 py-1.5 rounded bg-sky-700 hover:bg-sky-800 text-white font-semibold text-xs flex items-center gap-1 shadow-xs"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>Yangi Yangilik Kiritish</span>
-                  </button>
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                    <div>
+                      <label className="font-semibold text-slate-600 block mb-1">Kicker</label>
+                      <input type="text" value={localSettings.newsKicker || ''} onChange={e => setLocalSettings({ ...localSettings, newsKicker: e.target.value })} className="w-full px-2.5 py-1.5 rounded border border-slate-300" />
+                    </div>
+                    <div>
+                      <label className="font-semibold text-slate-600 block mb-1">Asosiy Sarlavha</label>
+                      <input type="text" value={localSettings.newsTitle || ''} onChange={e => setLocalSettings({ ...localSettings, newsTitle: e.target.value })} className="w-full px-2.5 py-1.5 rounded border border-slate-300" />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="font-semibold text-slate-600 block mb-1">Qisqa Izoh</label>
+                      <input type="text" value={localSettings.newsSubtitle || ''} onChange={e => setLocalSettings({ ...localSettings, newsSubtitle: e.target.value })} className="w-full px-2.5 py-1.5 rounded border border-slate-300" />
+                    </div>
+                    <div className="sm:col-span-4">
+                      <label className="font-semibold text-slate-600 block mb-1">Yangilik Kategoriyalari (vergul bilan ajrating)</label>
+                      <input
+                        type="text"
+                        value={(localSettings.newsCategories || []).join(', ')}
+                        onChange={e =>
+                          setLocalSettings({
+                            ...localSettings,
+                            newsCategories: e.target.value.split(',').map(s => s.trim()).filter(Boolean)
+                          })
+                        }
+                        className="w-full px-2.5 py-1.5 rounded border border-slate-300"
+                      />
+                    </div>
+                  </div>
                 </div>
+
+                <div className="bg-white rounded border border-slate-200 border-t-4 border-t-sky-600 shadow-xs p-6 space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4">
+                    <div>
+                      <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-sky-600" />
+                        <span>6. Yangiliklar va Ijtimoiy Tarmoqlarga Tarqatish (Telegram, Instagram, Facebook)</span>
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        Yangilik kiritilganda bir vaqtning o‘zida Telegram kanal, Instagram va Facebook sahifasiga yuboriladi
+                      </p>
+                    </div>
+                    <button
+                      onClick={() =>
+                        setNewsModal({
+                          isOpen: true,
+                          item: {
+                            date: new Date().toISOString().split('T')[0],
+                            category: localSettings.newsCategories?.[0] || "Boshlang'ich ta'lim",
+                            author: `${orgShortTitle} Matbuot xizmati`,
+                            views: 100
+                          },
+                          isEdit: false,
+                          broadcastToTelegram: localSettings.telegramAutoPublish ?? true,
+                          broadcastToFacebook: localSettings.facebookAutoPublish ?? false,
+                          broadcastToInstagram: localSettings.instagramAutoPublish ?? false
+                        })
+                      }
+                      className="px-3 py-1.5 rounded bg-sky-700 hover:bg-sky-800 text-white font-semibold text-xs flex items-center gap-1 shadow-xs"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Yangi Yangilik Kiritish</span>
+                    </button>
+                  </div>
 
                 <div className="space-y-3">
                   {news.map(item => (
@@ -1912,23 +2598,69 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   ))}
                 </div>
               </div>
+            </div>
             )}
 
             {/* ======================================================== */}
             {/* TAB 8: VIRTUAL RECEPTION (FUQAROLAR MUROJAATLARI)         */}
             {/* ======================================================== */}
             {activeTab === 'appeals' && (
-              <div className="bg-white rounded border border-slate-200 border-t-4 border-t-red-600 shadow-xs p-6 space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4">
-                  <div>
-                    <h3 className="font-bold text-slate-800 text-sm">
-                      7. Virtual Qabulxona (Fuqarolar va Ota-onalar Murojaatlari)
-                    </h3>
-                    <p className="text-xs text-slate-500">
-                      Kelib tushgan arizalar, holatlar, ko‘rib chiqish muddati va rasmiy javob xatlari
-                    </p>
+              <div className="space-y-4">
+                <div className="bg-white rounded border border-slate-200 p-4 space-y-3 text-xs">
+                  <div className="flex items-center justify-between border-b pb-2">
+                    <span className="font-bold text-slate-800">Virtual Qabulxona Sarlavhalari va Manzil Ro‘yxati</span>
+                    <button
+                      onClick={async () => {
+                        await updateSettings(localSettings);
+                        alert("Virtual qabulxona sozlamalari saqlandi!");
+                      }}
+                      className="px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white font-bold flex items-center gap-1"
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      <span>Saqlash</span>
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                    <div>
+                      <label className="font-semibold text-slate-600 block mb-1">Kicker</label>
+                      <input type="text" value={localSettings.receptionKicker || ''} onChange={e => setLocalSettings({ ...localSettings, receptionKicker: e.target.value })} className="w-full px-2.5 py-1.5 rounded border border-slate-300" />
+                    </div>
+                    <div>
+                      <label className="font-semibold text-slate-600 block mb-1">Asosiy Sarlavha</label>
+                      <input type="text" value={localSettings.receptionTitle || ''} onChange={e => setLocalSettings({ ...localSettings, receptionTitle: e.target.value })} className="w-full px-2.5 py-1.5 rounded border border-slate-300" />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="font-semibold text-slate-600 block mb-1">Qisqa Izoh</label>
+                      <input type="text" value={localSettings.receptionSubtitle || ''} onChange={e => setLocalSettings({ ...localSettings, receptionSubtitle: e.target.value })} className="w-full px-2.5 py-1.5 rounded border border-slate-300" />
+                    </div>
+                    <div className="sm:col-span-4">
+                      <label className="font-semibold text-slate-600 block mb-1">Murojaat Yo‘nalishlari (vergul bilan ajrating)</label>
+                      <input
+                        type="text"
+                        value={(localSettings.receptionTargets || []).join(', ')}
+                        onChange={e =>
+                          setLocalSettings({
+                            ...localSettings,
+                            receptionTargets: e.target.value.split(',').map(s => s.trim()).filter(Boolean)
+                          })
+                        }
+                        className="w-full px-2.5 py-1.5 rounded border border-slate-300"
+                      />
+                    </div>
                   </div>
                 </div>
+
+                <div className="bg-white rounded border border-slate-200 border-t-4 border-t-red-600 shadow-xs p-6 space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4">
+                    <div>
+                      <h3 className="font-bold text-slate-800 text-sm">
+                        7. Virtual Qabulxona (Fuqarolar va Ota-onalar Murojaatlari)
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        Kelib tushgan arizalar, holatlar, ko‘rib chiqish muddati va rasmiy javob xatlari
+                      </p>
+                    </div>
+                  </div>
 
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs border border-slate-200">
@@ -1979,7 +2711,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                                   isOpen: true,
                                   item: apl,
                                   replyText: apl.replyMessage || '',
-                                  officer: apl.officer || 'Qo‘shko‘pir tumani MMTB ijrochisi',
+                                  officer: apl.officer || `${orgShortTitle} mas’ul ijrochisi`,
                                   status: apl.status
                                 })
                               }
@@ -2009,6 +2741,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                   </table>
                 </div>
               </div>
+            </div>
             )}
 
             {/* ======================================================== */}
@@ -2284,148 +3017,372 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
             )}
 
             {/* ======================================================== */}
-            {/* TAB 10: CONTACT & DISTRICT SETTINGS                      */}
+            {/* TAB 10: CONTACT, MAP, FOOTER & DISTRICT SETTINGS         */}
             {/* ======================================================== */}
             {activeTab === 'contacts' && (
-              <div className="bg-white rounded border border-slate-200 border-t-4 border-t-sky-600 shadow-xs p-6 space-y-4 text-xs">
-                <div className="flex items-center justify-between border-b pb-3">
-                  <h3 className="font-bold text-slate-800 text-sm">
-                    9. Aloqa Ma’lumotlari, Ish Tartibi va Tuman Statistikasi
-                  </h3>
-                  <UzbekLetterHelper
-                    compact
-                    onInsertLetter={(letter) => {
-                      setLocalSettings(prev => ({
-                        ...prev,
-                        address: prev.address + letter
-                      }));
-                    }}
-                    onAutoFix={() => {
-                      setLocalSettings(prev => ({
-                        ...prev,
-                        address: fixUzbekText(prev.address),
-                        workingHours: fixUzbekText(prev.workingHours),
-                        marqueeText: fixUzbekText(prev.marqueeText)
-                      }));
-                    }}
-                  />
+              <div className="space-y-6 text-xs">
+                <div className="bg-white rounded border border-slate-200 border-t-4 border-t-sky-600 shadow-xs p-6 space-y-4">
+                  <div className="flex items-center justify-between border-b pb-3">
+                    <h3 className="font-bold text-slate-800 text-sm">
+                      9. Aloqa Ma’lumotlari, Xarita, Marquee va Asosiy Raqamlar
+                    </h3>
+                    <UzbekLetterHelper
+                      compact
+                      onInsertLetter={(letter) => {
+                        setLocalSettings(prev => ({
+                          ...prev,
+                          address: prev.address + letter
+                        }));
+                      }}
+                      onAutoFix={() => {
+                        setLocalSettings(prev => ({
+                          ...prev,
+                          address: fixUzbekText(prev.address),
+                          workingHours: fixUzbekText(prev.workingHours),
+                          marqueeText: fixUzbekText(prev.marqueeText),
+                          landmarkText: fixUzbekText(prev.landmarkText || ''),
+                          footerDisclaimer: fixUzbekText(prev.footerDisclaimer || '')
+                        }));
+                      }}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Tashkilot Nomi</label>
+                      <input
+                        type="text"
+                        value={localSettings.districtName}
+                        onChange={e => setLocalSettings({ ...localSettings, districtName: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Tashkilot Telefon Raqami</label>
+                      <input
+                        type="text"
+                        value={localSettings.departmentPhone}
+                        onChange={e => setLocalSettings({ ...localSettings, departmentPhone: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Ishonch Telefoni</label>
+                      <input
+                        type="text"
+                        value={localSettings.trustPhone}
+                        onChange={e => setLocalSettings({ ...localSettings, trustPhone: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Rasmiy Elektron Pochta</label>
+                      <input
+                        type="email"
+                        value={localSettings.email}
+                        onChange={e => setLocalSettings({ ...localSettings, email: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Ish Tartibi (To‘liq)</label>
+                      <input
+                        type="text"
+                        value={localSettings.workingHours}
+                        onChange={e => setLocalSettings({ ...localSettings, workingHours: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Pochta Manzili</label>
+                      <input
+                        type="text"
+                        value={localSettings.address}
+                        onChange={e => setLocalSettings({ ...localSettings, address: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Aloqa Bo‘limi Kicker</label>
+                      <input
+                        type="text"
+                        value={localSettings.contactKicker || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, contactKicker: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Aloqa Bo‘limi Sarlavhasi</label>
+                      <input
+                        type="text"
+                        value={localSettings.contactTitle || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, contactTitle: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Aloqa Bo‘limi Izohi</label>
+                      <input
+                        type="text"
+                        value={localSettings.contactSubtitle || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, contactSubtitle: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Manzil Karta Sarlavhasi</label>
+                      <input
+                        type="text"
+                        value={localSettings.contactAddressLabel || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, contactAddressLabel: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Mo‘ljal (Orientir)</label>
+                      <input
+                        type="text"
+                        value={localSettings.landmarkText || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, landmarkText: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Xarita Hudud Sarlavhasi</label>
+                      <input
+                        type="text"
+                        value={localSettings.mapAreaTitle || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, mapAreaTitle: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Xarita Hudud Izohi</label>
+                      <input
+                        type="text"
+                        value={localSettings.mapAreaDesc || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, mapAreaDesc: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Transport Yorlig‘i</label>
+                      <input
+                        type="text"
+                        value={localSettings.mapTransportLabel || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, mapTransportLabel: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Transport Ma’lumoti</label>
+                      <input
+                        type="text"
+                        value={localSettings.mapTransportText || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, mapTransportText: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Google Maps Tashqi Havola</label>
+                      <input
+                        type="text"
+                        value={localSettings.mapExternalUrl || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, mapExternalUrl: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300 font-mono"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Jami O‘quvchilar Soni</label>
+                      <input
+                        type="number"
+                        value={localSettings.studentsTotal}
+                        onChange={e => setLocalSettings({ ...localSettings, studentsTotal: parseInt(e.target.value) || 0 })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Jami O‘qituvchilar Soni</label>
+                      <input
+                        type="number"
+                        value={localSettings.teachersTotal}
+                        onChange={e => setLocalSettings({ ...localSettings, teachersTotal: parseInt(e.target.value) || 0 })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Oliy Toifali O‘qituvchilar Soni</label>
+                      <input
+                        type="number"
+                        value={localSettings.higherCategoryTeachersCount}
+                        onChange={e => setLocalSettings({ ...localSettings, higherCategoryTeachersCount: parseInt(e.target.value) || 0 })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2 lg:col-span-3">
+                      <label className="font-bold text-slate-700 block mb-1">
+                        Sayt Yuqorisidagi Yuguruvchi Satr Matni (Marquee)
+                      </label>
+                      <input
+                        type="text"
+                        value={localSettings.marqueeText}
+                        onChange={e => setLocalSettings({ ...localSettings, marqueeText: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-3 border-t">
+                    <button
+                      onClick={async () => {
+                        await updateSettings(localSettings);
+                        alert("Aloqa va xarita sozlamalari muvaffaqiyatli saqlandi!");
+                      }}
+                      className="px-4 py-2 rounded bg-sky-700 hover:bg-sky-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>Saqlash</span>
+                    </button>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">Tuman Nomi</label>
-                    <input
-                      type="text"
-                      value={localSettings.districtName}
-                      onChange={e => setLocalSettings({ ...localSettings, districtName: e.target.value })}
-                      className="w-full px-3 py-2 rounded border border-slate-300"
-                    />
+                {/* Footer Disclaimer & Government Links CRUD */}
+                <div className="bg-white rounded border border-slate-200 border-t-4 border-t-emerald-600 shadow-xs p-6 space-y-4">
+                  <div className="border-b pb-3">
+                    <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
+                      <Globe className="w-4 h-4 text-emerald-600" />
+                      <span>Footer Matnlari va Foydali Davlat Resurslari</span>
+                    </h3>
                   </div>
 
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">Bo‘lim Telefon Raqami</label>
-                    <input
-                      type="text"
-                      value={localSettings.departmentPhone}
-                      onChange={e => setLocalSettings({ ...localSettings, departmentPhone: e.target.value })}
-                      className="w-full px-3 py-2 rounded border border-slate-300"
-                    />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Footer Ta’rif Matni</label>
+                      <textarea
+                        rows={2}
+                        value={localSettings.footerDisclaimer || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, footerDisclaimer: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Mualliflik Huquqi (Copyright)</label>
+                      <textarea
+                        rows={2}
+                        value={localSettings.footerCopyright || ''}
+                        onChange={e => setLocalSettings({ ...localSettings, footerCopyright: e.target.value })}
+                        className="w-full px-3 py-2 rounded border border-slate-300"
+                      />
+                    </div>
                   </div>
 
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">Ishonch Telefoni</label>
-                    <input
-                      type="text"
-                      value={localSettings.trustPhone}
-                      onChange={e => setLocalSettings({ ...localSettings, trustPhone: e.target.value })}
-                      className="w-full px-3 py-2 rounded border border-slate-300"
-                    />
+                  <div className="space-y-2 pt-2 border-t border-slate-100">
+                    <span className="font-bold text-slate-700 block">Foydali Portallar Ro‘yxati:</span>
+                    {(localSettings.governmentLinks || []).map((lnk, idx) => (
+                      <div key={lnk.id || idx} className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
+                        <input
+                          type="text"
+                          value={lnk.title}
+                          onChange={e => {
+                            const next = [...(localSettings.governmentLinks || [])];
+                            next[idx] = { ...lnk, title: e.target.value };
+                            setLocalSettings({ ...localSettings, governmentLinks: next });
+                          }}
+                          className="sm:col-span-5 px-2.5 py-1.5 rounded border border-slate-300"
+                          placeholder="Sayt nomi"
+                        />
+                        <input
+                          type="text"
+                          value={lnk.url}
+                          onChange={e => {
+                            const next = [...(localSettings.governmentLinks || [])];
+                            next[idx] = { ...lnk, url: e.target.value };
+                            setLocalSettings({ ...localSettings, governmentLinks: next });
+                          }}
+                          className="sm:col-span-6 px-2.5 py-1.5 rounded border border-slate-300 font-mono"
+                          placeholder="https://..."
+                        />
+                        <button
+                          onClick={() => {
+                            const next = (localSettings.governmentLinks || []).filter((_, i) => i !== idx);
+                            setLocalSettings({ ...localSettings, governmentLinks: next });
+                          }}
+                          className="sm:col-span-1 p-1.5 rounded bg-red-50 hover:bg-red-100 text-red-600 flex justify-center"
+                          title="O‘chirish"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+
+                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 pt-2">
+                      <input
+                        type="text"
+                        placeholder="Yangi portal nomi (masalan: Edu.uz)"
+                        value={govLinkInput.title}
+                        onChange={e => setGovLinkInput({ ...govLinkInput, title: e.target.value })}
+                        className="sm:col-span-5 px-2.5 py-1.5 rounded border border-slate-300"
+                      />
+                      <input
+                        type="text"
+                        placeholder="https://..."
+                        value={govLinkInput.url}
+                        onChange={e => setGovLinkInput({ ...govLinkInput, url: e.target.value })}
+                        className="sm:col-span-5 px-2.5 py-1.5 rounded border border-slate-300 font-mono"
+                      />
+                      <button
+                        onClick={() => {
+                          if (!govLinkInput.title.trim() || !govLinkInput.url.trim()) return;
+                          const item: GovernmentLinkItem = {
+                            id: `gov-${Date.now()}`,
+                            title: govLinkInput.title.trim(),
+                            url: govLinkInput.url.trim()
+                          };
+                          setLocalSettings({
+                            ...localSettings,
+                            governmentLinks: [...(localSettings.governmentLinks || []), item]
+                          });
+                          setGovLinkInput({ title: '', url: '' });
+                        }}
+                        className="sm:col-span-2 px-3 py-1.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-semibold flex items-center justify-center gap-1"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Qo‘shish</span>
+                      </button>
+                    </div>
                   </div>
 
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">Rasmiy Elektron Pochta</label>
-                    <input
-                      type="email"
-                      value={localSettings.email}
-                      onChange={e => setLocalSettings({ ...localSettings, email: e.target.value })}
-                      className="w-full px-3 py-2 rounded border border-slate-300"
-                    />
+                  <div className="flex justify-end pt-3 border-t">
+                    <button
+                      onClick={async () => {
+                        await updateSettings(localSettings);
+                        alert("Footer va foydali havolalar saqlandi!");
+                      }}
+                      className="px-4 py-2 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>Footerni Saqlash</span>
+                    </button>
                   </div>
-
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">Ish Tartibi (Ish vaqti)</label>
-                    <input
-                      type="text"
-                      value={localSettings.workingHours}
-                      onChange={e => setLocalSettings({ ...localSettings, workingHours: e.target.value })}
-                      className="w-full px-3 py-2 rounded border border-slate-300"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">Pochta Manzili</label>
-                    <input
-                      type="text"
-                      value={localSettings.address}
-                      onChange={e => setLocalSettings({ ...localSettings, address: e.target.value })}
-                      className="w-full px-3 py-2 rounded border border-slate-300"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">Jami O‘quvchilar Soni</label>
-                    <input
-                      type="number"
-                      value={localSettings.studentsTotal}
-                      onChange={e => setLocalSettings({ ...localSettings, studentsTotal: parseInt(e.target.value) || 0 })}
-                      className="w-full px-3 py-2 rounded border border-slate-300"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">Jami O‘qituvchilar Soni</label>
-                    <input
-                      type="number"
-                      value={localSettings.teachersTotal}
-                      onChange={e => setLocalSettings({ ...localSettings, teachersTotal: parseInt(e.target.value) || 0 })}
-                      className="w-full px-3 py-2 rounded border border-slate-300"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">Oliy Toifali O‘qituvchilar Soni</label>
-                    <input
-                      type="number"
-                      value={localSettings.higherCategoryTeachersCount}
-                      onChange={e => setLocalSettings({ ...localSettings, higherCategoryTeachersCount: parseInt(e.target.value) || 0 })}
-                      className="w-full px-3 py-2 rounded border border-slate-300"
-                    />
-                  </div>
-
-                  <div className="md:col-span-2 lg:col-span-3">
-                    <label className="font-bold text-slate-700 block mb-1">
-                      Sayt Yuqorisidagi Yuguruvchi Satr Matni (Marquee)
-                    </label>
-                    <input
-                      type="text"
-                      value={localSettings.marqueeText}
-                      onChange={e => setLocalSettings({ ...localSettings, marqueeText: e.target.value })}
-                      className="w-full px-3 py-2 rounded border border-slate-300"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-end pt-3 border-t">
-                  <button
-                    onClick={async () => {
-                      await updateSettings(localSettings);
-                      alert("Aloqa va statistika sozlamalari muvaffaqiyatli saqlandi!");
-                    }}
-                    className="px-4 py-2 rounded bg-sky-700 hover:bg-sky-800 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs"
-                  >
-                    <Save className="w-4 h-4" />
-                    <span>Saqlash</span>
-                  </button>
                 </div>
               </div>
             )}
@@ -2678,7 +3635,7 @@ export const AdminDashboard: React.FC<{ onClose: () => void }> = ({ onClose }) =
                       <button
                         onClick={() => {
                           const script = `/**
- * Qo'shko'pir MMTB Rasmiy Baza Avto-Sinxronizatsiya Skripti
+ * ${orgShortTitle} Rasmiy Baza Avto-Sinxronizatsiya Skripti
  * Ushbu skript Google Sheets'da biror katak o'zgarganda avtomatik ishlaydi.
  */
 function onEdit(e) {
@@ -2711,22 +3668,187 @@ function onEdit(e) {
                 {/* Storage Schema Details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="p-4 rounded border border-slate-200 space-y-2">
-                    <span className="font-bold text-slate-800 block text-sm">Google Sheets Varaqlari (Tabs):</span>
+                    <span className="font-bold text-slate-800 block text-sm">Google Sheets Varaqlari (Yangi ustunlar bilan):</span>
                     <ul className="list-disc list-inside space-y-1 text-slate-600">
                       <li><code>Yangiliklar</code> - Barcha matbuot xabarlari</li>
-                      <li><code>Tashkilotlar</code> - 54 maktab va 38 MTT ro‘yxati</li>
-                      <li><code>Rahbariyat</code> - Bo‘lim mudiri va o‘rinbosarlari</li>
+                      <li><code>Tashkilotlar!A:P</code> - Muassasalar, O ustuni (direktor rasmi), P ustuni (batafsil tavsif)</li>
+                      <li><code>Rahbariyat!A:L</code> - Rahbarlar va L ustuni (admin Gmail manzili)</li>
                       <li><code>Hujjatlar</code> - Buyruqlar va qarorlar</li>
                       <li><code>Arizalar</code> - Fuqaro murojaatlari</li>
-                      <li><code>Sozlamalar</code> - Aloqa, ijtimoiy tarmoqlar va banner</li>
+                      <li><code>Sozlamalar!A:C</code> - Tashkilot haqida, sarlavhalar, statistika va Gmail admin ruxsatlari</li>
                     </ul>
                   </div>
 
                   <div className="p-4 rounded border border-slate-200 space-y-2">
                     <span className="font-bold text-slate-800 block text-sm">Google Drive Ombori:</span>
                     <p className="text-slate-600 leading-relaxed">
-                      Hujjatlar bo‘limiga yuklangan barcha PDF fayllar hamda yangiliklar rasmlari avtomatik ravishda Drive’dagi maxsus <code>Qo'shko'pir_MMTB_Fayllar</code> papkasiga saqlanadi.
+                      Hujjatlar bo‘limiga yuklangan barcha PDF fayllar hamda yangiliklar va rahbarlar rasmlari avtomatik ravishda Drive’dagi maxsus <code>Talim_Tashkiloti_Fayllar</code> papkasiga saqlanadi.
                     </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ======================================================== */}
+            {/* TAB 12: GMAIL ADMIN ACCESS CONTROL                       */}
+            {/* ======================================================== */}
+            {activeTab === 'access' && (
+              <div className="space-y-6 text-xs">
+                <div className="bg-white rounded border border-slate-200 border-t-4 border-t-emerald-600 shadow-xs p-6 space-y-5">
+                  <div className="border-b pb-3 flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
+                        <ShieldCheck className="w-5 h-5 text-emerald-600" />
+                        <span>11. Boshqa Gmail Hisoblariga Admin Ruxsati Berish</span>
+                      </h3>
+                      <p className="text-slate-500 mt-0.5">
+                        Bu ro‘yxatga kiritilgan Gmail manzillari admin panelga «Gmail bilan kirish» tugmasi orqali bevosita kira oladi (Google Sheets <code>Sozlamalar</code> jadvalida saqlanadi).
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Current session banner */}
+                  <div className="p-3.5 rounded bg-slate-50 border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <span className="text-slate-500 block text-[11px]">Joriy Admin Sessiyasi:</span>
+                      <strong className="text-slate-900">
+                        {adminSession?.user || 'Administrator'}
+                        {adminSession?.email ? ` (${adminSession.email})` : ' — Login/Parol orqali'}
+                      </strong>
+                    </div>
+                    {user?.email && !(localSettings.allowedAdminEmails || []).some(e => e.toLowerCase() === user.email?.toLowerCase()) && (
+                      <button
+                        onClick={async () => {
+                          const email = user.email!.trim().toLowerCase();
+                          const nextList = Array.from(new Set([...(localSettings.allowedAdminEmails || []), email]));
+                          const updated = { ...localSettings, allowedAdminEmails: nextList };
+                          setLocalSettings(updated);
+                          await updateSettings(updated);
+                          setAdminEmailMsg({ isError: false, text: `${email} ruxsatlar ro‘yxatiga qo‘shildi va saqlandi!` });
+                        }}
+                        className="px-3 py-1.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-semibold"
+                      >
+                        Joriy Gmail ({user.email}) ni qo‘shish
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Add Gmail form */}
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <div className="relative flex-1">
+                      <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                      <input
+                        type="email"
+                        placeholder="Masalan: xodim@gmail.com"
+                        value={newAdminEmail}
+                        onChange={e => setNewAdminEmail(e.target.value)}
+                        className="w-full pl-9 pr-3 py-2 rounded border border-slate-300 focus:border-emerald-600 focus:outline-hidden font-mono"
+                      />
+                    </div>
+                    <button
+                      onClick={async () => {
+                        const clean = newAdminEmail.trim().toLowerCase();
+                        if (!clean || !clean.includes('@') || !clean.includes('.')) {
+                          setAdminEmailMsg({ isError: true, text: "Iltimos, to‘g‘ri Gmail yoki elektron pochta manzilini kiriting." });
+                          return;
+                        }
+                        const current = (localSettings.allowedAdminEmails || []).map(x => x.trim().toLowerCase());
+                        if (current.includes(clean)) {
+                          setAdminEmailMsg({ isError: true, text: "Ushbu Gmail manzili allaqachon ro‘yxatda mavjud." });
+                          return;
+                        }
+                        const updatedList = [...current, clean];
+                        const updated = { ...localSettings, allowedAdminEmails: updatedList };
+                        setLocalSettings(updated);
+                        setNewAdminEmail('');
+                        await updateSettings(updated);
+                        setAdminEmailMsg({ isError: false, text: `"${clean}" uchun admin ruxsati muvaffaqiyatli berildi!` });
+                      }}
+                      className="px-4 py-2 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-bold flex items-center justify-center gap-1.5 shrink-0"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Gmail ruxsatini qo‘shish</span>
+                    </button>
+                  </div>
+
+                  {adminEmailMsg && (
+                    <div className={`p-3 rounded font-semibold ${
+                      adminEmailMsg.isError ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                    }`}>
+                      {adminEmailMsg.text}
+                    </div>
+                  )}
+
+                  {/* Allowed emails table */}
+                  <div className="space-y-2">
+                    <span className="font-bold text-slate-700 block">
+                      Ruxsat berilgan Gmail manzillari ({(localSettings.allowedAdminEmails || []).length} ta):
+                    </span>
+                    <div className="divide-y divide-slate-200 border border-slate-200 rounded-lg overflow-hidden">
+                      {(localSettings.allowedAdminEmails || []).map(email => {
+                        const isLast = (localSettings.allowedAdminEmails || []).length <= 1;
+                        return (
+                          <div key={email} className="p-3 bg-white flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold shrink-0">
+                                {email.charAt(0).toUpperCase()}
+                              </div>
+                              <div className="min-w-0">
+                                <div className="font-mono font-bold text-slate-900 truncate">{email}</div>
+                                <div className="text-[11px] text-emerald-700">To‘liq administrator ruxsati</div>
+                              </div>
+                            </div>
+                            <button
+                              disabled={isLast}
+                              onClick={() => {
+                                requestDelete(
+                                  "Gmail ruxsatini bekor qilish",
+                                  `"${email}" hisobidan admin panelga kirish ruxsatini olib tashlamoqchimisiz?`,
+                                  async () => {
+                                    const nextList = (localSettings.allowedAdminEmails || []).filter(e => e !== email);
+                                    const updated = { ...localSettings, allowedAdminEmails: nextList };
+                                    setLocalSettings(updated);
+                                    await updateSettings(updated);
+                                  }
+                                );
+                              }}
+                              className={`px-2.5 py-1 rounded font-semibold flex items-center gap-1 ${
+                                isLast
+                                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                                  : 'bg-red-50 hover:bg-red-100 text-red-600'
+                              }`}
+                              title={isLast ? "Kamida 1 ta admin qolishi shart" : "Ruxsatni o‘chirish"}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>O‘chirish</span>
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Leaders with L-column Gmail */}
+                  <div className="p-4 rounded bg-sky-50 border border-sky-200 space-y-2">
+                    <span className="font-bold text-sky-950 block">
+                      Rahbariyat jadvalidan (Google Sheets L ustuni) avtomatik ruxsat olganlar:
+                    </span>
+                    <p className="text-[11px] text-sky-800">
+                      «4. Rahbariyat tarkibi» bo‘limida rahbar uchun «Admin Gmail» manzili kiritilsa, u ham avtomatik ravishda ruxsat etilganlar ro‘yxatiga qo‘shiladi.
+                    </p>
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {leaders.filter(l => l.adminEmail).length > 0 ? (
+                        leaders
+                          .filter(l => l.adminEmail)
+                          .map(l => (
+                            <span key={l.id} className="px-2.5 py-1 rounded bg-white border border-sky-300 text-sky-900 font-mono text-[11px]">
+                              {l.name}: <strong>{l.adminEmail}</strong>
+                            </span>
+                          ))
+                      ) : (
+                        <span className="text-[11px] text-slate-500 italic">Hozircha rahbariyat kartalarida alohida Gmail ko‘rsatilmagan.</span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2802,7 +3924,7 @@ function onEdit(e) {
                 <div>
                   <label className="font-bold text-slate-700 block mb-1">Kategoriya</label>
                   <select
-                    value={newsModal.item.category || "Boshlang'ich ta'lim"}
+                    value={newsModal.item.category || localSettings.newsCategories?.[0] || "Boshlang'ich ta'lim"}
                     onChange={e =>
                       setNewsModal({
                         ...newsModal,
@@ -2811,13 +3933,16 @@ function onEdit(e) {
                     }
                     className="w-full px-3 py-2 rounded border border-slate-300"
                   >
-                    <option value="Boshlang'ich ta'lim">Boshlang‘ich ta’lim</option>
-                    <option value="Olimpiada">Olimpiada va fan tanlovlari</option>
-                    <option value="Pedagogika">Pedagogika va metodika</option>
-                    <option value="MTT">Maktabgacha ta’lim (MTT)</option>
-                    <option value="E'lon">Rasmiy e’lon</option>
-                    <option value="Tadbirlar">Tadbirlar va bayramlar</option>
-                    <option value="Boshqaruv">Bo‘lim boshqaruvi</option>
+                    {Array.from(
+                      new Set([
+                        ...(localSettings.newsCategories && localSettings.newsCategories.length > 0
+                          ? localSettings.newsCategories
+                          : ["Boshlang'ich ta'lim", "Olimpiada", "Pedagogika", "MTT", "E'lon", "Tadbirlar", "Boshqaruv"]),
+                        ...(newsModal.item.category ? [newsModal.item.category] : [])
+                      ])
+                    ).map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
                   </select>
                 </div>
 
@@ -2840,7 +3965,7 @@ function onEdit(e) {
                   <label className="font-bold text-slate-700 block mb-1">Muallif / Manba</label>
                   <input
                     type="text"
-                    value={newsModal.item.author || "Qo‘shko‘pir MMTB Matbuot xizmati"}
+                    value={newsModal.item.author || `${orgShortTitle} Matbuot xizmati`}
                     onChange={e =>
                       setNewsModal({
                         ...newsModal,
@@ -3128,7 +4253,7 @@ function onEdit(e) {
                       className="rounded text-sky-600"
                     />
                     <Send className="w-3.5 h-3.5 text-sky-600" />
-                    <span>Telegram Kanaliga (@{localSettings.telegramChannelUsername || 'qoshkopir_mmtb'})</span>
+                    <span>Telegram Kanaliga (@{localSettings.telegramChannelUsername || 'talim_tashkiloti'})</span>
                   </label>
 
                   <label className="flex items-center gap-2 cursor-pointer font-semibold text-pink-900">
@@ -3224,7 +4349,7 @@ function onEdit(e) {
                     driveFileId: newsModal.item.driveFileId,
                     driveFolderId: newsModal.item.driveFolderId,
                     driveFolderUrl: newsModal.item.driveFolderUrl,
-                    author: fixUzbekText(newsModal.item.author || "Qo‘shko‘pir MMTB Matbuot xizmati"),
+                    author: fixUzbekText(newsModal.item.author || `${orgShortTitle} Matbuot xizmati`),
                     views: newsModal.item.views || 100,
                     isPinned: newsModal.item.isPinned,
                     sentToTelegram: newsModal.item.sentToTelegram,
@@ -3346,6 +4471,7 @@ function onEdit(e) {
                   >
                     <option value="maktab">Umumta’lim Maktabi</option>
                     <option value="mtt">Maktabgacha Ta’lim Tashkiloti (MTT)</option>
+                    <option value="ixtisos">Ixtisoslashtirilgan Maktab / Markaz</option>
                   </select>
                 </div>
 
@@ -3366,6 +4492,26 @@ function onEdit(e) {
                     value={orgModal.item.phone || '+998 62 '}
                     onChange={e => setOrgModal({ ...orgModal, item: { ...orgModal.item, phone: e.target.value } })}
                     className="w-full px-3 py-2 rounded border border-slate-300 font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Mahalla / Hudud</label>
+                  <input
+                    type="text"
+                    value={orgModal.item.mahalla || ''}
+                    onChange={e => setOrgModal({ ...orgModal, item: { ...orgModal.item, mahalla: e.target.value } })}
+                    className="w-full px-3 py-2 rounded border border-slate-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Elektron Pochta</label>
+                  <input
+                    type="email"
+                    value={orgModal.item.email || ''}
+                    onChange={e => setOrgModal({ ...orgModal, item: { ...orgModal.item, email: e.target.value } })}
+                    className="w-full px-3 py-2 rounded border border-slate-300"
                   />
                 </div>
 
@@ -3398,6 +4544,47 @@ function onEdit(e) {
                     className="w-full px-3 py-2 rounded border border-slate-300"
                   />
                 </div>
+
+                <div className="sm:col-span-2">
+                  <label className="font-bold text-slate-700 block mb-1">Direktor Rasmi (Google Sheets O ustuni — URL yoki Drive)</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="https://..."
+                      value={orgModal.item.photoUrl || ''}
+                      onChange={e => setOrgModal({ ...orgModal, item: { ...orgModal.item, photoUrl: e.target.value } })}
+                      className="flex-1 px-3 py-2 rounded border border-slate-300"
+                    />
+                    <label className="cursor-pointer px-3 py-2 rounded bg-slate-100 hover:bg-slate-200 border border-slate-300 font-semibold text-slate-700 flex items-center gap-1 shrink-0">
+                      <Upload className="w-3.5 h-3.5 text-sky-600" />
+                      <span>Yuklash</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={e =>
+                          handleDriveFileUpload(e, url => {
+                            setOrgModal(prev => ({
+                              ...prev,
+                              item: { ...prev.item, photoUrl: url }
+                            }));
+                          })
+                        }
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="font-bold text-slate-700 block mb-1">Batafsil Tavsif / Izoh (Google Sheets P ustuni)</label>
+                  <textarea
+                    rows={3}
+                    placeholder="Muassasa yo‘nalishi, qo‘shimcha to‘garaklar va yutuqlari haqida..."
+                    value={orgModal.item.description || ''}
+                    onChange={e => setOrgModal({ ...orgModal, item: { ...orgModal.item, description: e.target.value } })}
+                    className="w-full px-3 py-2 rounded border border-slate-300"
+                  />
+                </div>
               </div>
             </div>
 
@@ -3421,7 +4608,7 @@ function onEdit(e) {
                     type: orgModal.item.type || 'maktab',
                     director: fixUzbekText(orgModal.item.director || ''),
                     address: fixUzbekText(orgModal.item.address || ''),
-                    mahalla: orgModal.item.mahalla || 'Markaz',
+                    mahalla: fixUzbekText(orgModal.item.mahalla || 'Markaz'),
                     phone: orgModal.item.phone || '',
                     email: orgModal.item.email || '',
                     studentsCount: orgModal.item.studentsCount || 0,
@@ -3430,7 +4617,9 @@ function onEdit(e) {
                     establishedYear: orgModal.item.establishedYear || 1990,
                     rating: orgModal.item.rating || 4.5,
                     inn: orgModal.item.inn || '',
-                    photoUrl: orgModal.item.photoUrl || ''
+                    capacity: orgModal.item.capacity,
+                    photoUrl: orgModal.item.photoUrl || '',
+                    description: fixUzbekText(orgModal.item.description || '')
                   };
                   if (orgModal.isEdit) {
                     await updateOrganization(finalOrg);
@@ -3518,15 +4707,20 @@ function onEdit(e) {
                 <div className="sm:col-span-2">
                   <label className="font-bold text-slate-700 block mb-1">Kategoriya</label>
                   <select
-                    value={docModal.item.category || 'Bo\'lim buyruqlari'}
+                    value={docModal.item.category || localSettings.docCategories?.[0] || "Tashkilot buyruqlari"}
                     onChange={e => setDocModal({ ...docModal, item: { ...docModal.item, category: e.target.value as any } })}
                     className="w-full px-3 py-2 rounded border border-slate-300"
                   >
-                    <option value="Bo'lim buyruqlari">Bo‘lim buyruqlari</option>
-                    <option value="Vazirlik buyruqlari">Vazirlik buyruqlari</option>
-                    <option value="Hokim qarorlari">Hokim qarorlari</option>
-                    <option value="Nizom va qoidalar">Nizom va qoidalar</option>
-                    <option value="O'quv dasturlari">O‘quv dasturlari</option>
+                    {Array.from(
+                      new Set([
+                        ...(localSettings.docCategories && localSettings.docCategories.length > 0
+                          ? localSettings.docCategories
+                          : ["Tashkilot buyruqlari", "Vazirlik buyruqlari", "Hokim qarorlari", "Nizom va qoidalar", "O'quv dasturlari"]),
+                        ...(docModal.item.category ? [docModal.item.category] : [])
+                      ])
+                    ).map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
                   </select>
                 </div>
 
@@ -3585,7 +4779,7 @@ function onEdit(e) {
                     title: fixUzbekText(docModal.item.title),
                     docNumber: docModal.item.docNumber || '№ 1',
                     date: docModal.item.date || new Date().toISOString().split('T')[0],
-                    category: docModal.item.category || 'Bo\'lim buyruqlari',
+                    category: docModal.item.category || localSettings.docCategories?.[0] || "Tashkilot buyruqlari",
                     fileUrl: docModal.item.fileUrl || '',
                     driveFileId: docModal.item.driveFileId,
                     fileSize: docModal.item.fileSize || 'PDF',
@@ -3782,6 +4976,26 @@ function onEdit(e) {
                 </div>
 
                 <div>
+                  <label className="font-bold text-slate-700 block mb-1">Bo‘linma / Yo‘nalish</label>
+                  <input
+                    type="text"
+                    value={leaderModal.item.department || 'Rahbariyat'}
+                    onChange={e => setLeaderModal({ ...leaderModal, item: { ...leaderModal.item, department: e.target.value } })}
+                    className="w-full px-3 py-2 rounded border border-slate-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Elektron Pochta (Aloqa)</label>
+                  <input
+                    type="email"
+                    value={leaderModal.item.email || ''}
+                    onChange={e => setLeaderModal({ ...leaderModal, item: { ...leaderModal.item, email: e.target.value } })}
+                    className="w-full px-3 py-2 rounded border border-slate-300"
+                  />
+                </div>
+
+                <div>
                   <label className="font-bold text-slate-700 block mb-1">Qabul Kunlari</label>
                   <input
                     type="text"
@@ -3797,6 +5011,29 @@ function onEdit(e) {
                     type="text"
                     value={leaderModal.item.receptionHours || '09:00 - 12:00'}
                     onChange={e => setLeaderModal({ ...leaderModal, item: { ...leaderModal.item, receptionHours: e.target.value } })}
+                    className="w-full px-3 py-2 rounded border border-slate-300"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="font-bold text-emerald-800 block mb-1">
+                    Admin Panelga Kirish Gmail Manzili (Google Sheets L ustuni — ixtiyoriy)
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="masalan: rahbar@gmail.com (bo‘sh qoldirilsa admin ruxsati berilmaydi)"
+                    value={leaderModal.item.adminEmail || ''}
+                    onChange={e => setLeaderModal({ ...leaderModal, item: { ...leaderModal.item, adminEmail: e.target.value } })}
+                    className="w-full px-3 py-2 rounded border border-emerald-300 bg-emerald-50/40 font-mono"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="font-bold text-slate-700 block mb-1">Qisqacha Tarjimai Hol / Ma’lumot</label>
+                  <textarea
+                    rows={2}
+                    value={leaderModal.item.bio || ''}
+                    onChange={e => setLeaderModal({ ...leaderModal, item: { ...leaderModal.item, bio: e.target.value } })}
                     className="w-full px-3 py-2 rounded border border-slate-300"
                   />
                 </div>
@@ -3849,14 +5086,15 @@ function onEdit(e) {
                     id: leaderModal.item.id || `ldr-${Date.now()}`,
                     name: fixUzbekText(leaderModal.item.name),
                     position: fixUzbekText(leaderModal.item.position || ''),
-                    department: leaderModal.item.department || "Rahbariyat",
+                    department: fixUzbekText(leaderModal.item.department || "Rahbariyat"),
                     phone: leaderModal.item.phone || '',
                     email: leaderModal.item.email || '',
                     receptionDays: fixUzbekText(leaderModal.item.receptionDays || 'Har kuni'),
                     receptionHours: leaderModal.item.receptionHours || '09:00 - 12:00',
                     bio: fixUzbekText(leaderModal.item.bio || ''),
                     photoUrl: leaderModal.item.photoUrl || './assets/aistudio/image_0a3ac00b.png',
-                    order: leaderModal.item.order || leaders.length + 1
+                    order: leaderModal.item.order || leaders.length + 1,
+                    adminEmail: leaderModal.item.adminEmail?.trim().toLowerCase() || ''
                   };
                   if (leaderModal.isEdit) {
                     await updateLeader(finalLeader);
@@ -4119,6 +5357,146 @@ function onEdit(e) {
                   setServiceModal({ ...serviceModal, isOpen: false });
                 }}
                 className="px-4 py-1.5 rounded bg-sky-700 hover:bg-sky-800 text-white font-bold"
+              >
+                Saqlash
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================== */}
+      {/* MODAL 8: STAT CARD CREATE / EDIT                               */}
+      {/* ============================================================== */}
+      {statModal.isOpen && (
+        <div className="fixed inset-0 z-60 bg-black/70 backdrop-blur-2xs flex items-center justify-center p-3 overflow-y-auto">
+          <div className="bg-white rounded-lg w-full max-w-lg flex flex-col shadow-2xl border border-slate-300 overflow-hidden my-auto">
+            <div className="bg-slate-800 text-white px-5 py-3.5 flex items-center justify-between border-b border-slate-700">
+              <h3 className="font-bold text-sm">
+                {statModal.isEdit ? "Statistika Ko‘rsatkichini Tahrirlash" : "Yangi Statistika Ko‘rsatkichi Qo‘shish"}
+              </h3>
+              <button onClick={() => setStatModal({ ...statModal, isOpen: false })} className="text-slate-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4 text-xs overflow-y-auto max-h-[80vh]">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Qiymat (Raqam / Matn)</label>
+                  <input
+                    type="text"
+                    placeholder="masalan: 1200"
+                    value={statModal.item.value || ''}
+                    onChange={e => setStatModal({ ...statModal, item: { ...statModal.item, value: e.target.value } })}
+                    className="w-full px-3 py-2 rounded border border-slate-300 font-bold"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Birlik / Qo‘shimcha</label>
+                  <input
+                    type="text"
+                    placeholder="masalan: ta, %, +"
+                    value={statModal.item.suffix || ''}
+                    onChange={e => setStatModal({ ...statModal, item: { ...statModal.item, suffix: e.target.value } })}
+                    className="w-full px-3 py-2 rounded border border-slate-300"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">Ko‘rsatkich Nomi</label>
+                <input
+                  type="text"
+                  placeholder="masalan: Umumiy o‘quvchilar"
+                  value={statModal.item.label || ''}
+                  onChange={e => setStatModal({ ...statModal, item: { ...statModal.item, label: e.target.value } })}
+                  className="w-full px-3 py-2 rounded border border-slate-300 font-semibold"
+                />
+              </div>
+
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">Qisqa Izoh</label>
+                <input
+                  type="text"
+                  placeholder="masalan: kunduzgi va maxsus guruhlar"
+                  value={statModal.item.sub || ''}
+                  onChange={e => setStatModal({ ...statModal, item: { ...statModal.item, sub: e.target.value } })}
+                  className="w-full px-3 py-2 rounded border border-slate-300"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Ikonka</label>
+                  <select
+                    value={statModal.item.icon || 'school'}
+                    onChange={e => setStatModal({ ...statModal, item: { ...statModal.item, icon: e.target.value as StatCardItem['icon'] } })}
+                    className="w-full px-3 py-2 rounded border border-slate-300"
+                  >
+                    <option value="school">Maktab / Bino</option>
+                    <option value="baby">MTT / Bola</option>
+                    <option value="graduation">Bitiruvchi</option>
+                    <option value="users">Jamoa / Odamlar</option>
+                    <option value="book">Kitob / Dastur</option>
+                    <option value="award">Mukofot / Yutuq</option>
+                    <option value="building">Tashkilot</option>
+                    <option value="star">Yulduz</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Rang</label>
+                  <select
+                    value={statModal.item.color || 'bg-sky-700'}
+                    onChange={e => setStatModal({ ...statModal, item: { ...statModal.item, color: e.target.value } })}
+                    className="w-full px-3 py-2 rounded border border-slate-300"
+                  >
+                    <option value="bg-sky-700">To‘q ko‘k (Sky)</option>
+                    <option value="bg-emerald-700">Yashil (Emerald)</option>
+                    <option value="bg-amber-600">Sariq / Oltin (Amber)</option>
+                    <option value="bg-indigo-700">Indigo</option>
+                    <option value="bg-rose-600">Qizil / Pushti (Rose)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-slate-100 px-5 py-3 border-t border-slate-200 flex justify-end gap-2">
+              <button
+                onClick={() => setStatModal({ ...statModal, isOpen: false })}
+                className="px-4 py-1.5 rounded bg-slate-200 text-slate-700 font-semibold"
+              >
+                Bekor qilish
+              </button>
+              <button
+                onClick={async () => {
+                  if (!statModal.item.label || !statModal.item.value) {
+                    alert("Ko‘rsatkich nomi va qiymatini kiriting!");
+                    return;
+                  }
+                  const finalStat: StatCardItem = {
+                    id: statModal.item.id || `stat-${Date.now()}`,
+                    label: fixUzbekText(statModal.item.label),
+                    value: String(statModal.item.value),
+                    suffix: statModal.item.suffix || '',
+                    sub: fixUzbekText(statModal.item.sub || ''),
+                    icon: statModal.item.icon || 'school',
+                    color: statModal.item.color || 'bg-sky-700'
+                  };
+
+                  let currentStats = [...(localSettings.statsItems || [])];
+                  if (statModal.isEdit && statModal.index !== undefined) {
+                    currentStats[statModal.index] = finalStat;
+                  } else {
+                    currentStats.push(finalStat);
+                  }
+
+                  const newSettings = { ...localSettings, statsItems: currentStats };
+                  setLocalSettings(newSettings);
+                  await updateSettings(newSettings);
+                  setStatModal({ ...statModal, isOpen: false });
+                }}
+                className="px-4 py-1.5 rounded bg-amber-600 hover:bg-amber-700 text-white font-bold"
               >
                 Saqlash
               </button>

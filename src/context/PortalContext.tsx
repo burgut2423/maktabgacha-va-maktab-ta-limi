@@ -22,6 +22,14 @@ import { getOrCreatePortalFolder } from '../services/googleDrive';
 import { PORTAL_CONFIG } from '../config/portalConfig';
 import { toNewUzbekAlphabet } from '../utils/uzbekTypography';
 
+import { createGoogleAdminSession, isEmailAllowedAdmin } from '../services/adminAuth';
+
+export interface AdminGoogleAuthResult {
+  authorized: boolean;
+  email?: string;
+  error?: string;
+}
+
 interface PortalContextType {
   // State
   news: NewsItem[];
@@ -31,11 +39,14 @@ interface PortalContextType {
   appeals: CitizenAppeal[];
   settings: PortalSettings;
 
-  // Google Integration
+  // Google Integration & Gmail Admin Auth
   user: User | null;
   googleSyncStatus: GoogleSyncStatus;
   loginWithGoogle: () => Promise<void>;
   loginWithGoogleRedirect: () => Promise<void>;
+  loginAdminWithGoogle: (mode?: 'popup' | 'redirect') => Promise<AdminGoogleAuthResult>;
+  pendingAdminAuthResult: AdminGoogleAuthResult | null;
+  clearPendingAdminAuthResult: () => void;
   connectSpreadsheetById: (sheetId: string) => Promise<boolean>;
   refreshDataFromSheets: (targetId?: string) => Promise<void>;
   logoutGoogle: () => Promise<void>;
@@ -133,7 +144,19 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [settings, setSettings] = useState<PortalSettings>(() => {
     try {
       const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_settings`);
-      return saved ? JSON.parse(saved) : INITIAL_SETTINGS;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return {
+          ...INITIAL_SETTINGS,
+          ...parsed,
+          navLabels: { ...INITIAL_SETTINGS.navLabels, ...(parsed.navLabels || {}) },
+          allowedAdminEmails:
+            Array.isArray(parsed.allowedAdminEmails) && parsed.allowedAdminEmails.length > 0
+              ? parsed.allowedAdminEmails
+              : INITIAL_SETTINGS.allowedAdminEmails
+        };
+      }
+      return INITIAL_SETTINGS;
     } catch {
       return INITIAL_SETTINGS;
     }
@@ -141,6 +164,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   // Google State
   const [user, setUser] = useState<User | null>(null);
+  const [pendingAdminAuthResult, setPendingAdminAuthResult] = useState<AdminGoogleAuthResult | null>(null);
+  const clearPendingAdminAuthResult = useCallback(() => setPendingAdminAuthResult(null), []);
   const [googleSyncStatus, setGoogleSyncStatus] = useState<GoogleSyncStatus>({
     isConnected: false,
     spreadsheetId: getStoredSpreadsheetId(),
@@ -180,10 +205,9 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, [useNewAlphabet]);
 
   useEffect(() => {
-    document.title = useNewAlphabet
-      ? "Qöşköpir Tumani Maktabgaça va Maktab Ta'limi Bölimi"
-      : "Qo'shko'pir Tumani Maktabgacha va Maktab Ta'limi Bo'limi";
-  }, [useNewAlphabet]);
+    const titleBase = settings.districtName || "Ta'lim Tashkiloti";
+    document.title = useNewAlphabet ? toNewUzbekAlphabet(titleBase) : titleBase;
+  }, [useNewAlphabet, settings.districtName]);
 
   // Sync to local storage
   useEffect(() => {
@@ -264,6 +288,11 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               error: null
             }));
 
+            let latestAllowedEmails: string[] = [
+              ...(settings.allowedAdminEmails || []),
+              ...leaders.map(l => l.adminEmail || '').filter(Boolean)
+            ];
+
             // If existing spreadsheet, load data from it
             if (!sheetInfo.isNew) {
               const loaded = await fetchAllPortalDataFromSheets(sheetInfo.id);
@@ -272,8 +301,31 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               setLeaders(loaded.leaders);
               setDocuments(loaded.documents);
               setAppeals(loaded.appeals);
-              setSettings(loaded.settings);
+              setSettings(prev => ({ ...INITIAL_SETTINGS, ...prev, ...loaded.settings }));
+              latestAllowedEmails = Array.from(new Set([
+                ...(loaded.settings.allowedAdminEmails || []),
+                ...loaded.leaders.map(l => l.adminEmail || '').filter(Boolean),
+                ...INITIAL_SETTINGS.allowedAdminEmails
+              ]));
             }
+
+            // Finish pending Gmail Admin Login if returning from redirect
+            try {
+              if (sessionStorage.getItem('pending_admin_gmail_login') === '1') {
+                sessionStorage.removeItem('pending_admin_gmail_login');
+                const email = authUser.email || '';
+                if (isEmailAllowedAdmin(email, latestAllowedEmails)) {
+                  createGoogleAdminSession(email, authUser.displayName || undefined, true);
+                  setPendingAdminAuthResult({ authorized: true, email });
+                } else {
+                  setPendingAdminAuthResult({
+                    authorized: false,
+                    email,
+                    error: `Ushbu Gmail (${email}) hisobiga admin ruxsati berilmagan. Ruxsat olish uchun bosh administratordan Gmail manzilingizni ruxsatlar ro'yxatiga qo'shishni so'rang.`
+                  });
+                }
+              }
+            } catch {}
           } catch (err: any) {
             console.warn("Google Sheets dastlabki tekshiruvida xatolik:", err);
             setGoogleSyncStatus(prev => ({
@@ -336,7 +388,17 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           } catch {}
         }
         if (loaded.settings) {
-          setSettings(prev => ({ ...prev, ...loaded.settings, googleSpreadsheetId: cleanId }));
+          setSettings(prev => ({
+            ...INITIAL_SETTINGS,
+            ...prev,
+            ...loaded.settings,
+            navLabels: {
+              ...INITIAL_SETTINGS.navLabels,
+              ...(prev.navLabels || {}),
+              ...(loaded.settings.navLabels || {})
+            },
+            googleSpreadsheetId: cleanId
+          }));
         }
       }
       setGoogleSyncStatus(prev => ({
@@ -449,7 +511,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           setLeaders(loaded.leaders);
           setDocuments(loaded.documents);
           setAppeals(loaded.appeals);
-          setSettings(loaded.settings);
+          setSettings(prev => ({ ...INITIAL_SETTINGS, ...prev, ...loaded.settings }));
         }
       }
     } catch (err: any) {
@@ -478,6 +540,93 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         error: err.customExplanation || err.message,
         unauthorizedDomain: isDomainError ? (err.domainToAdd || window.location.hostname) : null
       }));
+    }
+  };
+
+  const loginAdminWithGoogle = async (mode: 'popup' | 'redirect' = 'popup'): Promise<AdminGoogleAuthResult> => {
+    if (mode === 'redirect') {
+      try {
+        sessionStorage.setItem('pending_admin_gmail_login', '1');
+      } catch {}
+      await loginWithGoogleRedirect();
+      return { authorized: false };
+    }
+
+    try {
+      setGoogleSyncStatus(prev => ({ ...prev, syncing: true, error: null }));
+      const result = await googleSignIn();
+      if (!result) {
+        setGoogleSyncStatus(prev => ({ ...prev, syncing: false }));
+        return { authorized: false, error: "Google hisobiga kirish bekor qilindi." };
+      }
+
+      const authUser = result.user;
+      setUser(authUser);
+
+      let latestAllowedEmails: string[] = [
+        ...(settings.allowedAdminEmails || []),
+        ...leaders.map(l => l.adminEmail || '').filter(Boolean),
+        ...INITIAL_SETTINGS.allowedAdminEmails
+      ];
+
+      try {
+        const sheetInfo = await getOrCreateSpreadsheet();
+        let folderId: string | null = null;
+        try {
+          folderId = await getOrCreatePortalFolder();
+        } catch {}
+
+        setGoogleSyncStatus(prev => ({
+          ...prev,
+          isConnected: true,
+          spreadsheetId: sheetInfo.id,
+          spreadsheetUrl: sheetInfo.url,
+          folderId,
+          folderUrl: folderId ? `https://drive.google.com/drive/folders/${folderId}` : null,
+          syncing: false,
+          error: null
+        }));
+
+        if (!sheetInfo.isNew) {
+          const loaded = await fetchAllPortalDataFromSheets(sheetInfo.id);
+          setNews(loaded.news);
+          setOrganizations(loaded.organizations);
+          setLeaders(loaded.leaders);
+          setDocuments(loaded.documents);
+          setAppeals(loaded.appeals);
+          setSettings(prev => ({ ...INITIAL_SETTINGS, ...prev, ...loaded.settings }));
+          latestAllowedEmails = Array.from(new Set([
+            ...(loaded.settings.allowedAdminEmails || []),
+            ...loaded.leaders.map(l => l.adminEmail || '').filter(Boolean),
+            ...INITIAL_SETTINGS.allowedAdminEmails
+          ]));
+        }
+      } catch (syncErr) {
+        console.warn("Sheets sinxronizatsiyada ogohlantirish:", syncErr);
+        setGoogleSyncStatus(prev => ({ ...prev, isConnected: true, syncing: false }));
+      }
+
+      const email = authUser.email || '';
+      if (isEmailAllowedAdmin(email, latestAllowedEmails)) {
+        createGoogleAdminSession(email, authUser.displayName || undefined, true);
+        return { authorized: true, email };
+      }
+
+      return {
+        authorized: false,
+        email,
+        error: `Ushbu Gmail (${email}) hisobiga admin ruxsati berilmagan. Ruxsat olish uchun bosh administratordan Gmail manzilingizni ruxsatlar ro'yxatiga qo'shishni so'rang.`
+      };
+    } catch (err: any) {
+      const isDomainError = err.code === 'auth/unauthorized-domain';
+      const msg = err.customExplanation || err.message || "Google bilan kirishda xatolik yuz berdi.";
+      setGoogleSyncStatus(prev => ({
+        ...prev,
+        syncing: false,
+        error: msg,
+        unauthorizedDomain: isDomainError ? (err.domainToAdd || window.location.hostname) : null
+      }));
+      return { authorized: false, error: msg };
     }
   };
 
@@ -522,7 +671,17 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           } catch {}
         }
         if (loaded.settings) {
-          setSettings(prev => ({ ...prev, ...loaded.settings, googleSpreadsheetId: clean }));
+          setSettings(prev => ({
+            ...INITIAL_SETTINGS,
+            ...prev,
+            ...loaded.settings,
+            navLabels: {
+              ...INITIAL_SETTINGS.navLabels,
+              ...(prev.navLabels || {}),
+              ...(loaded.settings.navLabels || {})
+            },
+            googleSpreadsheetId: clean
+          }));
         } else {
           setSettings(prev => ({ ...prev, googleSpreadsheetId: clean }));
         }
@@ -688,7 +847,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const submitCitizenAppeal = async (data: Omit<CitizenAppeal, 'id' | 'trackingCode' | 'date' | 'status'>): Promise<string> => {
-    const randomCode = `QSP-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+    const randomCode = `ORG-2026-${Math.floor(1000 + Math.random() * 9000)}`;
     const newAppeal: CitizenAppeal = {
       ...data,
       id: `app-${Date.now()}`,
@@ -785,6 +944,9 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         googleSyncStatus,
         loginWithGoogle,
         loginWithGoogleRedirect,
+        loginAdminWithGoogle,
+        pendingAdminAuthResult,
+        clearPendingAdminAuthResult,
         connectSpreadsheetById,
         refreshDataFromSheets,
         logoutGoogle,
