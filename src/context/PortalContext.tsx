@@ -146,9 +146,24 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_settings`);
       if (saved) {
         const parsed = JSON.parse(saved);
+        const migratedDistrictName =
+          !parsed.districtName || parsed.districtName === "Qo'shko'pir Ta'lim Tashkiloti"
+            ? INITIAL_SETTINGS.districtName
+            : parsed.districtName;
+        const migratedShortName =
+          !parsed.shortName || parsed.shortName === "Ta'lim Tashkiloti"
+            ? INITIAL_SETTINGS.shortName
+            : parsed.shortName;
+        const migratedRegionLabel =
+          !parsed.regionLabel || parsed.regionLabel === "Xorazm viloyati · Qo'shko'pir"
+            ? INITIAL_SETTINGS.regionLabel
+            : parsed.regionLabel;
         return {
           ...INITIAL_SETTINGS,
           ...parsed,
+          districtName: migratedDistrictName,
+          shortName: migratedShortName,
+          regionLabel: migratedRegionLabel,
           navLabels: { ...INITIAL_SETTINGS.navLabels, ...(parsed.navLabels || {}) },
           allowedAdminEmails:
             Array.isArray(parsed.allowedAdminEmails) && parsed.allowedAdminEmails.length > 0

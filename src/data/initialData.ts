@@ -2,10 +2,10 @@ import { NewsItem, Organization, Leader, DocumentItem, CitizenAppeal, PortalSett
 import { heroImage, headPortrait, preschoolBuilding, conferenceImage } from '../assets/images';
 
 export const INITIAL_SETTINGS: PortalSettings = {
-  districtName: "Qo'shko'pir Ta'lim Tashkiloti",
-  shortName: "Ta'lim Tashkiloti",
+  districtName: "Qo'shko'pir tumani ta'lim bo'limi",
+  shortName: "Qo'shko'pir ta'lim bo'limi",
   supervisingOrg: "O'zbekiston Respublikasi Ta'lim tizimi",
-  regionLabel: "Xorazm viloyati · Qo'shko'pir",
+  regionLabel: "Xorazm viloyati",
   portalSubtitle: "Rasmiy axborot va elektron xizmatlar portali",
   departmentPhone: "+998 (62) 352-14-25",
   trustPhone: "+998 (62) 352-11-02",
